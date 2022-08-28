@@ -334,7 +334,8 @@ ISR(ADC_vect) {
       adc[5] = get_adc_result();
       if (s_sensors_enabled) {
         // got all the dark ones so light them up
-        digitalWriteFast(EMITTER, 1);
+        digitalWriteFast(EMITTER_A, 1);
+        digitalWriteFast(EMITTER_B, 1);
       }
       start_adc(A7); // dummy read of the battery to provide delay
       // wait at least one cycle for the detectors to respond
@@ -364,7 +365,8 @@ ISR(ADC_vect) {
       break;
     case 15:
       adc[5] = get_adc_result() - adc[5];
-      digitalWriteFast(EMITTER, 0);
+      digitalWriteFast(EMITTER_A, 0);
+      digitalWriteFast(EMITTER_B, 0);
       bitClear(ADCSRA, ADIE); // turn off the interrupt
       break;
     default:

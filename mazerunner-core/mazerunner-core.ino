@@ -29,7 +29,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+#include "config.h"
 #include "encoders.h"
 #include "maze.h"
 #include "motors.h"
@@ -51,7 +51,7 @@ void setup() {
   restore_default_settings();
 #endif
   setup_systick();
-  pinMode(USER_IO, OUTPUT);
+  pinMode(USER_IO_6, OUTPUT);
   pinMode(EMITTER_A, OUTPUT);
   pinMode(EMITTER_B, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
