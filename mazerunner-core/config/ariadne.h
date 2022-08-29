@@ -30,10 +30,7 @@ const int EEPROM_ADDR_SETTINGS = 0x0000;
 #define DEFAULTS_ROT_KD 4.0
 
 #define DEFAULTS_MOUSE_RADIUS (57.29583 * DEFAULTS_MM_PER_COUNT / DEFAULTS_DEG_PER_COUNT)
-// controller constants for the line follower configuration
-#define DEFAULTS_LINE_KP 1.5
-#define DEFAULTS_LINE_KD 6.0
-#define DEFAULTS_LINE_ALPHA 0.1 // sensor error filter constant
+
 
 // controller constants for the line follower configuration
 #define DEFAULTS_WALL_KP 1.5
