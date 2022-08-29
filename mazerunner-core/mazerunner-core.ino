@@ -36,7 +36,6 @@
 #include "reports.h"
 #include "sensors.h"
 #include "settings.h"
-#include "stopwatch.h"
 #include "systick.h"
 #include "tests.h"
 #include "ui.h"
