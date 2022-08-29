@@ -22,7 +22,7 @@ env.AddPostAction(
 env.AddPostAction(
     "$BUILD_DIR/${PROGNAME}.elf",
     env.VerboseAction(" ".join([
-        "avr-objdump -d -S ", "$BUILD_DIR/${PROGNAME}.elf",
+        "avr-objdump -d -S --disassemble-zeroes", "$BUILD_DIR/${PROGNAME}.elf",
         " > ", "${PROGNAME}.lst"
     ]), "Generate listing file ${PROGNAME}.lst")
 )
