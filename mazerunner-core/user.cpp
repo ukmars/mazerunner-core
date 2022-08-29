@@ -84,7 +84,7 @@ void run_mouse(int function) {
       break;
     case 2:
       // enter your function call here
-      dorothy.report_status();
+      emily.report_status();
       break;
     case 3:
       // enter your function call here
@@ -232,18 +232,18 @@ void run_mouse(int function) {
       break;
     case 14:
       Serial.println("Search TO");
-      dorothy.handStart = true;
-      dorothy.location = START;
-      dorothy.heading = NORTH;
-      dorothy.search_to(maze_goal());
-      dorothy.handStart = false;
-      dorothy.search_to(START);
-      dorothy.search_to(maze_goal());
+      emily.handStart = true;
+      emily.location = START;
+      emily.heading = NORTH;
+      emily.search_to(maze_goal());
+      emily.handStart = false;
+      emily.search_to(START);
+      emily.search_to(maze_goal());
 
       break;
     case 15:
       Serial.println("Follow TO");
-      dorothy.follow_to(maze_goal());
+      emily.follow_to(maze_goal());
       break;
     default:
       disable_sensors();

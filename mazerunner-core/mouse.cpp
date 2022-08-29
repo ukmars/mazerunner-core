@@ -41,7 +41,7 @@
 #include "sensors.h"
 #include "ui.h"
 
-Mouse dorothy;
+Mouse emily;
 
 char path[128];
 char commands[128];

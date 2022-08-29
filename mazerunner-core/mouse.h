@@ -77,6 +77,6 @@ class Mouse {
 
 extern char p_mouse_state;
 
-extern Mouse dorothy;
+extern Mouse emily;
 
 #endif // MOUSE_H
