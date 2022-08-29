@@ -311,7 +311,7 @@ void Mouse::follow_to(unsigned char target) {
   handStart = true;
   location = 0;
   heading = NORTH;
-  initialise_maze(emptyMaze);
+  initialise_maze();
   flood_maze(maze_goal());
   // wait_for_front_sensor();
   delay(1000);

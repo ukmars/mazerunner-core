@@ -87,7 +87,7 @@ void copy_walls_from_flash(const uint8_t *src);
 void set_wall_present(uint8_t cell, uint8_t direction);
 void set_wall_absent(uint8_t cell, uint8_t direction);
 
-void initialise_maze(const uint8_t *testMaze);
+void initialise_maze();
 void flood_maze(uint8_t target);
 
 #endif // MAZE_H

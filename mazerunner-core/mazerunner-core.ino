@@ -49,7 +49,7 @@ void setup() {
   pinMode(EMITTER_B, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   enable_sensors();
-  initialise_maze(emptyMaze);
+  initialise_maze();
   setup_motors();
   setup_encoders();
   setup_adc();
