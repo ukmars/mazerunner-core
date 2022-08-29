@@ -64,185 +64,50 @@ void user_log_front_sensor() {
   disable_sensors();
 }
 
-void user_test_back_wall_start() {
-  reset_drive_system();
-  enable_motor_controllers();
-  forward.start(BACK_WALL_TO_CENTER, 100, 0, 500);
-  stop_motors();
-  disable_motor_controllers();
-}
-
 void run_mouse(int function) {
   switch (function) {
     case 0:
       Serial.println(F("OK"));
       break;
     case 1:
-      // enter your function call here
       // NOTE: will start on button click
       user_log_front_sensor();
       break;
     case 2:
-      // enter your function call here
       emily.report_status();
       break;
     case 3:
-      // enter your function call here
+      test_SS90ER();
       break;
     case 4:
-      // enter your function call here
-      {
-        // enter your function call here
-        // test SS90ER
-        reset_drive_system();
-        enable_motor_controllers();
-        enable_sensors();
-        float run_in = 5.0;   // mm
-        float run_out = 10.0; // mm
-        float angle = -90.0;  // deg
-        float omega = 280;    // deg/s integer such that omega = 8 n
-        float alpha = 4000;   // deg/s/s
-        bool triggered = false;
-        disable_steering();
-        float distance = BACK_WALL_TO_CENTER + 100 + run_in;
-        forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
-        while (not forward.is_finished()) {
-          delay(2);
-        }
-        Serial.print('R');
-        print_justified(forward.position(), 4);
-        Serial.print(' ');
-        print_justified(get_front_sensor(), 3);
-        Serial.println();
-        rotation.start(angle, omega, 0, alpha);
-        while (not rotation.is_finished()) {
-          delay(2);
-        }
-        forward.start(run_out + 100, DEFAULT_TURN_SPEED, 0, SEARCH_ACCELERATION);
-        while (not forward.is_finished()) {
-          delay(2);
-        }
-        reset_drive_system();
-      }
+      test_SS90EL();
       break;
     case 5:
-      // enter your function call here
-      {
-        // enter your function call here
-        // test SS90EL
-        reset_drive_system();
-        enable_motor_controllers();
-        enable_sensors();
-        float run_in = 5.0;   // mm
-        float run_out = 10.0; // mm
-        float angle = 90.0;   // deg
-        float omega = 280;    // deg/s
-        float alpha = 4000;   // deg/s/s
-        bool triggered = false;
-        disable_steering();
-        float distance = BACK_WALL_TO_CENTER + 100 + run_in;
-        forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
-        while (not forward.is_finished()) {
-          delay(2);
-        }
-        Serial.print('L');
-        print_justified(forward.position(), 4);
-        Serial.print(' ');
-        print_justified(get_front_sensor(), 3);
-        Serial.println();
-        rotation.start(angle, omega, 0, alpha);
-        while (not rotation.is_finished()) {
-          delay(2);
-        }
-        forward.start(100 + run_out, DEFAULT_TURN_SPEED, 0, SEARCH_ACCELERATION);
-        while (not forward.is_finished()) {
-          delay(2);
-        }
-        reset_drive_system();
-      }
+      emily.search_maze();
       break;
     case 6:
+      report_sensor_calibration();
       break;
     case 7:
-      // enter your function call here
-      reset_drive_system();
-      enable_motor_controllers();
-      forward.start(500, SPEEDMAX_EXPLORE, 0, 1000);
-      while (not forward.is_finished()) {
-        delay(2);
-      }
-      // forward.set_position(HALF_CELL);
-      // Serial.println(F("Off we go..."));
-      // // wait_until_position(FULL_CELL-10);
-      // stop_at(FULL_CELL-10);
-      Serial.print('@');
-      print_justified((int)forward.position(), 4);
-      Serial.print(' ');
-      Serial.println();
+      test_edge_detection();
       break;
     case 8:
-      // enter your function call here
-      reset_drive_system();
-      enable_motor_controllers();
-      forward.start(BACK_WALL_TO_CENTER + 80, SPEEDMAX_EXPLORE, 0, SEARCH_ACCELERATION);
-      while (not forward.is_finished()) {
-        delay(2);
-      }
-      // forward.set_position(HALF_CELL);
-      // Serial.println(F("Off we go..."));
-      // // wait_until_position(FULL_CELL-10);
-      // stop_at(FULL_CELL-10);
-      Serial.print('@');
-      print_justified((int)forward.position(), 4);
-      Serial.print(' ');
-      Serial.println();
-
+      test_sensor_spin_calibrate();
       break;
-    case 9: {
-      reset_drive_system();
-      enable_motor_controllers();
-      report_profile_header();
-      forward.start(FULL_CELL, 180, 30, 1000);
-      while (not forward.is_finished()) {
-        report_profile();
-      }
-      forward.stop();
-      Serial.println();
-      uint32_t t = millis() + 200;
-      while (millis() < t) {
-        report_profile();
-      }
-      reset_drive_system();
-    } break;
+    case 9:
+      break;
     case 10:
-      // enter your function call here
-      test_spin_turn(360);
       break;
     case 11:
-      // reserved
-      test_spin_turn(90);
       break;
     case 12:
-      // reserved
-      test_spin_turn(-90);
       break;
     case 13:
-      // reserved
-      user_test_back_wall_start();
       break;
     case 14:
-      Serial.println("Search TO");
-      emily.handStart = true;
-      emily.location = START;
-      emily.heading = NORTH;
-      emily.search_to(maze_goal());
-      emily.handStart = false;
-      emily.search_to(START);
-      emily.search_to(maze_goal());
-
       break;
     case 15:
-      Serial.println("Follow TO");
+
       emily.follow_to(maze_goal());
       break;
     default:

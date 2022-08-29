@@ -308,6 +308,7 @@ void Mouse::log_status(char action) {
 }
 
 void Mouse::follow_to(unsigned char target) {
+  Serial.println("Follow TO");
   handStart = true;
   location = 0;
   heading = NORTH;
@@ -635,22 +636,13 @@ void Mouse::update_map() {
  */
 int Mouse::search_maze() {
   wait_for_front_sensor();
-  //                                             motorsEnable();
-  location = 0;
+  Serial.println("Search TO");
+  handStart = true;
+  location = START;
   heading = NORTH;
-  int result = search_to(maze_goal());
-  if (result != 0) {
-    panic(1);
-  }
-  //  EEPROM.put(0, walls);
-  // digitalWrite(RED_LED, 1);
-  delay(200);
-  result = search_to(0);
+  search_to(maze_goal());
+  handStart = false;
+  search_to(START);
   stop_motors();
-  if (result != 0) {
-    panic(1);
-  }
-  //    EEPROM.put(0, walls);
-  delay(200);
   return 0;
 }

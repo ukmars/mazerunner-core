@@ -41,147 +41,6 @@
 
 //***************************************************************************//
 
-/** TEST 5
- * Used to  calibrate the encoder counts per meter for each wheel.
- *
- * With the robot on the ground, start the test and push the robot in as
- * straight a line as possible over a known distance. 1000mm is best since
- * the encoder calibrations are expressed in counts per meter.
- *
- * Reports left count, right count, distance (mm) and angle (deg)
- *
- * At the end of the move, record the left and right encoder counts and
- * enter them into the configuration settings in config.h
- *
- * The values are likely to be different because the wheels will have
- * slightly different diameters. If you estimate the values in some other
- * way, and use the same value for both wheels, the robot is likely to
- * move in a slight curve instead of a straight line. A later test will let
- * you fine-tune these calibration value to get better straight line motion.
- *
- * Press the function button when done.
- *
- * @brief wheel encoder calibration
- */
-void test_calibrate_encoders() {
-  reset_drive_system();
-  report_encoder_header();
-  while (not button_pressed()) {
-    report_encoders();
-    delay(50);
-  }
-  report_pose();
-}
-
-//***************************************************************************//
-/** TEST 8
- * This test wil use the rotation profiler to perform an in-place turn of
- * an integer multiple of 360 degrees. You can use the test to calibrate
- * the MOUSE_RADIUS config setting in the file config.h.
- *
- * There is no point in adjusting MOUSE_RADIUS until you have adjusted
- * the left and right wheel encoder calibration.
- *
- * Test in both left and right directions and adjust the MOUSE_RADIUS to
- * get a reasonable average turn accuracy. The stock motors have a lot of
- * backash so this is never going to be high precision but you should be
- * able to get to +/- a degree or two.
- *
- * Maxumum angular velocity here should not exceed 1000 deg/s or the robot
- * is likely to begin to wander about because the centre of mass is not
- * over the centre of rotation.
- *
- * You can experiment by using the robot_angle instead of the
- * rotation.position() function to get the current angle. The robot_angle
- * is measured from the encoders while rotation.position() is the set
- * value from the profiler. There is no 'correct' way to do this but,
- * if you want repeatable results, always use the same technique.
- *
- * If the robot physical turn angle is less than expected, increase the
- * MOUSE_RADIUS.
- *
- * @brief perform n * 360 degree turn-in-place
- */
-void test_spin_turn(float angle) {
-  float max_speed = 720.0;     // deg/s
-  float acceleration = 4320.0; // deg/s/s
-  report_profile_header();
-  reset_drive_system();
-  enable_motor_controllers();
-  spin_turn(angle, max_speed, acceleration);
-  reset_drive_system();
-}
-
-//***************************************************************************//
-/** TEST 9
- *
- * Perform a straight-line movement
- *
- * Two segments are used to illustrate how movement profiles can be
- * concatenated.
- *
- * You can use this test to adjust the encoder calibration so that your
- * robot drives as straight as possible for the correct distance.
- *
- * @brief perform 1000mm forward or reverse move
- */
-void test_fwd_move() {
-  float distance_a = 3 * FULL_CELL;         // mm
-  float distance_b = FULL_CELL + HALF_CELL; // mm
-  float max_speed_a = 800.0;                // mm/s
-  float common_speed = 300.0;               // mm/s
-  float max_speed_b = 500.0;                // mm/s
-  float acceleration_a = 2000.0;            // mm/s/s
-  float acceleration_b = 1000.0;            // mm/s/s
-  reset_drive_system();
-  enable_motor_controllers();
-  report_profile_header();
-  forward.start(distance_a, max_speed_a, common_speed, acceleration_a);
-  while (not forward.is_finished()) {
-    report_profile();
-  }
-  forward.start(distance_b, max_speed_b, 0, acceleration_b);
-  while (not forward.is_finished()) {
-    report_profile();
-  }
-  reset_drive_system();
-}
-
-//***************************************************************************//
-
-//***************************************************************************//
-
-/** TEST 11
- *
- * Illustrates how to combine forward motion with rotation to get a smooth,
- * integrated turn.
- *
- * All the parameters in the call to rotation.start() interact with the
- * forward speed to determine the turn radius
- *
- * @brief move, smooth turn, move sequence
- */
-void test_search_turn(float angle) {
-  float turn_speed = 300;
-  reset_drive_system();
-  enable_motor_controllers();
-  report_profile_header();
-  // it takes only 45mm to get up to speed
-  forward.start(300, 800, turn_speed, 1500);
-  while (not forward.is_finished()) {
-    report_profile();
-  }
-  rotation.start(angle, 300, 0, 2000);
-  while (not rotation.is_finished()) {
-    report_profile();
-  }
-  forward.start(300, 800, 0, 1000);
-  while (not forward.is_finished()) {
-    report_profile();
-  }
-  reset_drive_system();
-}
-
 /**
  * By turning in place through 360 degrees, it should be possible to get a
  * sensor calibration for all sensors?
@@ -294,67 +153,71 @@ void test_edge_detection() {
   disable_sensors();
   delay(100);
 }
-//***************************************************************************//
-/** Test runner
- *
- * Runs one of 16 different test routines depending on the settings fthe DIP
- * switches.
- *
- * Custom tests should leave the robot inert. That is, sensors off with drive
- * system reset and shut down.
- *
- * @brief Uses the DIP switches to decide which test to run
- */
-void run_test(int test, float arg) {
-  switch (test) {
-    case 0:
-      // ui
-      Serial.println(F("OK"));
-      break;
-    case 1:
-      break;
-    case 2:
-      break;
-    case 3:
-      break;
-    case 4:
-      report_sensor_calibration();
-      break;
-    case 5:
-      test_calibrate_encoders();
-      break;
-    case 6:
-      break;
-    case 7:
-      break;
-    case 8:
-      test_spin_turn(360);
-      break;
-    case 9:
-      test_fwd_move();
-      break;
-    case 10:
-      break;
-    case 11:
-      test_search_turn(90);
-      break;
-    case 12:
-      break;
-    case 13:
-      break;
-    case 14:
-      break;
-    case 15:
-      break;
-    case (20):
-      test_edge_detection();
-      break;
-    case (21):
-      test_sensor_spin_calibrate();
-      break;
-    default:
-      disable_sensors();
-      reset_drive_system();
-      break;
+
+void test_SS90ER() {
+  // enter your function call here
+  // test SS90ER
+  reset_drive_system();
+  enable_motor_controllers();
+  enable_sensors();
+  float run_in = 5.0;   // mm
+  float run_out = 10.0; // mm
+  float angle = -90.0;  // deg
+  float omega = 280;    // deg/s integer such that omega = 8 n
+  float alpha = 4000;   // deg/s/s
+  bool triggered = false;
+  disable_steering();
+  float distance = BACK_WALL_TO_CENTER + 100 + run_in;
+  forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
+  while (not forward.is_finished()) {
+    delay(2);
   }
+  Serial.print('R');
+  print_justified(forward.position(), 4);
+  Serial.print(' ');
+  print_justified(get_front_sensor(), 3);
+  Serial.println();
+  rotation.start(angle, omega, 0, alpha);
+  while (not rotation.is_finished()) {
+    delay(2);
+  }
+  forward.start(run_out + 100, DEFAULT_TURN_SPEED, 0, SEARCH_ACCELERATION);
+  while (not forward.is_finished()) {
+    delay(2);
+  }
+  reset_drive_system();
+}
+
+void test_SS90EL() {
+  // enter your function call here
+  // test SS90EL
+  reset_drive_system();
+  enable_motor_controllers();
+  enable_sensors();
+  float run_in = 5.0;   // mm
+  float run_out = 10.0; // mm
+  float angle = 90.0;   // deg
+  float omega = 280;    // deg/s
+  float alpha = 4000;   // deg/s/s
+  bool triggered = false;
+  disable_steering();
+  float distance = BACK_WALL_TO_CENTER + 100 + run_in;
+  forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
+  while (not forward.is_finished()) {
+    delay(2);
+  }
+  Serial.print('L');
+  print_justified(forward.position(), 4);
+  Serial.print(' ');
+  print_justified(get_front_sensor(), 3);
+  Serial.println();
+  rotation.start(angle, omega, 0, alpha);
+  while (not rotation.is_finished()) {
+    delay(2);
+  }
+  forward.start(100 + run_out, DEFAULT_TURN_SPEED, 0, SEARCH_ACCELERATION);
+  while (not forward.is_finished()) {
+    delay(2);
+  }
+  reset_drive_system();
 }

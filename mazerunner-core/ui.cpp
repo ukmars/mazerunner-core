@@ -144,24 +144,6 @@ uint8_t read_float(const char *line, float &value) {
   return digits;
 }
 
-int cli_run_test(const Args args) {
-  if (args.argc < 2) {
-    run_test(get_switches());
-    return T_OK;
-  }
-  int test_number = -1;
-  read_integer(args.argv[1], test_number);
-  if (test_number < 0) {
-    return T_UNEXPECTED_TOKEN;
-  }
-  float arg = 0;
-  if (args.argc > 2) {
-    read_float(args.argv[2], arg);
-  }
-  run_test(test_number, arg);
-  return T_OK;
-}
-
 int cli_run_user(const Args args) {
   if (args.argc < 2) {
     run_mouse(get_switches());
@@ -241,42 +223,23 @@ void cli_help() {
   Serial.println(F("X   : reset maze"));
   Serial.println(F("R   : display maze with directions"));
   Serial.println(F("S   : show sensor readings"));
-  Serial.println(F("T n : Run Test n"));
-  Serial.println(F("       0 = ---"));
-  Serial.println(F("       1 = Report sensor calibration"));
-  Serial.println(F("       2 = load settings from EEPROM"));
-  Serial.println(F("       3 = save settings to EEPROM"));
-  Serial.println(F("       4 = "));
-  Serial.println(F("       5 = calibrate encoders"));
-  Serial.println(F("       6 = test rotation controller tunings"));
-  Serial.println(F("       7 = test forward controller tunings"));
-  Serial.println(F("       8 = spin turn 360"));
-  Serial.println(F("       9 = forward move"));
-  Serial.println(F("      10 = sprint and return"));
-  Serial.println(F("      11 = smooth 90 turn"));
-  Serial.println(F("      12 = stop at distance"));
-  Serial.println(F("      13 = sprint with steeering"));
-  Serial.println(F("      14 = test steering lock"));
-  Serial.println(F("      15 = ---"));
-  Serial.println(F("      20 = test edge detection"));
-  Serial.println(F("      21 = sensor spin calibration"));
   Serial.println(F("U n : Run user function n"));
   Serial.println(F("       0 = ---"));
-  Serial.println(F("       1 = log front sensor "));
-  Serial.println(F("       2 = report status "));
-  Serial.println(F("       3 = - "));
-  Serial.println(F("       4 = test SS90ER"));
-  Serial.println(F("       5 = test SS90EL"));
-  Serial.println(F("       6 = - "));
-  Serial.println(F("       7 = move forward 500mm"));
-  Serial.println(F("       8 = move to sensing point"));
-  Serial.println(F("       9 = move one cell "));
-  Serial.println(F("      10 = test 360 spin turn"));
-  Serial.println(F("      11 = test 90 left spin"));
-  Serial.println(F("      12 = test 90 right spin"));
-  Serial.println(F("      13 = test back wall start "));
-  Serial.println(F("      14 = search to goal "));
-  Serial.println(F("      15 = follow to goal"));
+  Serial.println(F("       1 = "));
+  Serial.println(F("       2 = "));
+  Serial.println(F("       3 = "));
+  Serial.println(F("       4 = "));
+  Serial.println(F("       5 = "));
+  Serial.println(F("       6 = "));
+  Serial.println(F("       7 = "));
+  Serial.println(F("       8 = "));
+  Serial.println(F("       9 = "));
+  Serial.println(F("      10 = "));
+  Serial.println(F("      11 = "));
+  Serial.println(F("      12 = "));
+  Serial.println(F("      13 = "));
+  Serial.println(F("      14 = "));
+  Serial.println(F("      15 = "));
 }
 
 void cli_interpret(const Args &args) {
@@ -294,7 +257,7 @@ void cli_interpret(const Args &args) {
         break;
       case 'X':
         Serial.println(F("Reset Maze"));
-        initialise_maze(emptyMaze);
+        initialise_maze();
         break;
       case 'R':
         print_maze_with_directions();
@@ -304,9 +267,6 @@ void cli_interpret(const Args &args) {
         delay(10);
         report_wall_sensors();
         disable_sensors();
-        break;
-      case 'T':
-        cli_run_test(args);
         break;
       case 'U':
         cli_run_user(args);
@@ -335,16 +295,13 @@ void cli_run() {
 /***
  * just sit in a loop, flashing lights waiting for the button to be pressed
  */
-void panic(uint16_t n = 0xAAAA) {
-  uint16_t p = n;
+void panic() {
   while (!button_pressed()) {
-    uint16_t b = p & 1;
-    digitalWriteFast(LED_LEFT, b);
-    digitalWriteFast(LED_RIGHT, b);
-    p = (p >> 1) | (b << 15);
+    digitalWriteFast(LED_BUILTIN, 1);
+    delay(100);
+    digitalWriteFast(LED_BUILTIN, 0);
     delay(100);
   }
   wait_for_button_release();
-  digitalWriteFast(LED_LEFT, 0);
-  digitalWriteFast(LED_RIGHT, 0);
+  digitalWriteFast(LED_BUILTIN, 0);
 }
