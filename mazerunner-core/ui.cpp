@@ -176,55 +176,6 @@ int cli_run_user(const Args args) {
   return T_OK;
 }
 
-int cli_settings_command(const Args &args) {
-  if (args.argc == 1) {
-    dump_settings(5);
-    return T_OK;
-  }
-  if (strlen(args.argv[1]) == 1) {
-    char cmd = args.argv[1][0];
-    switch (cmd) {
-      case '$':
-        for (int i = 0; i < get_settings_count(); i++) {
-          print_setting_details(i, 5);
-          Serial.print(F(";  // $"));
-          Serial.println(i);
-        }
-        return T_OK;
-        break;
-      case '!':
-        save_settings_to_eeprom();
-        return T_OK;
-        break;
-      case '@':
-        load_settings_from_eeprom();
-        return T_OK;
-        break;
-      case '#':
-        restore_default_settings();
-        return T_OK;
-        break;
-    }
-  }
-  // it must have been a parameter get/set
-  int param = -1;
-  read_integer(args.argv[1], param);
-  if (param < 0 || param >= get_settings_count()) {
-    return T_UNEXPECTED_TOKEN;
-  }
-  if (args.argc == 2) {
-    print_setting(param);
-    return T_OK;
-  }
-  float value = NAN;
-  if (!read_float(args.argv[2], value)) {
-    return T_UNEXPECTED_TOKEN;
-  }
-  write_setting(param, value);
-  print_setting(param);
-  return T_OK;
-}
-
 void cli_clear_input() {
   s_index = 0;
   s_input_line[s_index] = 0;
@@ -337,7 +288,6 @@ void cli_interpret(const Args &args) {
         cli_help();
         break;
       case '$':
-        cli_settings_command(args);
         break;
       case 'W':
         print_maze_plain();

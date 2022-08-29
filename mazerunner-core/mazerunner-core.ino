@@ -44,11 +44,7 @@
 
 void setup() {
   Serial.begin(BAUDRATE);
-  load_settings_from_eeprom();
-#if ALWAYS_USE_DEFAULT_SETTINGS
-  // used during development to make sure compiled-in defaults are used
   restore_default_settings();
-#endif
   setup_systick();
   pinMode(USER_IO_6, OUTPUT);
   pinMode(EMITTER_A, OUTPUT);

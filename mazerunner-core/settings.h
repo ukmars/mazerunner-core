@@ -164,68 +164,30 @@ enum TypeName : uint8_t {
  * }
  */
 struct Settings {
-  SETTINGS_PARAMETERS(MAKE_STRUCT)
+  float fwdKP;
+  float fwdKD;
+  float rotKP;
+  float rotKD;
+  float steering_KP;
+  float steering_KD;
+  float mouseRadius;
+  int left_calibration;
+  int front_calibration;
+  int right_calibration;
+  float left_adjust;
+  float front_adjust;
+  float right_adjust;
+  int left_threshold;
+  int front_threshold;
+  int right_threshold;
+  int left_nominal;
+  int front_nominal;
+  int right_nominal;
 };
 
 // Now declare the  global instances of the settings data
-extern Settings settings;       // the global working copy in RAM
-extern const Settings defaults; // The coded-in defaults in flash
-// and the supprting structures
-extern void *const variablePointers[] PROGMEM;
-extern const TypeName variableType[] PROGMEM;
+extern Settings settings; // the global working copy in RAM
+extern const Settings defaults;
 
-const int get_settings_count();
-
-int get_setting_name(int i, char *s);
-void print_setting_name(int i);
-void print_setting_type(const int i);
-void print_setting_value(const int i, const int dp = DEFAULT_DECIMAL_PLACES);
-void print_setting_details(const int i, const int dp = DEFAULT_DECIMAL_PLACES);
-
-// reading and writing EEPROM settings values and defaults
 int restore_default_settings();
-void save_settings_to_eeprom();
-void load_settings_from_eeprom(bool verbose = false);
-
-// send one setting to the serial device in the form '$n=xxx'
-void print_setting(const int i, const int dp = DEFAULT_DECIMAL_PLACES);
-
-// send all to the serial device. sets displayed decimals
-void dump_settings(const int dp = DEFAULT_DECIMAL_PLACES);
-void dump_settings_detail(const int dp = DEFAULT_DECIMAL_PLACES);
-
-// write a value to a setting by index number
-int write_setting(const int i, const char *valueString);
-/***
- * The templated version executes much faster because there are
- * no calls to the ascii_to_xxx converters.
- *
- * If the string converting version is never called, you will
- * save about 1k of flash. Unless you use atof() or atoi() elsewhere.
- *
- */
-template <class T>
-int write_setting(const int i, const T value) {
-  void *ptr = (void *)pgm_read_word_near(variablePointers + i);
-  switch (pgm_read_byte_near(variableType + i)) {
-    case T_float:
-      *reinterpret_cast<float *>(ptr) = value;
-      break;
-    case T_bool:
-      *reinterpret_cast<bool *>(ptr) = value;
-      break;
-    case T_uint32_t:
-      *reinterpret_cast<uint32_t *>(ptr) = value;
-      break;
-    case T_uint16_t:
-      *reinterpret_cast<uint16_t *>(ptr) = value;
-      break;
-    case T_int:
-      *reinterpret_cast<int *>(ptr) = value;
-      break;
-    default:
-      return -1;
-  }
-  return 0;
-}
 #endif // SETTINGS_H

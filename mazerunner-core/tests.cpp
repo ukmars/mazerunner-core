@@ -324,12 +324,8 @@ void run_test(int test, float arg) {
       report_sensor_calibration();
       break;
     case 2:
-      load_settings_from_eeprom();
-      Serial.println(F("OK - Settings read from EEPROM, changes lost"));
       break;
     case 3:
-      save_settings_to_eeprom();
-      Serial.println(F("OK - Settings written to EEPROM"));
       break;
     case 4:
       settings = defaults;
