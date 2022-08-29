@@ -182,6 +182,7 @@ float update_wall_sensors() {
   if (not s_sensors_enabled) {
     return 0;
   }
+
   // they should never be negative
   adc[0] = max(0, adc[0]);
   adc[1] = max(0, adc[1]);

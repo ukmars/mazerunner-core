@@ -66,6 +66,7 @@ void setup() {
 }
 
 void loop() {
+
   if (Serial.available()) {
     cli_run();
   }
@@ -75,10 +76,6 @@ void loop() {
     if (function > 1) {
       wait_for_front_sensor(); // cover front sensor with hand to start
     }
-    if (USER_MODE) {
-      run_mouse(function);
-    } else {
-      run_test(function);
-    }
+    run_mouse(function);
   }
 }
