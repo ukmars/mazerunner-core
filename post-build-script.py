@@ -26,6 +26,23 @@ env.AddPostAction(
         " > ", "${PROGNAME}.lst"
     ]), "Generate listing file ${PROGNAME}.lst")
 )
+# Make ram list
+env.AddPostAction(
+    "$BUILD_DIR/${PROGNAME}.elf",
+    env.VerboseAction(" ".join([
+        " avr-nm -Crtd --size-sort", "$BUILD_DIR/${PROGNAME}.elf",
+        "  | grep -i ' [dbv] ' > ", "${PROGNAME}.ram.txt"
+    ]), "Generate RAM file ${PROGNAME}.ram.txt")
+)
+
+# Make flash list
+env.AddPostAction(
+    "$BUILD_DIR/${PROGNAME}.elf",
+    env.VerboseAction(" ".join([
+        " avr-nm -Crtd --size-sort", "$BUILD_DIR/${PROGNAME}.elf",
+        "  | grep -i ' [t] ' > ", "${PROGNAME}.flash.txt"
+    ]), "Generate RAM file ${PROGNAME}.flash.txt")
+)
 
 # format sources
 env.AddPostAction(
