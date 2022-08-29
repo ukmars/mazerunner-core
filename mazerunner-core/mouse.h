@@ -64,14 +64,8 @@ class Mouse {
   void end_run();
   int search_to(unsigned char target);
   void follow_to(unsigned char target);
-  void run_in_place_turns(int top_speed);
-  void run_smooth_turns(int top_speed);
   void update_map();
   int search_maze();
-  int run_maze();
-  bool make_path(unsigned char startCell);
-  void expand_path(char *pathString);
-  void print_path();
 
   unsigned char heading;
   unsigned char location;
@@ -82,9 +76,6 @@ class Mouse {
 };
 
 extern char p_mouse_state;
-
-extern char path[];
-extern char commands[];
 
 extern Mouse dorothy;
 
