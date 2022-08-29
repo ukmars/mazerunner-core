@@ -41,7 +41,7 @@ env.AddPostAction(
     env.VerboseAction(" ".join([
         " avr-nm -Crtd --size-sort", "$BUILD_DIR/${PROGNAME}.elf",
         "  | grep -i ' [t] ' > ", "${PROGNAME}.flash.txt"
-    ]), "Generate RAM file ${PROGNAME}.flash.txt")
+    ]), "Generate FLASH file ${PROGNAME}.flash.txt")
 )
 
 # format sources
