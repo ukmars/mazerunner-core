@@ -131,23 +131,12 @@ const int BACK_WALL_TO_CENTER = 48;
  * That minimum voltage is the BIAS_FF. It is not dependent upon speed but is expressed
  * here as a fraction for comparison.
  */
-const float SPEED_FF = 0.00357; //(1.0 / 280.0);
-const float BIAS_FF = 0.0821; //(23.0 / 280.0);
 
-// Motor Feedforward
-#define DEFAULTS_LEFT_FF_SPEED_FWD 0.00359
-#define DEFAULTS_LEFT_FF_SPEED_REV 0.00359
-#define DEFAULTS_LEFT_FF_ACC_FWD 0.000330
-#define DEFAULTS_LEFT_FF_ACC_REV 0.000330
-#define DEFAULTS_LEFT_FF_STATIC_FWD 0.190
-#define DEFAULTS_LEFT_FF_STATIC_REV 0.190
+const float ACC_FF = 0.000337; //(1.0 / 280.0);
+const float SPEED_FF = 0.00359; //(1.0 / 280.0);
+const float BIAS_FF = 0.190; //(23.0 / 280.0);
 
-#define DEFAULTS_RIGHT_FF_SPEED_FWD 0.00359
-#define DEFAULTS_RIGHT_FF_SPEED_REV 0.00359
-#define DEFAULTS_RIGHT_FF_ACC_FWD 0.000330
-#define DEFAULTS_RIGHT_FF_ACC_REV 0.000330
-#define DEFAULTS_RIGHT_FF_STATIC_FWD 0.190
-#define DEFAULTS_RIGHT_FF_STATIC_REV 0.190
+
 
 // The robot is likely to have wheels of different diameters and that must be
 // compensated for if the robot is to reliably drive in a straight line
