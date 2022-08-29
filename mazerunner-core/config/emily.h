@@ -114,29 +114,6 @@ const int FRONT_REFERENCE = 850; // reading when mouse centered with wall ahead
 const int BACK_WALL_TO_CENTER = 48;
 
 
-// Motor Feedforward
-/***
- * Speed Feedforward is used to add a drive voltage proportional to the motor speed
- * The units are Volts per mm/s and the value will be different for each
- * robot where the motor + gearbox + wheel diamter + robot weight are different
- * You can experimentally determine a suitable value by turning off the controller
- * and then commanding a set voltage to the motors. The same voltage is applied to
- * each motor. Have the robot report its speed regularly or have it measure
- * its steady state speed after a period of acceleration.
- * Do this for several applied voltages from 0.5Volts to 3 Volts in steps of 0.5V
- * Plot a chart of steady state speed against voltage. The slope of that graph is
- * the speed feedforward, SPEED_FF.
- * Note that the line will not pass through the origin because there will be
- * some minimum voltage needed just to ovecome friction and get the wheels to turn at all.
- * That minimum voltage is the BIAS_FF. It is not dependent upon speed but is expressed
- * here as a fraction for comparison.
- */
-
-const float ACC_FF = 0.000337; //(1.0 / 280.0);
-const float SPEED_FF = 0.00359; //(1.0 / 280.0);
-const float BIAS_FF = 0.190; //(23.0 / 280.0);
-
-
 
 // The robot is likely to have wheels of different diameters and that must be
 // compensated for if the robot is to reliably drive in a straight line

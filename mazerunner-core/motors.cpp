@@ -102,16 +102,8 @@ void update_motor_controllers(float steering_adjustment) {
   float rot_output = angle_controller(steering_adjustment);
   float left_output = 0;
   float right_output = 0;
-  left_output += pos_output;
-  right_output += pos_output;
-  left_output -= rot_output;
-  right_output += rot_output;
-  float v_fwd = forward.speed();
-  float v_rot = rotation.speed();
-  float v_left = v_fwd - (PI / 180.0) * MOUSE_RADIUS * v_rot;
-  float v_right = v_fwd + (PI / 180.0) * MOUSE_RADIUS * v_rot;
-  left_output += SPEED_FF * v_left;
-  right_output += SPEED_FF * v_right;
+  left_output = pos_output - rot_output;
+  right_output = pos_output + rot_output;
   if (s_controllers_output_enabled) {
     set_right_motor_volts(right_output);
     set_left_motor_volts(left_output);
