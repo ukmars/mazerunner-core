@@ -44,8 +44,6 @@ void stop_after(float distance);
 void wait_until_position(float position);
 void wait_until_distance(float distance);
 
-void turn_SS90L_example();
-void turn_SS90R_example();
 void turn_around();
 void spin_turn(float degrees, float speed, float acceleration);
 
