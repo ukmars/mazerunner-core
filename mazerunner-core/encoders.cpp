@@ -31,8 +31,8 @@
  */
 
 #include "encoders.h"
+#include "config.h"
 #include "digitalWriteFast.h"
-#include "settings.h"
 #include <Arduino.h>
 #include <util/atomic.h>
 /****************************************************************************/

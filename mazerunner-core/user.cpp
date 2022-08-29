@@ -29,8 +29,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 #include "user.h"
+#include "config.h"
 #include "encoders.h"
 #include "maze.h"
 #include "motion.h"

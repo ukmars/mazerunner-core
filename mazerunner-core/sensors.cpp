@@ -31,8 +31,8 @@
  */
 
 #include "sensors.h"
+#include "config.h"
 #include "digitalWriteFast.h"
-#include "settings.h"
 #include <Arduino.h>
 #include <util/atomic.h>
 #include <wiring_private.h>
@@ -131,8 +131,8 @@ int get_switches() {
  */
 float calculate_steering_adjustment(float error) {
   // always calculate the adjustment for testing. It may not get used.
-  float pTerm = settings.steering_KP * error;
-  float dTerm = settings.steering_KD * (error - last_steering_error);
+  float pTerm = STEERING_KP * error;
+  float dTerm = STEERING_KD * (error - last_steering_error);
   float adjustment = (pTerm + dTerm) * LOOP_INTERVAL;
   // TODO: are these limits appropriate, or even needed?
   adjustment = constrain(adjustment, -STEERING_ADJUST_LIMIT, STEERING_ADJUST_LIMIT);
@@ -193,19 +193,19 @@ float update_wall_sensors() {
   g_left_wall_sensor_raw = adc[2];
 
   // normalise to a nominal value of 100
-  g_right_wall_sensor = (int)(g_right_wall_sensor_raw * settings.right_adjust);
-  g_front_wall_sensor = (int)(g_front_wall_sensor_raw * settings.front_adjust);
-  g_left_wall_sensor = (int)(g_left_wall_sensor_raw * settings.left_adjust);
+  g_right_wall_sensor = (int)(g_right_wall_sensor_raw * RIGHT_SCALE);
+  g_front_wall_sensor = (int)(g_front_wall_sensor_raw * FRONT_SCALE);
+  g_left_wall_sensor = (int)(g_left_wall_sensor_raw * LEFT_SCALE);
 
   // set the wall detection flags
-  g_left_wall_present = g_left_wall_sensor > settings.left_threshold;
-  g_right_wall_present = g_right_wall_sensor > settings.right_threshold;
-  g_front_wall_present = g_front_wall_sensor > settings.front_threshold;
+  g_left_wall_present = g_left_wall_sensor > LEFT_THRESHOLD;
+  g_right_wall_present = g_right_wall_sensor > RIGHT_THRESHOLD;
+  g_front_wall_present = g_front_wall_sensor > FRONT_THRESHOLD;
 
   // calculate the alignment errors - too far left is negative
   float error = 0;
-  float right_error = settings.right_nominal - g_right_wall_sensor;
-  float left_error = settings.left_nominal - g_left_wall_sensor;
+  float right_error = RIGHT_NOMINAL - g_right_wall_sensor;
+  float left_error = LEFT_NOMINAL - g_left_wall_sensor;
   if (g_left_wall_present && g_right_wall_present) {
     error = left_error - right_error;
   } else if (g_left_wall_present) {

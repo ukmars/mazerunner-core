@@ -33,8 +33,8 @@
 #ifndef PROFILE_H
 #define PROFILE_H
 
+#include "config.h"
 #include "encoders.h"
-#include "settings.h"
 #include <Arduino.h>
 #include <util/atomic.h>
 //***************************************************************************//

@@ -31,11 +31,11 @@
  */
 
 #include "motors.h"
+#include "config.h"
 #include "digitalWriteFast.h"
 #include "encoders.h"
 #include "profile.h"
 #include "sensors.h"
-#include "settings.h"
 #include <Arduino.h>
 
 // these are maintained only for logging
@@ -82,7 +82,7 @@ float position_controller() {
   s_fwd_error += forward.increment() - robot_fwd_increment();
   float diff = s_fwd_error - s_old_fwd_error;
   s_old_fwd_error = s_fwd_error;
-  float output = settings.fwdKP * s_fwd_error + settings.fwdKD * diff;
+  float output = FWD_KP * s_fwd_error + FWD_KD * diff;
   return output;
 }
 
@@ -93,7 +93,7 @@ float angle_controller(float steering_adjustment) {
   }
   float diff = s_rot_error - s_old_rot_error;
   s_old_rot_error = s_rot_error;
-  float output = settings.rotKP * s_rot_error + settings.rotKD * diff;
+  float output = ROT_KP * s_rot_error + ROT_KD * diff;
   return output;
 }
 

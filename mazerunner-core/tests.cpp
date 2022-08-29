@@ -29,8 +29,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 #include "tests.h"
+#include "config.h"
 #include "encoders.h"
 #include "motion.h"
 #include "motors.h"
@@ -182,15 +182,6 @@ void test_search_turn(float angle) {
   reset_drive_system();
 }
 
-//***************************************************************************//
-
-//***************************************************************************//
-
-//***************************************************************************//
-
-//***************************************************************************//
-
-//***************************************************************************//
 /**
  * By turning in place through 360 degrees, it should be possible to get a
  * sensor calibration for all sensors?
@@ -321,15 +312,13 @@ void run_test(int test, float arg) {
       Serial.println(F("OK"));
       break;
     case 1:
-      report_sensor_calibration();
       break;
     case 2:
       break;
     case 3:
       break;
     case 4:
-      settings = defaults;
-      Serial.println(F("OK - Settings cleared to defaults"));
+      report_sensor_calibration();
       break;
     case 5:
       test_calibrate_encoders();

@@ -31,11 +31,11 @@
  */
 
 #include "ui.h"
+#include "config.h"
 #include "digitalWriteFast.h"
 #include "maze.h"
 #include "reports.h"
 #include "sensors.h"
-#include "settings.h"
 #include "tests.h"
 #include "user.h"
 #include <Arduino.h>
@@ -246,7 +246,7 @@ void cli_help() {
   Serial.println(F("       1 = Report sensor calibration"));
   Serial.println(F("       2 = load settings from EEPROM"));
   Serial.println(F("       3 = save settings to EEPROM"));
-  Serial.println(F("       4 = reset settings to defaults"));
+  Serial.println(F("       4 = "));
   Serial.println(F("       5 = calibrate encoders"));
   Serial.println(F("       6 = test rotation controller tunings"));
   Serial.println(F("       7 = test forward controller tunings"));

@@ -35,7 +35,6 @@
 #include "motors.h"
 #include "reports.h"
 #include "sensors.h"
-#include "settings.h"
 #include "systick.h"
 #include "tests.h"
 #include "ui.h"
@@ -44,7 +43,6 @@
 
 void setup() {
   Serial.begin(BAUDRATE);
-  restore_default_settings();
   setup_systick();
   pinMode(USER_IO_6, OUTPUT);
   pinMode(EMITTER_A, OUTPUT);
