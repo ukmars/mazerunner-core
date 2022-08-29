@@ -66,7 +66,7 @@ void setup_systick() {
  * With just a single profile active and moving, that increases to nearly 30%.
  * Two such active profiles increases it to about 35-40%.
  *
- * The reasin that two prifiles does not take up twice as much time is that
+ * The reason that two prifiles does not take up twice as much time is that
  * an active profile has a processing overhead even if there is no motion.
  *
  * Most of the load is due to that overhead. While the profile generates actual
@@ -75,6 +75,8 @@ void setup_systick() {
  *
  */
 ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
+  // NOTE - the code here seems to get inlined and so the function is 2800 bytes!
+  
   // TODO: make sure all variables are interrupt-safe if they are used outside IRQs
   // grab the encoder values first because they will continue to change
   update_encoders();
