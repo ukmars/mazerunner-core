@@ -99,7 +99,7 @@ void turn(float angle, float omega, float alpha) {
   rotation.reset();
   rotation.start(angle, omega, 0, alpha);
   while (not rotation.is_finished()) {
-    report_profile();
+    delay(2);
   }
 }
 
@@ -134,8 +134,9 @@ void spin_turn(float degrees, float speed, float acceleration) {
 void stop_at(float position) {
   float remaining = position - forward.position();
   forward.start(remaining, forward.speed(), 0, forward.acceleration());
+  Serial.print("STOP AT");
   while (not forward.is_finished()) {
-    report_profile();
+    delay(2);
   }
 }
 
@@ -154,8 +155,9 @@ void stop_at(float position) {
  */
 void stop_after(float distance) {
   forward.start(distance, forward.speed(), 0, forward.acceleration());
+  Serial.print("STOP AFTER");
   while (not forward.is_finished()) {
-    report_profile();
+    delay(2);
   }
 }
 
