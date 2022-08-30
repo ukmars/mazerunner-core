@@ -62,7 +62,6 @@ class Mouse {
   void init();
   void report_status();
   void update_sensors();
-  void log_turn(char action);
   void log_status(char action);
   void set_heading(unsigned char new_heading);
   void turn_to_face(unsigned char new_heading);
