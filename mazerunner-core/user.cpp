@@ -86,7 +86,6 @@ void run_mouse(int function) {
       // test_SS90EL();
       break;
     case 6:
-      // emily.report_status();
       break;
     case 7:
       break;
