@@ -267,7 +267,7 @@ void Mouse::follow_to(unsigned char target) {
   heading = NORTH;
   initialise_maze();
   flood_maze(maze_goal());
-  // wait_for_front_sensor();
+  // wait_for_user_start();
   delay(1000);
   enable_sensors();
   reset_drive_system();
@@ -535,7 +535,7 @@ void Mouse::update_map() {
  * reader as an exercise to do something useful with that.
  */
 int Mouse::search_maze() {
-  wait_for_front_sensor();
+  wait_for_user_start();
   Serial.println("Search TO");
   handStart = true;
   location = START;

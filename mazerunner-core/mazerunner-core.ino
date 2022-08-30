@@ -67,7 +67,7 @@ void loop() {
     wait_for_button_release();
     int function = get_switches();
     if (function > 1) {
-      wait_for_front_sensor(); // cover front sensor with hand to start
+      wait_for_user_start(); // cover front sensor with hand to start
     }
     run_mouse(function);
   }

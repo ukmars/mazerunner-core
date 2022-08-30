@@ -49,6 +49,11 @@ enum {
   STEERING_OFF,
 };
 
+// used in the wait_for_user_start_function to indicate whih sensor was occluded
+const uint8_t NO_START = 0;
+const uint8_t LEFT_START = 1;
+const uint8_t RIGHT_START = 2;
+
 //***************************************************************************//
 extern volatile float g_battery_voltage;
 extern volatile float g_battery_scale; // adjusts PWM for voltage changes
@@ -125,16 +130,40 @@ inline void wait_for_button_click() {
   delay(250);
 }
 
-inline void wait_for_front_sensor() {
-  enable_sensors();
-  while (g_lfs < 250) {
-    delay(10);
-  }
-  while (g_lfs > 200) {
-    delay(10);
-  }
-  disable_sensors();
-  delay(500);
+inline bool occluded_left() {
+  return g_lfs_raw > 100 && g_rfs_raw < 100;
 }
 
+inline bool occluded_right() {
+  return g_lfs_raw < 100 && g_rfs_raw > 100;
+}
+
+inline uint8_t wait_for_user_start() {
+  enable_sensors();
+  int count = 0;
+  uint8_t choice = NO_START;
+  while (choice == NO_START) {
+    count = 0;
+    while (occluded_left()) {
+      count++;
+      delay(20);
+    }
+    if (count > 5) {
+      choice = LEFT_START;
+      break;
+    }
+    count = 0;
+    while (occluded_right()) {
+      count++;
+      delay(20);
+    }
+    if (count > 5) {
+      choice = RIGHT_START;
+      break;
+    }
+  }
+  disable_sensors();
+  delay(250);
+  return choice;
+}
 #endif
