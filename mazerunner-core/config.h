@@ -124,22 +124,14 @@ const uint32_t BAUDRATE = 115200;
 const float LOOP_FREQUENCY = 500.0;
 const float LOOP_INTERVAL = (1.0 / LOOP_FREQUENCY);
 
-// force rewrite of EEPROM settings. Set this when developing
-#define ALWAYS_USE_DEFAULT_SETTINGS 0
-
 //***************************************************************************//
 
 // This is the size fo each cell in the maze. Normally 180mm for a classic maze
 const float FULL_CELL = 180.0f;
 const float HALF_CELL = FULL_CELL / 2.0;
 
-//***************************************************************************//
-
-//***************************************************************************//
-// change the revision if the settings structure changes to force rewrte of EEPROM
-const int SETTINGS_REVISION = 10429;
-const int DEFAULT_DECIMAL_PLACES = 5;
-
+// the position in the cell where the sensors are sampled.
+const float SENSING_POSITION = 170.0;
 //***************************************************************************//
 
 #endif
