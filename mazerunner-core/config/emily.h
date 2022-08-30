@@ -70,10 +70,10 @@ const int MOTOR_RIGHT_POLARITY = (-1);
 
 //***** PERFORMANCE CONSTANTS************************************************//
 // search and run speeds in mm/s and mm
-const float DEFAULT_TURN_SPEED = 300;
-const float DEFAULT_SEARCH_SPEED = 400;
-const float DEFAULT_MAX_SPEED = 800;
-const float DEFAULT_SEARCH_ACCEL = 2000;
+const int DEFAULT_TURN_SPEED = 300;
+const int DEFAULT_SEARCH_SPEED = 400;
+const int DEFAULT_MAX_SPEED = 800;
+const int DEFAULT_SEARCH_ACCEL = 2000;
 //***************************************************************************//
 
 
