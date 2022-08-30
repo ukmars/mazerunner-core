@@ -65,36 +65,37 @@ void user_log_front_sensor() {
 }
 
 void run_mouse(int function) {
+  // NOTE: will start on button click
   switch (function) {
     case 0:
       Serial.println(F("OK"));
       break;
     case 1:
-      // NOTE: will start on button click
       user_log_front_sensor();
       break;
     case 2:
-      emily.report_status();
-      break;
-    case 3:
-      test_SS90ER();
-      break;
-    case 4:
-      test_SS90EL();
-      break;
-    case 5:
       emily.search_maze();
       break;
+    case 3:
+      emily.follow_to(maze_goal());
+      break;
+    case 4:
+      test_SS90ER();
+      break;
+    case 5:
+      test_SS90EL();
+      break;
     case 6:
-      report_sensor_calibration();
+      emily.report_status();
       break;
     case 7:
-      test_edge_detection();
+      report_sensor_calibration();
       break;
     case 8:
-      test_sensor_spin_calibrate();
+      test_edge_detection();
       break;
     case 9:
+      test_sensor_spin_calibrate();
       break;
     case 10:
       break;
@@ -108,7 +109,6 @@ void run_mouse(int function) {
       break;
     case 15:
 
-      emily.follow_to(maze_goal());
       break;
     default:
       disable_sensors();
