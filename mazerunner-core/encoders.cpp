@@ -166,7 +166,7 @@ float robot_position() {
 
 float robot_speed() {
   float speed;
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { speed = 500.0 * s_robot_fwd_increment; }
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { speed = LOOP_FREQUENCY * s_robot_fwd_increment; }
   return speed;
 }
 
