@@ -90,7 +90,7 @@ void report_sensor_track_header() {
 #endif
 }
 
-void report_sensor_track() {
+void report_sensor_track(bool use_raw = false) {
 #if DEBUG_LOGGING == 1
   if (millis() >= s_report_time) {
     s_report_time += s_report_interval;
@@ -99,38 +99,25 @@ void report_sensor_track() {
     Serial.print(robot_position());
     Serial.print(' ');
     Serial.print(robot_angle());
-    Serial.print(' ');
-    Serial.print(g_lss);
-    Serial.print(' ');
-    Serial.print(g_rss);
-    Serial.print(' ');
-    Serial.print(g_lfs);
-    Serial.print(' ');
-    Serial.print(g_cross_track_error);
-    Serial.print(' ');
-    Serial.print(g_steering_adjustment);
-    Serial.println();
-  }
-#else
-  delay(2);
-#endif
-}
-
-void report_sensor_track_raw() {
-#if DEBUG_LOGGING == 1
-  if (millis() >= s_report_time) {
-    s_report_time += s_report_interval;
-    Serial.print(millis() - s_start_time);
-    Serial.print(' ');
-    Serial.print(robot_position());
-    Serial.print(' ');
-    Serial.print(robot_angle());
-    Serial.print(' ');
-    Serial.print(g_lss_raw);
-    Serial.print(' ');
-    Serial.print(g_rss_raw);
-    Serial.print(' ');
-    Serial.print(g_lfs_raw);
+    if (use_raw) {
+      Serial.print(' ');
+      Serial.print(g_lss_raw);
+      Serial.print(' ');
+      Serial.print(g_rss_raw);
+      Serial.print(' ');
+      Serial.print(g_lfs_raw);
+      Serial.print(' ');
+      Serial.print(g_rfs_raw);
+    } else {
+      Serial.print(' ');
+      Serial.print(g_lss);
+      Serial.print(' ');
+      Serial.print(g_rss);
+      Serial.print(' ');
+      Serial.print(g_lfs);
+      Serial.print(' ');
+      Serial.print(g_rfs);
+    }
     Serial.print(' ');
     Serial.print(g_cross_track_error);
     Serial.print(' ');

@@ -60,8 +60,7 @@ void report_profile();
 void report_profile_header();
 
 void report_sensor_track_header();
-void report_sensor_track();
-void report_sensor_track_raw();
+void report_sensor_track(bool use_raw);
 
 void report_front_sensor_track_header();
 void report_front_sensor_track();

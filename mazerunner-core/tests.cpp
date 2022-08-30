@@ -69,7 +69,7 @@ void test_sensor_spin_calibrate() {
   report_sensor_track_header();
   rotation.start(360, 180, 0, 1800);
   while (not rotation.is_finished()) {
-    report_sensor_track_raw();
+    report_sensor_track(true);
   }
   reset_drive_system();
   disable_sensors();
