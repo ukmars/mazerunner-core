@@ -183,16 +183,14 @@ struct TurnParameters {
   int trigger;   // sensor value
 };
 
-const TurnParameters turn_params[4] = {
+const TurnParameters turn_params[4] PROGMEM = {
     {DEFAULT_TURN_SPEED, 25, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
     {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90ER
     {DEFAULT_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
     {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
 };
 
-void Mouse::turn_SS90EL() {
-  int turn_id = 0;
-
+void Mouse::turn_SS90E(int turn_id) {
   bool triggered = false;
   disable_steering();
   forward.set_target_speed(DEFAULT_TURN_SPEED);
@@ -205,43 +203,6 @@ void Mouse::turn_SS90EL() {
     trigger += 6;
   }
   float turn_point = FULL_CELL + turn_params[turn_id].run_in;
-  while (forward.position() < turn_point) {
-    if (g_front_sum > trigger) {
-      forward.set_state(CS_FINISHED);
-      triggered = true;
-      break;
-    }
-  }
-  if (triggered) {
-    log_turn('S');
-  } else {
-    log_turn('D');
-  }
-  rotation.start(turn_params[turn_id].angle, turn_params[turn_id].omega, 0, turn_params[turn_id].alpha);
-  while (not rotation.is_finished()) {
-    delay(2);
-  }
-  forward.start(turn_params[turn_id].run_out, forward.speed(), SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
-  while (not forward.is_finished()) {
-    delay(2);
-  }
-  forward.set_position(SENSING_POSITION);
-}
-
-void Mouse::turn_SS90ER() {
-  int turn_id = 1;
-  bool triggered = false;
-  disable_steering();
-  forward.set_target_speed(DEFAULT_TURN_SPEED);
-  float turn_point = FULL_CELL + turn_params[turn_id].run_in;
-
-  float trigger = turn_params[turn_id].trigger;
-  if (g_lss_has_wall) {
-    trigger += 10;
-  }
-  if (g_rss_has_wall) {
-    trigger += 6;
-  }
   while (forward.position() < turn_point) {
     if (g_front_sum > trigger) {
       forward.set_state(CS_FINISHED);
@@ -382,7 +343,7 @@ void Mouse::follow_to(unsigned char target) {
     if (location == target) {
       end_run();
     } else if (!leftWall) {
-      turn_SS90EL();
+      turn_SS90E(SS90EL);
       heading = (heading + 3) & 0x03;
       log_status('x');
     } else if (!frontWall) {
@@ -391,7 +352,7 @@ void Mouse::follow_to(unsigned char target) {
       wait_until_position(FULL_CELL - 10.0);
       log_status('x');
     } else if (!rightWall) {
-      turn_SS90ER();
+      turn_SS90E(SS90ER);
       heading = (heading + 1) & 0x03;
       log_status('x');
     } else {
@@ -510,7 +471,7 @@ int Mouse::search_to(unsigned char target) {
           log_status('x');
           break;
         case 1: // right
-          turn_SS90ER();
+          turn_SS90E(SS90ER);
           heading = (heading + 1) & 0x03;
           log_status('x');
           break;
@@ -520,7 +481,7 @@ int Mouse::search_to(unsigned char target) {
           log_status('x');
           break;
         case 3: // left
-          turn_SS90EL();
+          turn_SS90E(SS90EL);
           heading = (heading + 3) & 0x03;
           log_status('x');
           break;

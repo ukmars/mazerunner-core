@@ -48,6 +48,13 @@ enum {
   FINISHED
 };
 
+enum {
+  SS90EL = 0,
+  SS90ER = 1,
+  SS90L = 3,
+  SS90R = 3,
+};
+
 /// TODO: should the whole mouse object be persistent?
 class Mouse {
   public:
@@ -59,8 +66,7 @@ class Mouse {
   void log_status(char action);
   void set_heading(unsigned char new_heading);
   void turn_to_face(unsigned char new_heading);
-  void turn_SS90EL();
-  void turn_SS90ER();
+  void turn_SS90E(int turn_id);
   void turn_around();
   void end_run();
   int search_to(unsigned char target);
