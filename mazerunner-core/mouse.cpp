@@ -190,7 +190,7 @@ const TurnParameters turn_params[4] PROGMEM = {
     {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
 };
 
-void Mouse::turn_SS90E(int turn_id) {
+void Mouse::turn_smooth(int turn_id) {
   bool triggered = false;
   disable_steering();
   forward.set_target_speed(DEFAULT_TURN_SPEED);
@@ -343,7 +343,7 @@ void Mouse::follow_to(unsigned char target) {
     if (location == target) {
       end_run();
     } else if (!leftWall) {
-      turn_SS90E(SS90EL);
+      turn_smooth(SS90EL);
       heading = (heading + 3) & 0x03;
       log_status('x');
     } else if (!frontWall) {
@@ -352,7 +352,7 @@ void Mouse::follow_to(unsigned char target) {
       wait_until_position(FULL_CELL - 10.0);
       log_status('x');
     } else if (!rightWall) {
-      turn_SS90E(SS90ER);
+      turn_smooth(SS90ER);
       heading = (heading + 1) & 0x03;
       log_status('x');
     } else {
@@ -471,7 +471,7 @@ int Mouse::search_to(unsigned char target) {
           log_status('x');
           break;
         case 1: // right
-          turn_SS90E(SS90ER);
+          turn_smooth(SS90ER);
           heading = (heading + 1) & 0x03;
           log_status('x');
           break;
@@ -481,7 +481,7 @@ int Mouse::search_to(unsigned char target) {
           log_status('x');
           break;
         case 3: // left
-          turn_SS90E(SS90EL);
+          turn_smooth(SS90EL);
           heading = (heading + 3) & 0x03;
           log_status('x');
           break;

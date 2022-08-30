@@ -66,7 +66,7 @@ class Mouse {
   void log_status(char action);
   void set_heading(unsigned char new_heading);
   void turn_to_face(unsigned char new_heading);
-  void turn_SS90E(int turn_id);
+  void turn_smooth(int turn_id);
   void turn_around();
   void end_run();
   int search_to(unsigned char target);
