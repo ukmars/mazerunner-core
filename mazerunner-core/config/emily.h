@@ -207,19 +207,23 @@ const int LED_RIGHT = USER_IO_6;
 
 
 //***** SENSOR HARDWARE *****************************************************//
-// the ADC channels corresponding to the sensor inputs
+// the ADC channels corresponding to the sensor inputs. There are 8 available
+// Channels 0..3 are normally used for sensors. 
+// Channels 4 and 5 are available if you do not want to add an I2C device
+// Channel 6 is pre-allocated to the Battery monitor
+// Channel 7 is re-allocated to the function switch and button
 // ADVANCED SENSOR
 #define RFS_CHANNEL 0
 #define RSS_CHANNEL 1
 #define LSS_CHANNEL 2
 #define LFS_CHANNEL 3
-// BASIC SENSOR
+// BASIC SENSOR - just repeat the front sensor to make the code cleaner
 // #define RFS_CHANNEL 1
 // #define RSS_CHANNEL 0
 // #define LSS_CHANNEL 2
 // #define LFS_CHANNEL 1
 
-// if you have  basic sensor board with a single emitter pin
+// if you have  basic sensor board with a single emitter pin,
 // put the same pin number for both entries
 // BASIC
 // const int EMITTER_A = USER_IO_12;
@@ -228,13 +232,6 @@ const int LED_RIGHT = USER_IO_6;
 const int EMITTER_A = USER_IO_11;
 const int EMITTER_B = USER_IO_12;
 
-// these are the sensor ADC channels in case we have no special use for a given channel
-const uint8_t SENSOR_0 = A0;
-const uint8_t SENSOR_1 = A1;
-const uint8_t SENSOR_2 = A2;
-const uint8_t SENSOR_3 = A3;
-const uint8_t SENSOR_4 = A4;
-const uint8_t SENSOR_5 = A5;
 
 
 #endif
