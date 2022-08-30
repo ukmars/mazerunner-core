@@ -88,9 +88,7 @@ float position_controller() {
 
 float angle_controller(float steering_adjustment) {
   s_rot_error += rotation.increment() - robot_rot_increment();
-  if (g_steering_enabled) {
-    s_rot_error += steering_adjustment;
-  }
+  s_rot_error += steering_adjustment;
   float diff = s_rot_error - s_old_rot_error;
   s_old_rot_error = s_rot_error;
   float output = ROT_KP * s_rot_error + ROT_KD * diff;

@@ -42,6 +42,13 @@ struct WallSensor {
   bool has_wall; // true if a wall is present
 };
 
+enum {
+  STEER_NORMAL,
+  STEER_LEFT_WALL,
+  STEER_RIGHT_WALL,
+  STEERING_OFF,
+};
+
 //***************************************************************************//
 extern volatile float g_battery_voltage;
 extern volatile float g_battery_scale; // adjusts PWM for voltage changes
@@ -75,6 +82,7 @@ extern volatile bool g_rss_has_wall;
 extern volatile bool g_rfs_has_wall;
 
 /*** steering variables ***/
+extern uint8_t g_steering_mode;
 extern bool g_steering_enabled;
 extern volatile float g_cross_track_error;
 extern volatile float g_steering_adjustment;
@@ -89,9 +97,7 @@ float update_wall_sensors();
 
 void start_sensor_cycle();
 
-void reset_steering();
-void enable_steering();
-void disable_steering();
+void set_steering_mode(uint8_t mode);
 float calculate_steering_adjustment(float error);
 
 int get_switches();

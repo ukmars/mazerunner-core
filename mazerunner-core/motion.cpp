@@ -55,7 +55,7 @@
 void reset_drive_system() {
   stop_motors();
   disable_motor_controllers();
-  disable_steering();
+  set_steering_mode(STEERING_OFF);
   reset_encoders();
   reset_motor_controllers();
   forward.reset();

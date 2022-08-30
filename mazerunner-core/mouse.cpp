@@ -79,7 +79,7 @@ void print_walls() {
  */
 static void stopAndAdjust() {
   float remaining = (FULL_CELL + HALF_CELL) - forward.position();
-  disable_steering();
+  set_steering_mode(STEERING_OFF);
   forward.start(remaining, forward.speed(), 0, forward.acceleration());
   while (not forward.is_finished()) {
     if (g_front_sum > (FRONT_REFERENCE - 150)) {
@@ -117,7 +117,7 @@ void turn_IP90L() {
 
 void Mouse::end_run() {
   bool has_wall = frontWall;
-  disable_steering();
+  set_steering_mode(STEERING_OFF);
   log_status('T');
   float remaining = (FULL_CELL + HALF_CELL) - forward.position();
   forward.start(remaining, forward.speed(), 30, forward.acceleration());
@@ -169,7 +169,7 @@ const TurnParameters turn_params[4] = {
 
 void Mouse::turn_smooth(int turn_id) {
   bool triggered = false;
-  disable_steering();
+  set_steering_mode(STEERING_OFF);
   forward.set_target_speed(DEFAULT_TURN_SPEED);
 
   float trigger = turn_params[turn_id].trigger;
@@ -218,7 +218,7 @@ void Mouse::turn_smooth(int turn_id) {
  */
 void Mouse::turn_around() {
   bool has_wall = frontWall;
-  disable_steering();
+  set_steering_mode(STEERING_OFF);
   log_status('A');
   float remaining = (FULL_CELL + HALF_CELL) - forward.position();
   forward.start(remaining, forward.speed(), 30, forward.acceleration());
@@ -249,7 +249,7 @@ Mouse::Mouse() {
 
 void Mouse::init() {
   handStart = false;
-  disable_steering();
+  set_steering_mode(STEERING_OFF);
   location = 0;
   heading = NORTH;
   p_mouse_state = SEARCHING;
@@ -262,9 +262,9 @@ void Mouse::update_sensors() {
 }
 
 void Mouse::log_status(char action) {
-  Serial.print(' ');
-  Serial.print(action);
   Serial.print('{');
+  Serial.print(action);
+  Serial.print(' ');
   print_hex_2(location);
   Serial.print(' ');
   Serial.print(dirLetters[heading]);
@@ -303,7 +303,7 @@ void Mouse::follow_to(unsigned char target) {
     }
     Serial.println();
     log_status('-');
-    enable_steering();
+    set_steering_mode(STEER_NORMAL);
     location = neighbour(location, heading);
     update_sensors();
     update_map();
@@ -423,7 +423,7 @@ int Mouse::search_to(unsigned char target) {
     }
     Serial.println();
     log_status('-');
-    enable_steering();
+    set_steering_mode(STEER_NORMAL);
     location = neighbour(location, heading);
     update_sensors();
     update_map();

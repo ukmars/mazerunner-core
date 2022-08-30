@@ -65,7 +65,7 @@ void test_sensor_spin_calibrate() {
   delay(100);
   reset_drive_system();
   enable_motor_controllers();
-  disable_steering();
+  set_steering_mode(STEERING_OFF);
   report_sensor_track_header();
   rotation.start(360, 180, 0, 1800);
   while (not rotation.is_finished()) {
@@ -108,7 +108,7 @@ void test_edge_detection() {
   delay(100);
   reset_drive_system();
   enable_motor_controllers();
-  disable_steering();
+  set_steering_mode(STEERING_OFF);
   Serial.println(F("Edge positions:"));
   forward.start(FULL_CELL - 30.0, 100, 0, 1000);
   while (not forward.is_finished()) {
@@ -166,7 +166,7 @@ void test_SS90ER() {
   float omega = 280;    // deg/s integer such that omega = 8 n
   float alpha = 4000;   // deg/s/s
   bool triggered = false;
-  disable_steering();
+  set_steering_mode(STEERING_OFF);
   float distance = BACK_WALL_TO_CENTER + 100 + run_in;
   forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
@@ -200,7 +200,7 @@ void test_SS90EL() {
   float omega = 280;    // deg/s
   float alpha = 4000;   // deg/s/s
   bool triggered = false;
-  disable_steering();
+  set_steering_mode(STEERING_OFF);
   float distance = BACK_WALL_TO_CENTER + 100 + run_in;
   forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {

@@ -66,6 +66,7 @@ volatile bool g_front_has_wall;
 volatile bool g_rss_has_wall;
 
 /*** steering variables ***/
+uint8_t g_steering_mode = STEER_NORMAL;
 bool g_steering_enabled;
 volatile float g_cross_track_error;
 volatile float g_steering_adjustment;
@@ -149,18 +150,10 @@ float calculate_steering_adjustment(float error) {
   return adjustment;
 }
 
-void reset_steering() {
+void set_steering_mode(uint8_t mode) {
   last_steering_error = g_cross_track_error;
   g_steering_adjustment = 0;
-}
-
-void enable_steering() {
-  reset_steering();
-  g_steering_enabled = true;
-};
-
-void disable_steering() {
-  g_steering_enabled = false;
+  g_steering_mode = mode;
 }
 
 //***************************************************************************//
@@ -225,11 +218,17 @@ float update_wall_sensors() {
   int error = 0;
   int right_error = SIDE_NOMINAL - g_rss;
   int left_error = SIDE_NOMINAL - g_lss;
-  if (g_lss_has_wall && g_rss_has_wall) {
-    error = left_error - right_error;
-  } else if (g_lss_has_wall) {
+  if (g_steering_mode == STEER_NORMAL) {
+    if (g_lss_has_wall && g_rss_has_wall) {
+      error = left_error - right_error;
+    } else if (g_lss_has_wall) {
+      error = 2 * left_error;
+    } else if (g_rss_has_wall) {
+      error = -2 * right_error;
+    }
+  } else if (g_steering_mode == STEER_LEFT_WALL) {
     error = 2 * left_error;
-  } else if (g_rss_has_wall) {
+  } else if (g_steering_mode == STEER_RIGHT_WALL) {
     error = -2 * right_error;
   }
 
