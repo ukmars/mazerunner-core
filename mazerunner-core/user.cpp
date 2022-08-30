@@ -71,7 +71,7 @@ void run_mouse(int function) {
       Serial.println(F("OK"));
       break;
     case 1:
-      user_log_front_sensor();
+      report_sensor_calibration();
       break;
     case 2:
       emily.search_maze();
@@ -80,22 +80,21 @@ void run_mouse(int function) {
       emily.follow_to(maze_goal());
       break;
     case 4:
-      test_SS90ER();
+      // test_SS90ER();
       break;
     case 5:
-      test_SS90EL();
+      // test_SS90EL();
       break;
     case 6:
-      emily.report_status();
+      // emily.report_status();
       break;
     case 7:
-      report_sensor_calibration();
       break;
     case 8:
-      test_edge_detection();
+      // test_edge_detection();
       break;
     case 9:
-      test_sensor_spin_calibrate();
+      // test_sensor_spin_calibrate();
       break;
     case 10:
       break;
