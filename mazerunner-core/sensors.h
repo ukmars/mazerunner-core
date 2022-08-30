@@ -35,25 +35,44 @@
 
 #include <Arduino.h>
 #include <util/atomic.h>
+
+struct WallSensor {
+  int raw;       // whatever the ADC gives us
+  int value;     // normalised to 100 at reference position
+  bool has_wall; // true if a wall is present
+};
+
 //***************************************************************************//
 extern volatile float g_battery_voltage;
 extern volatile float g_battery_scale; // adjusts PWM for voltage changes
 //***************************************************************************//
 
+extern volatile int g_ws_lfs;
+extern volatile int g_ws_lss;
+extern volatile int g_ws_rss;
+extern volatile int g_ws_rfs;
+
 /*** wall sensor variables ***/
-extern volatile int g_front_wall_sensor;
-extern volatile int g_left_wall_sensor;
-extern volatile int g_right_wall_sensor;
+extern volatile int g_lfs;
+extern volatile int g_lss;
+extern volatile int g_rss;
+extern volatile int g_rfs;
+
+extern volatile int g_front_sum;
 
 /*** These are the values before normalisation */
-extern volatile int g_front_wall_sensor_raw;
-extern volatile int g_left_wall_sensor_raw;
-extern volatile int g_right_wall_sensor_raw;
+extern volatile int g_lfs_raw;
+extern volatile int g_lss_raw;
+extern volatile int g_rss_raw;
+extern volatile int g_rfs_raw;
 
 // true if a wall is present
-extern volatile bool g_left_wall_present;
-extern volatile bool g_front_wall_present;
-extern volatile bool g_right_wall_present;
+extern volatile bool g_front_has_wall;
+
+extern volatile bool g_lfs_has_wall;
+extern volatile bool g_lss_has_wall;
+extern volatile bool g_rss_has_wall;
+extern volatile bool g_rfs_has_wall;
 
 /*** steering variables ***/
 extern bool g_steering_enabled;
@@ -63,15 +82,16 @@ extern volatile float g_steering_adjustment;
 inline int get_left_sensor() {
   int value;
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    value = g_left_wall_sensor;
+    value = g_lss;
   }
   return value;
 }
 
 inline int get_front_sensor() {
   int value;
+  _NOP();
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    value = g_front_wall_sensor;
+    value = g_lfs;
   }
   return value;
 }
@@ -79,7 +99,7 @@ inline int get_front_sensor() {
 inline int get_right_sensor() {
   int value;
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    value = g_right_wall_sensor;
+    value = g_rss;
   }
   return value;
 }
@@ -126,10 +146,10 @@ inline void wait_for_button_click() {
 
 inline void wait_for_front_sensor() {
   enable_sensors();
-  while (g_front_wall_sensor < 250) {
+  while (g_lfs < 250) {
     delay(10);
   }
-  while (g_front_wall_sensor > 200) {
+  while (g_lfs > 200) {
     delay(10);
   }
   disable_sensors();

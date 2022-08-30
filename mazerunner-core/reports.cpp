@@ -123,11 +123,11 @@ void report_sensor_track() {
     Serial.print(' ');
     Serial.print(robot_angle());
     Serial.print(' ');
-    Serial.print(g_left_wall_sensor);
+    Serial.print(g_lss);
     Serial.print(' ');
-    Serial.print(g_right_wall_sensor);
+    Serial.print(g_rss);
     Serial.print(' ');
-    Serial.print(g_front_wall_sensor);
+    Serial.print(g_lfs);
     Serial.print(' ');
     Serial.print(g_cross_track_error);
     Serial.print(' ');
@@ -149,11 +149,11 @@ void report_sensor_track_raw() {
     Serial.print(' ');
     Serial.print(robot_angle());
     Serial.print(' ');
-    Serial.print(g_left_wall_sensor_raw);
+    Serial.print(g_lss_raw);
     Serial.print(' ');
-    Serial.print(g_right_wall_sensor_raw);
+    Serial.print(g_rss_raw);
     Serial.print(' ');
-    Serial.print(g_front_wall_sensor_raw);
+    Serial.print(g_lfs_raw);
     Serial.print(' ');
     Serial.print(g_cross_track_error);
     Serial.print(' ');
@@ -181,9 +181,9 @@ void report_front_sensor_track() {
     Serial.print(' ');
     Serial.print(fabsf(robot_position()));
     Serial.print(' ');
-    Serial.print(g_front_wall_sensor);
+    Serial.print(g_lfs);
     Serial.print(' ');
-    Serial.print(g_front_wall_sensor_raw);
+    Serial.print(g_lfs_raw);
     Serial.println();
   }
 #else
@@ -238,14 +238,14 @@ void report_pose() {
 //***************************************************************************//
 
 void report_wall_sensors() {
-  int left_front = g_left_wall_sensor;
-  int left = g_left_wall_sensor;
-  int right = g_right_wall_sensor;
-  int right_front = g_front_wall_sensor;
-  int left_front_raw = g_left_wall_sensor_raw;
-  int left_raw = g_right_wall_sensor_raw;
-  int right_raw = g_right_wall_sensor_raw;
-  int right_front_raw = g_front_wall_sensor_raw;
+  int left_front = g_lss;
+  int left = g_lss;
+  int right = g_rss;
+  int right_front = g_lfs;
+  int left_front_raw = g_lss_raw;
+  int left_raw = g_rss_raw;
+  int right_raw = g_rss_raw;
+  int right_front_raw = g_lfs_raw;
   Serial.print('\n');
   print_justified(left_front, 5);
   print_justified(left, 5);

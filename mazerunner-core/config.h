@@ -82,11 +82,17 @@
 #define ROBOT_MODE MODE_RUN
 
 /*************************************************************************/
+/***
+ * It is possible that you might want to run the robot in a number of
+ * different mazes with different calibration values
+ */
+// list the available event/maze names
 #define EVENT_HOME 1
 #define EVENT_UK 2
 #define EVENT_PORTUGAL 3
-
+// choose the one you will be using
 #define EVENT UK
+
 /*************************************************************************/
 #define BOARD_UKMARSBOT_V1 1
 

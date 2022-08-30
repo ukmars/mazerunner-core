@@ -50,17 +50,17 @@ char p_mouse_state __attribute__((section(".noinit")));
 static char dirLetters[] = "NESW";
 
 void print_walls() {
-  if (g_left_wall_present) {
+  if (g_lss_has_wall) {
     Serial.print('L');
   } else {
     Serial.print('-');
   }
-  if (g_front_wall_present) {
+  if (g_front_has_wall) {
     Serial.print('F');
   } else {
     Serial.print('-');
   }
-  if (g_right_wall_present) {
+  if (g_rss_has_wall) {
     Serial.print('R');
   } else {
     Serial.print('-');
@@ -82,13 +82,13 @@ static void stopAndAdjust() {
   disable_steering();
   forward.start(remaining, forward.speed(), 0, forward.acceleration());
   while (not forward.is_finished()) {
-    if (g_front_wall_sensor > (FRONT_REFERENCE - 150)) {
+    if (g_front_sum > (FRONT_REFERENCE - 150)) {
       break;
     }
     delay(2);
   }
-  if (g_front_wall_present) {
-    while (g_front_wall_sensor < FRONT_REFERENCE) {
+  if (g_front_has_wall) {
+    while (g_front_sum < FRONT_REFERENCE) {
       forward.start(10, 50, 0, 1000);
       delay(2);
     }
@@ -177,7 +177,7 @@ void Mouse::turn_SS90ER() {
   forward.start(distance, forward.speed(), DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
     delay(2);
-    if (g_front_wall_sensor > 54) {
+    if (g_front_sum > 54) {
       forward.set_state(CS_FINISHED);
       triggered = true;
     }
@@ -210,7 +210,7 @@ void Mouse::turn_SS90EL() {
   forward.start(distance, forward.speed(), DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
     delay(2);
-    if (g_front_wall_sensor > 54) {
+    if (g_front_sum > 54) {
       forward.set_state(CS_FINISHED);
       triggered = true;
     }

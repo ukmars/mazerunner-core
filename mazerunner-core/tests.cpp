@@ -112,22 +112,22 @@ void test_edge_detection() {
   Serial.println(F("Edge positions:"));
   forward.start(FULL_CELL - 30.0, 100, 0, 1000);
   while (not forward.is_finished()) {
-    if (g_left_wall_sensor > left_max) {
-      left_max = g_left_wall_sensor;
+    if (g_lss > left_max) {
+      left_max = g_lss;
     }
 
-    if (g_right_wall_sensor > right_max) {
-      right_max = g_right_wall_sensor;
+    if (g_rss > right_max) {
+      right_max = g_rss;
     }
 
     if (not left_edge_found) {
-      if (g_left_wall_sensor < left_max / 2) {
+      if (g_lss < left_max / 2) {
         left_edge_position = int(0.5 + forward.position());
         left_edge_found = true;
       }
     }
     if (not right_edge_found) {
-      if (g_right_wall_sensor < right_max / 2) {
+      if (g_rss < right_max / 2) {
         right_edge_position = int(0.5 + forward.position());
         right_edge_found = true;
       }

@@ -42,19 +42,28 @@
 volatile float g_battery_voltage;
 volatile float g_battery_scale;
 
-/*** wall sensor variables ***/
-volatile int g_front_wall_sensor;
-volatile int g_left_wall_sensor;
-volatile int g_right_wall_sensor;
+volatile int g_ws_lfs;
+volatile int g_ws_lss;
+volatile int g_ws_rss;
+volatile int g_ws_rfs;
 
-volatile int g_front_wall_sensor_raw;
-volatile int g_left_wall_sensor_raw;
-volatile int g_right_wall_sensor_raw;
+/*** wall sensor variables ***/
+volatile int g_lfs;
+volatile int g_lss;
+volatile int g_rss;
+volatile int g_rfs;
+
+volatile int g_front_sum;
+
+volatile int g_lfs_raw;
+volatile int g_lss_raw;
+volatile int g_rss_raw;
+volatile int g_rfs_raw;
 
 /*** true if a wall is present ***/
-volatile bool g_left_wall_present;
-volatile bool g_front_wall_present;
-volatile bool g_right_wall_present;
+volatile bool g_lss_has_wall;
+volatile bool g_front_has_wall;
+volatile bool g_rss_has_wall;
 
 /*** steering variables ***/
 bool g_steering_enabled;
@@ -171,9 +180,11 @@ void update_battery_voltage() {
   g_battery_scale = 255.0 / g_battery_voltage;
 }
 /*********************************** Wall tracking **************************/
+
+/*********************************** Wall tracking **************************/
+// calculate the alignment errors - too far left is negative
+
 /***
- * This is for the basic, three detector wall sensor only
- *
  * Note: Runs in the systick interrupt. DO NOT call this directly.
  * @brief update the global wall sensor values.
  * @return robot cross-track-error. Too far left is negative.
@@ -187,35 +198,44 @@ float update_wall_sensors() {
   adc[0] = max(0, adc[0]);
   adc[1] = max(0, adc[1]);
   adc[2] = max(0, adc[2]);
+  adc[3] = max(0, adc[3]);
+
+  // this should be the only place that the aactual ADC channels are referenced
+  // if there is only a single front sensor (Basic sensor board) then the value is
+  // just used twice
   // keep these values for calibration assistance
-  g_right_wall_sensor_raw = adc[0];
-  g_front_wall_sensor_raw = adc[1];
-  g_left_wall_sensor_raw = adc[2];
+  g_rfs_raw = adc[RFS_CHANNEL];
+  g_rss_raw = adc[RSS_CHANNEL];
+  g_lss_raw = adc[LSS_CHANNEL];
+  g_lfs_raw = adc[LFS_CHANNEL];
 
   // normalise to a nominal value of 100
-  g_right_wall_sensor = (int)(g_right_wall_sensor_raw * RIGHT_SCALE);
-  g_front_wall_sensor = (int)(g_front_wall_sensor_raw * FRONT_SCALE);
-  g_left_wall_sensor = (int)(g_left_wall_sensor_raw * LEFT_SCALE);
+  g_rfs = (int)(g_rfs_raw * FRONT_RIGHT_SCALE);
+  g_rss = (int)(g_rss_raw * RIGHT_SCALE);
+  g_lss = (int)(g_lss_raw * LEFT_SCALE);
+  g_lfs = (int)(g_lfs_raw * FRONT_LEFT_SCALE);
 
   // set the wall detection flags
-  g_left_wall_present = g_left_wall_sensor > LEFT_THRESHOLD;
-  g_right_wall_present = g_right_wall_sensor > RIGHT_THRESHOLD;
-  g_front_wall_present = g_front_wall_sensor > FRONT_THRESHOLD;
+  g_lss_has_wall = g_lss > LEFT_THRESHOLD;
+  g_rss_has_wall = g_rss > RIGHT_THRESHOLD;
+  g_front_sum = g_lfs + g_rfs;
+  g_front_has_wall = g_front_sum > FRONT_THRESHOLD;
 
   // calculate the alignment errors - too far left is negative
-  float error = 0;
-  float right_error = RIGHT_NOMINAL - g_right_wall_sensor;
-  float left_error = LEFT_NOMINAL - g_left_wall_sensor;
-  if (g_left_wall_present && g_right_wall_present) {
+  int error = 0;
+  int right_error = SIDE_NOMINAL - g_rss;
+  int left_error = SIDE_NOMINAL - g_lss;
+  if (g_lss_has_wall && g_rss_has_wall) {
     error = left_error - right_error;
-  } else if (g_left_wall_present) {
-    error = 2.0 * left_error;
-  } else if (g_right_wall_present) {
-    error = -2.0 * right_error;
+  } else if (g_lss_has_wall) {
+    error = 2 * left_error;
+  } else if (g_rss_has_wall) {
+    error = -2 * right_error;
   }
+
   // the side sensors are not reliable close to a wall ahead.
   // TODO: The magic number 100 may need adjusting
-  if (g_front_wall_sensor > 100) {
+  if (g_front_sum > 100) {
     error = 0;
   }
   return error;
@@ -225,7 +245,7 @@ float update_wall_sensors() {
 
 /***
  * NOTE: Manual analogue conversions
- * All eight available ADC channels are aatomatically converted
+ * All eight available ADC channels are automatically converted
  * by the sensor interrupt. Attempting to performa a manual ADC
  * conversion with the Arduino AnalogueIn() function will disrupt
  * that process so avoid doing that.
@@ -309,15 +329,15 @@ ISR(ADC_vect) {
       break;
     case 2:
       switches_adc_reading = get_adc_result();
-      start_adc(RIGHT_WALL_SENSOR);
+      start_adc(A0);
       break;
     case 3:
       adc[0] = get_adc_result();
-      start_adc(FRONT_WALL_SENSOR);
+      start_adc(A1);
       break;
     case 4:
       adc[1] = get_adc_result();
-      start_adc(LEFT_WALL_SENSOR);
+      start_adc(A2);
       break;
     case 5:
       adc[2] = get_adc_result();
@@ -342,15 +362,15 @@ ISR(ADC_vect) {
       // wait at least one cycle for the detectors to respond
       break;
     case 9:
-      start_adc(RIGHT_WALL_SENSOR);
+      start_adc(A0);
       break;
     case 10:
       adc[0] = get_adc_result() - adc[0];
-      start_adc(FRONT_WALL_SENSOR);
+      start_adc(A1);
       break;
     case 11:
       adc[1] = get_adc_result() - adc[1];
-      start_adc(LEFT_WALL_SENSOR);
+      start_adc(A2);
       break;
     case 12:
       adc[2] = get_adc_result() - adc[2];

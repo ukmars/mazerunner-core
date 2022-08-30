@@ -76,31 +76,79 @@ const float DEFAULT_MAX_SPEED = 800;
 const float DEFAULT_SEARCH_ACCEL = 2000;
 //***************************************************************************//
 
+
+
 //***** SENSOR CALIBRATION **************************************************//
 // wall sensor thresholds and constants
-// RAW values for the front sensor when the robot is backed up to a wall
-const int FRONT_CALIBRATION = 70;
-// RAW values for the side sensors when the robot is centred in a cell
-// and there is no wall ahead
-const int LEFT_CALIBRATION = 97;
-const int RIGHT_CALIBRATION = 92;
+// if you have the basic sensor board enter the same value for both front constants
+#if EVENT == HOME
+    // RAW values for the front sensor when the robot is backed up to a wall
+    const int FRONT_LEFT_CALIBRATION = 97;
+    const int FRONT_RIGHT_CALIBRATION = 48;
+    // RAW values for the side sensors when the robot is centred in a cell
+    // and there is no wall ahead
+    const int LEFT_CALIBRATION = 87;
+    const int RIGHT_CALIBRATION = 80;
+    // SS90E turn thresholds. This is the front sum reading to trigger a turn
+    // it changes a bit if there is an adjacent wall. The threshold is set for
+    // when the robot is 20mm past the threshold.
+    const int TURN_THRESHOLD_SS90E = 115;
+    const int EXTRA_WALL_ADJUST = 6;
 
+#elif EVENT == UK
+
+    // RAW values for the front sensor when the robot is backed up to a wall
+    const int FRONT_LEFT_CALIBRATION = 83;
+    const int FRONT_RIGHT_CALIBRATION = 39;
+    // RAW side sensor values when robot is centred in a cell and wall ahead
+    const int LEFT_CALIBRATION = 80;
+    const int RIGHT_CALIBRATION = 72;
+
+    // SS90E turn thresholds. This is the front sum reading to trigger a turn
+    // it changes a bit if there is an adjacent wall. The threshold is set for
+    // when the robot is 20mm past the threshold.
+    const int TURN_THRESHOLD_SS90E = 100;
+    const int EXTRA_WALL_ADJUST = 6;
+
+#elif EVENT == PORTUGAL
+    // wall sensor thresholds and constants
+    // RAW values for the front sensor when the robot is backed up to a wall
+    const int FRONT_LEFT_CALIBRATION = 97;
+    const int FRONT_RIGHT_CALIBRATION = 48;
+    // RAW values for the side sensors when the robot is centred in a cell
+    // and there is no wall ahead
+    const int LEFT_CALIBRATION = 87;
+    const int RIGHT_CALIBRATION = 80;
+    // SS90E turn thresholds. This is the front sum reading to trigger a turn
+    // it changes a bit if there is an adjacent wall. The threshold is set for
+    // when the robot is 20mm past the threshold.
+    const int TURN_THRESHOLD_SS90E = 115;
+    const int EXTRA_WALL_ADJUST = 6;
+
+#endif
+
+
+//***** SENSOR SCALING ******************************************************//
 // This is the normalised value seen by the front sensor when the mouse is
 // in its calibration position
-const int LEFT_NOMINAL = 100;
+const int SIDE_NOMINAL = 100;
 const int FRONT_NOMINAL = 100;
-const int RIGHT_NOMINAL = 100;
 
 // Sensor brightness adjustment factor. The compiler calculates these so it saves processor time
-const float FRONT_SCALE = (float)FRONT_NOMINAL / FRONT_CALIBRATION;
-const float LEFT_SCALE = (float)LEFT_NOMINAL / LEFT_CALIBRATION;
-const float RIGHT_SCALE = (float)RIGHT_NOMINAL / RIGHT_CALIBRATION;
+const float FRONT_LEFT_SCALE = (float)FRONT_NOMINAL / FRONT_LEFT_CALIBRATION;
+const float FRONT_RIGHT_SCALE = (float)FRONT_NOMINAL / FRONT_RIGHT_CALIBRATION;
+const float LEFT_SCALE = (float)SIDE_NOMINAL / LEFT_CALIBRATION;
+const float RIGHT_SCALE = (float)SIDE_NOMINAL / RIGHT_CALIBRATION;
 
 // the values above which, a wall is seen
 const int LEFT_THRESHOLD = 40;   // minimum value to register a wall
 const int FRONT_THRESHOLD = 20;  // minimum value to register a wall
 const int RIGHT_THRESHOLD = 40;  // minimum value to register a wall
 const int FRONT_REFERENCE = 850; // reading when mouse centered with wall ahead
+
+const float left_edge_pos = 90.0f;
+const float right_edge_pos = 93.0f;
+
 //***************************************************************************//
 //***************************************************************************//
 // Some physical constants that are likely to be board -specific
@@ -149,9 +197,33 @@ const float BATTERY_MULTIPLIER = (ADC_REF_VOLTS / ADC_FSR / BATTERY_DIVIDER_RATI
 
 
 // these are aliases of convenience
+// the BASIC sensor board has two LEDs
+// const int LED_LEFT = USER_IO_6;
+// const int LED_RIGHT = USER_IO_11;
+// the ADVANCED sensor board has only one LED so use the value twice
 const int LED_LEFT = USER_IO_6;
-const int LED_RIGHT = USER_IO_12;
+const int LED_RIGHT = USER_IO_6;
 
+
+//***** SENSOR HARDWARE *****************************************************//
+// the ADC channels corresponding to the sensor inputs
+// ADVANCED SENSOR
+#define RFS_CHANNEL 0
+#define RSS_CHANNEL 1
+#define LSS_CHANNEL 2
+#define LFS_CHANNEL 3
+// BASIC SENSOR
+// #define RFS_CHANNEL 1
+// #define RSS_CHANNEL 0
+// #define LSS_CHANNEL 2
+// #define LFS_CHANNEL 1
+
+// if you have  basic sensor board with a single emitter pin
+// put the same pin number for both entries
+// BASIC
+// const int EMITTER_A = USER_IO_12;
+// const int EMITTER_B = USER_IO_12;
+// ADVANCED
 const int EMITTER_A = USER_IO_11;
 const int EMITTER_B = USER_IO_12;
 
@@ -163,9 +235,5 @@ const uint8_t SENSOR_3 = A3;
 const uint8_t SENSOR_4 = A4;
 const uint8_t SENSOR_5 = A5;
 
-// convenient aliases for the basic wall sensor channels
-const uint8_t RIGHT_WALL_SENSOR = A0;
-const uint8_t FRONT_WALL_SENSOR = A1;
-const uint8_t LEFT_WALL_SENSOR = A2;
 
 #endif
