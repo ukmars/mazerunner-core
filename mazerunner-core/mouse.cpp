@@ -439,12 +439,13 @@ int Mouse::search_to(unsigned char target) {
       }
     }
   }
+  disable_sensors();
   Serial.println();
   Serial.println(F("Arrived!  "));
   for (int i = 0; i < 4; i++) {
-    disable_sensors();
+    digitalWrite(LED_LEFT, 1);
     delay(250);
-    enable_sensors();
+    digitalWrite(LED_LEFT, 0);
     delay(250);
   }
 
