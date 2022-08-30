@@ -151,6 +151,14 @@ void Mouse::end_run() {
   forward.stop();
   spin_turn(-180, SPEEDMAX_SPIN_TURN, SPIN_TURN_ACCELERATION);
 }
+
+void Mouse::log_turn(char action) {
+  Serial.print(' ');
+  Serial.print(action);
+  print_justified(g_front_sum, 5);
+  print_justified((int)forward.position(), 5);
+  Serial.print(' ');
+}
 /** Search turns
  *
  * These turns assume that the robot is crossing the cell boundary but is still
@@ -164,71 +172,97 @@ void Mouse::end_run() {
  * TODO: There is only just enough space to get down to turn speed. Increase turn speed to 350?
  *
  */
-void Mouse::turn_SS90ER() {
 
-  float run_in = 5.0;   // mm
-  float run_out = 10.0; // mm
-  float angle = -90.0;  // deg
-  float omega = 280;    // deg/s
-  float alpha = 4000;   // deg/s/s
-  bool triggered = false;
-  disable_steering();
-  float distance = FULL_CELL + 10.0 + run_in - forward.position();
-  forward.start(distance, forward.speed(), DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
-  while (not forward.is_finished()) {
-    delay(2);
-    if (g_front_sum > 54) {
-      forward.set_state(CS_FINISHED);
-      triggered = true;
-    }
-  }
-  if (triggered) {
-    log_status('R');
-  } else {
-    log_status('r');
-  }
-  rotation.start(angle, omega, 0, alpha);
-  while (not rotation.is_finished()) {
-    delay(2);
-  }
-  forward.start(run_out, forward.speed(), DEFAULT_SEARCH_SPEED, SEARCH_ACCELERATION);
-  while (not forward.is_finished()) {
-    delay(2);
-  }
-  forward.set_position(FULL_CELL - 10.0);
-}
+struct TurnParameters {
+  float speed;
+  float run_in;  // (mm)
+  float run_out; // mm
+  float angle;   // deg
+  float omega;   // deg/s
+  float alpha;   // deg/s/s
+  int trigger;   // sensor value
+};
+
+const TurnParameters turn_params[4] = {
+    {DEFAULT_TURN_SPEED, 25, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
+    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90ER
+    {DEFAULT_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
+    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
+};
 
 void Mouse::turn_SS90EL() {
-  float run_in = 5.0;   // mm
-  float run_out = 10.0; // mm
-  float angle = 90.0;   // deg
-  float omega = 280;    // deg/s
-  float alpha = 4000;   // deg/s/s
+  int turn_id = 0;
+
   bool triggered = false;
   disable_steering();
-  float distance = FULL_CELL + 10.0 + run_in - forward.position();
-  forward.start(distance, forward.speed(), DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
-  while (not forward.is_finished()) {
-    delay(2);
-    if (g_front_sum > 54) {
+  forward.set_target_speed(DEFAULT_TURN_SPEED);
+
+  float trigger = turn_params[turn_id].trigger;
+  if (g_lss_has_wall) {
+    trigger += 10;
+  }
+  if (g_rss_has_wall) {
+    trigger += 6;
+  }
+  float turn_point = FULL_CELL + turn_params[turn_id].run_in;
+  while (forward.position() < turn_point) {
+    if (g_front_sum > trigger) {
       forward.set_state(CS_FINISHED);
       triggered = true;
+      break;
     }
   }
   if (triggered) {
-    log_status('L');
+    log_turn('S');
   } else {
-    log_status('l');
+    log_turn('D');
   }
-  rotation.start(angle, omega, 0, alpha);
+  rotation.start(turn_params[turn_id].angle, turn_params[turn_id].omega, 0, turn_params[turn_id].alpha);
   while (not rotation.is_finished()) {
     delay(2);
   }
-  forward.start(run_out, forward.speed(), DEFAULT_SEARCH_SPEED, SEARCH_ACCELERATION);
+  forward.start(turn_params[turn_id].run_out, forward.speed(), SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
     delay(2);
   }
-  forward.set_position(FULL_CELL - 10.0);
+  forward.set_position(SENSING_POSITION);
+}
+
+void Mouse::turn_SS90ER() {
+  int turn_id = 1;
+  bool triggered = false;
+  disable_steering();
+  forward.set_target_speed(DEFAULT_TURN_SPEED);
+  float turn_point = FULL_CELL + turn_params[turn_id].run_in;
+
+  float trigger = turn_params[turn_id].trigger;
+  if (g_lss_has_wall) {
+    trigger += 10;
+  }
+  if (g_rss_has_wall) {
+    trigger += 6;
+  }
+  while (forward.position() < turn_point) {
+    if (g_front_sum > trigger) {
+      forward.set_state(CS_FINISHED);
+      triggered = true;
+      break;
+    }
+  }
+  if (triggered) {
+    log_turn('S');
+  } else {
+    log_turn('D');
+  }
+  rotation.start(turn_params[turn_id].angle, turn_params[turn_id].omega, 0, turn_params[turn_id].alpha);
+  while (not rotation.is_finished()) {
+    delay(2);
+  }
+  forward.start(turn_params[turn_id].run_out, forward.speed(), SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
+  while (not forward.is_finished()) {
+    delay(2);
+  }
+  forward.set_position(SENSING_POSITION);
 }
 
 /**
@@ -283,9 +317,9 @@ void Mouse::init() {
 }
 
 void Mouse::update_sensors() {
-  rightWall = (g_right_wall_present);
-  leftWall = (g_left_wall_present);
-  frontWall = (g_front_wall_present);
+  rightWall = (g_rss_has_wall);
+  leftWall = (g_lss_has_wall);
+  frontWall = (g_front_has_wall);
 }
 
 void Mouse::log_status(char action) {
