@@ -175,7 +175,7 @@ void test_SS90ER() {
   Serial.print('R');
   print_justified(forward.position(), 4);
   Serial.print(' ');
-  print_justified(get_front_sensor(), 3);
+  print_justified(g_front_sum, 3);
   Serial.println();
   rotation.start(angle, omega, 0, alpha);
   while (not rotation.is_finished()) {
@@ -209,7 +209,7 @@ void test_SS90EL() {
   Serial.print('L');
   print_justified(forward.position(), 4);
   Serial.print(' ');
-  print_justified(get_front_sensor(), 3);
+  print_justified(g_front_sum, 3);
   Serial.println();
   rotation.start(angle, omega, 0, alpha);
   while (not rotation.is_finished()) {

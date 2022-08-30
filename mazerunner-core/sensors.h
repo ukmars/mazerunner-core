@@ -79,31 +79,6 @@ extern bool g_steering_enabled;
 extern volatile float g_cross_track_error;
 extern volatile float g_steering_adjustment;
 
-inline int get_left_sensor() {
-  int value;
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    value = g_lss;
-  }
-  return value;
-}
-
-inline int get_front_sensor() {
-  int value;
-  _NOP();
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    value = g_lfs;
-  }
-  return value;
-}
-
-inline int get_right_sensor() {
-  int value;
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    value = g_rss;
-  }
-  return value;
-}
-
 //***************************************************************************//
 void setup_adc();
 void enable_sensors();

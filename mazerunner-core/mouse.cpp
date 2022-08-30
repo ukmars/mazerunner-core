@@ -113,18 +113,6 @@ void turn_IP90L() {
   spin_turn(90, SPEEDMAX_SPIN_TURN, SPIN_TURN_ACCELERATION);
 }
 
-void turnSS90L() {
-  turn(90, 200, 2000);
-}
-
-void turnSS90R() {
-  turn(-90, 200, 2000);
-}
-
-void move_forward(float distance, float top_speed, float end_speed) {
-  forward.start(distance, top_speed, end_speed, SEARCH_ACCELERATION);
-}
-
 //***************************************************************************//
 
 void Mouse::end_run() {
@@ -134,7 +122,7 @@ void Mouse::end_run() {
   float remaining = (FULL_CELL + HALF_CELL) - forward.position();
   forward.start(remaining, forward.speed(), 30, forward.acceleration());
   if (has_wall) {
-    while (get_front_sensor() < 850) {
+    while (g_front_sum < 850) {
       delay(2);
     }
   } else {
@@ -142,23 +130,12 @@ void Mouse::end_run() {
       delay(2);
     }
   }
-  Serial.print(' ');
-  Serial.print(get_front_sensor());
-  Serial.print('@');
-  Serial.print(forward.position());
-  Serial.print(' ');
+  log_status('x');
   // Be sure robot has come to a halt.
   forward.stop();
   spin_turn(-180, SPEEDMAX_SPIN_TURN, SPIN_TURN_ACCELERATION);
 }
 
-void Mouse::log_turn(char action) {
-  Serial.print(' ');
-  Serial.print(action);
-  print_justified(g_front_sum, 5);
-  print_justified((int)forward.position(), 5);
-  Serial.print(' ');
-}
 /** Search turns
  *
  * These turns assume that the robot is crossing the cell boundary but is still
@@ -174,16 +151,16 @@ void Mouse::log_turn(char action) {
  */
 
 struct TurnParameters {
-  float speed;
-  float run_in;  // (mm)
-  float run_out; // mm
-  float angle;   // deg
-  float omega;   // deg/s
-  float alpha;   // deg/s/s
-  int trigger;   // sensor value
+  int speed;
+  int run_in;  // (mm)
+  int run_out; // mm
+  int angle;   // deg
+  int omega;   // deg/s
+  int alpha;   // deg/s/s
+  int trigger; // sensor value
 };
 
-const TurnParameters turn_params[4] PROGMEM = {
+const TurnParameters turn_params[4] = {
     {DEFAULT_TURN_SPEED, 25, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
     {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90ER
     {DEFAULT_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
@@ -202,6 +179,7 @@ void Mouse::turn_smooth(int turn_id) {
   if (g_rss_has_wall) {
     trigger += 6;
   }
+
   float turn_point = FULL_CELL + turn_params[turn_id].run_in;
   while (forward.position() < turn_point) {
     if (g_front_sum > trigger) {
@@ -211,9 +189,9 @@ void Mouse::turn_smooth(int turn_id) {
     }
   }
   if (triggered) {
-    log_turn('S');
+    log_status('S');
   } else {
-    log_turn('D');
+    log_status('D');
   }
   rotation.start(turn_params[turn_id].angle, turn_params[turn_id].omega, 0, turn_params[turn_id].alpha);
   while (not rotation.is_finished()) {
@@ -245,7 +223,7 @@ void Mouse::turn_around() {
   float remaining = (FULL_CELL + HALF_CELL) - forward.position();
   forward.start(remaining, forward.speed(), 30, forward.acceleration());
   if (has_wall) {
-    while (get_front_sensor() < FRONT_REFERENCE) {
+    while (g_front_sum < FRONT_REFERENCE) {
       delay(2);
     }
   } else {
@@ -286,19 +264,16 @@ void Mouse::update_sensors() {
 void Mouse::log_status(char action) {
   Serial.print(' ');
   Serial.print(action);
-  Serial.print('(');
+  Serial.print('{');
   print_hex_2(location);
+  Serial.print(' ');
   Serial.print(dirLetters[heading]);
-  Serial.print(')');
-  Serial.print('[');
-  print_justified(get_front_sensor(), 3);
-  Serial.print(']');
+  print_justified(g_front_sum, 4);
   Serial.print('@');
   print_justified((int)forward.position(), 4);
   Serial.print(' ');
   print_walls();
-  Serial.print(' ');
-  Serial.print('|');
+  Serial.print('}');
   Serial.print(' ');
 }
 
@@ -397,6 +372,8 @@ void Mouse::report_status() {
   Serial.println();
 }
 
+char hdg_letters[] = "FRAL";
+
 /***
  * The mouse is assumed to be centrally placed in a cell and may be
  * stationary. The current location is known and need not be any cell
@@ -421,12 +398,12 @@ void Mouse::report_status() {
 int Mouse::search_to(unsigned char target) {
 
   flood_maze(target);
-  // wait_for_front_sensor();
   delay(1000);
   enable_sensors();
   reset_drive_system();
   enable_motor_controllers();
   if (not handStart) {
+    // back up to the wall behind
     forward.start(-60, 120, 0, 1000);
     while (not forward.is_finished()) {
       delay(2);
@@ -453,11 +430,8 @@ int Mouse::search_to(unsigned char target) {
     flood_maze(target);
     unsigned char newHeading = direction_to_smallest(location, heading);
     unsigned char hdgChange = (newHeading - heading) & 0x3;
-    Serial.print(hdgChange);
+    Serial.print(hdg_letters[hdgChange]);
     Serial.write(' ');
-    Serial.write('|');
-    Serial.write(' ');
-    log_status('.');
     if (location == target) {
       end_run();
       heading = (heading + 2) & 0x03;
@@ -467,23 +441,23 @@ int Mouse::search_to(unsigned char target) {
         case 0: // ahead
           forward.adjust_position(-FULL_CELL);
           log_status('F');
-          wait_until_position(FULL_CELL - 10);
           log_status('x');
+          wait_until_position(FULL_CELL - 10);
           break;
         case 1: // right
           turn_smooth(SS90ER);
-          heading = (heading + 1) & 0x03;
           log_status('x');
+          heading = (heading + 1) & 0x03;
           break;
         case 2: // behind
           turn_around();
-          heading = (heading + 2) & 0x03;
           log_status('x');
+          heading = (heading + 2) & 0x03;
           break;
         case 3: // left
           turn_smooth(SS90EL);
-          heading = (heading + 3) & 0x03;
           log_status('x');
+          heading = (heading + 3) & 0x03;
           break;
       }
     }

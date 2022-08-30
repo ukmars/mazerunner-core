@@ -238,24 +238,28 @@ void report_pose() {
 //***************************************************************************//
 
 void report_wall_sensors() {
-  int left_front = g_lss;
+  int left_front = g_lfs;
   int left = g_lss;
   int right = g_rss;
-  int right_front = g_lfs;
-  int left_front_raw = g_lss_raw;
-  int left_raw = g_rss_raw;
+  int right_front = g_rfs;
+
+  int left_front_raw = g_lfs_raw;
+  int left_raw = g_lss_raw;
   int right_raw = g_rss_raw;
-  int right_front_raw = g_lfs_raw;
+  int right_front_raw = g_rfs_raw;
+
   Serial.print('\n');
-  print_justified(left_front, 5);
-  print_justified(left, 5);
-  print_justified(right, 5);
-  print_justified(right_front, 5);
-  Serial.print(' ');
   print_justified(left_front_raw, 5);
   print_justified(left_raw, 5);
   print_justified(right_raw, 5);
   print_justified(right_front_raw, 5);
+  Serial.print(' ');
+  Serial.print('|');
+  Serial.print(' ');
+  print_justified(left_front, 5);
+  print_justified(left, 5);
+  print_justified(right, 5);
+  print_justified(right_front, 5);
   Serial.print(' ');
 }
 
