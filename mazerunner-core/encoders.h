@@ -35,9 +35,6 @@
 
 #include <stdint.h>
 
-uint32_t encoder_left_total();
-uint32_t encoder_right_total();
-
 void reset_encoders();
 void setup_encoders();
 void update_encoders();

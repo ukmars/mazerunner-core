@@ -82,14 +82,17 @@ const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENC
 const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
 const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 
+// None of the variables in this file should be directly available to the rest
+// of the code without a guard to ensure atomic access
+
 static volatile float s_robot_position;
 static volatile float s_robot_angle;
 
 static float s_robot_fwd_increment = 0;
 static float s_robot_rot_increment = 0;
 
-int encoder_left_counter;
-int encoder_right_counter;
+static int encoder_left_counter;
+static int encoder_right_counter;
 
 static volatile int32_t s_left_total;
 static volatile int32_t s_right_total;
@@ -184,14 +187,6 @@ float robot_angle() {
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { angle = s_robot_angle; }
   return angle;
 }
-
-uint32_t encoder_left_total() {
-  return s_left_total;
-};
-
-uint32_t encoder_right_total() {
-  return s_right_total;
-};
 
 /**
  * Measurements indicate that even at 1500mm/s thetotal load due to
