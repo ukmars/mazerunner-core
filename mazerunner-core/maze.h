@@ -82,8 +82,6 @@ uint8_t neighbour(uint8_t cell, uint8_t direction);
 uint8_t neighbour_cost(uint8_t cell, uint8_t direction);
 uint8_t direction_to_smallest(uint8_t cell, uint8_t startDirection);
 
-void copy_walls_from_flash(const uint8_t *src);
-
 void set_wall_present(uint8_t cell, uint8_t direction);
 void set_wall_absent(uint8_t cell, uint8_t direction);
 
