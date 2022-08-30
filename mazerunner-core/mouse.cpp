@@ -461,47 +461,19 @@ void Mouse::set_heading(unsigned char new_heading) {
   heading = new_heading;
 }
 
-/***
- * inelegant but simple solution to the problem
- */
 void Mouse::turn_to_face(unsigned char newHeading) {
-  // debug << dirLetters[mouse.heading] << '>' << dirLetters[newHeading] << endl;
-  switch (heading) {
-    case NORTH:
-      if (newHeading == EAST) {
-        turn_IP90R();
-      } else if (newHeading == SOUTH) {
-        turnIP180();
-      } else if (newHeading == WEST) {
-        turn_IP90L();
-      }
+  unsigned char hdgChange = (newHeading - heading) & 0x3;
+  switch (hdgChange) {
+    case 0: // already got it
       break;
-    case EAST:
-      if (newHeading == SOUTH) {
-        turn_IP90R();
-      } else if (newHeading == WEST) {
-        turnIP180();
-      } else if (newHeading == NORTH) {
-        turn_IP90L();
-      }
+    case 1: // right
+      turn_IP90R();
       break;
-    case SOUTH:
-      if (newHeading == WEST) {
-        turn_IP90R();
-      } else if (newHeading == NORTH) {
-        turnIP180();
-      } else if (newHeading == EAST) {
-        turn_IP90L();
-      }
+    case 2: // behind
+      turnIP180();
       break;
-    case WEST:
-      if (newHeading == NORTH) {
-        turn_IP90R();
-      } else if (newHeading == EAST) {
-        turnIP180();
-      } else if (newHeading == SOUTH) {
-        turn_IP90L();
-      }
+    case 3: // left
+      turn_IP90L();
       break;
   }
   heading = newHeading;
