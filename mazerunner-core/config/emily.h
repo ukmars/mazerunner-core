@@ -57,15 +57,15 @@ const float STEERING_ADJUST_LIMIT = 10.0; // deg/s
 
 
 
-// encoder polarity is set to account for reversal of the encoder phases
-const int ENCODER_LEFT_POLARITY = (-1);
-const int ENCODER_RIGHT_POLARITY = (1);
+// encoder polarity is either 1 or -1 and is used to account for reversal of the encoder phases
+#define ENCODER_LEFT_POLARITY (-1)
+#define ENCODER_RIGHT_POLARITY (1)
 
-// similarly, the motors may be wired with different polarity and that
-// is defined here so that setting a positive voltage always moves the robot
-// forwards
-const int MOTOR_LEFT_POLARITY = (1);
-const int MOTOR_RIGHT_POLARITY = (-1);
+// similarly, the motors may be wired with different polarity and that is defined here so that
+// setting a positive voltage always moves the robot forwards
+#define MOTOR_LEFT_POLARITY (-1)
+#define MOTOR_RIGHT_POLARITY (1)
+
 
 //***************************************************************************//
 
