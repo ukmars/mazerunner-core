@@ -169,12 +169,15 @@ void report_wall_sensors() {
   int right_front_raw = g_rfs_raw;
 
   Serial.print('\n');
+  Serial.print('R');
+  Serial.print(' ');
   print_justified(left_front_raw, 7);
   print_justified(left_raw, 7);
   print_justified(right_raw, 7);
   print_justified(right_front_raw, 7);
   Serial.print(' ');
-  Serial.print('|');
+  Serial.print('-');
+  Serial.print('>');
   print_justified(left_front, 7);
   print_justified(left, 7);
   print_justified(right, 7);
@@ -185,7 +188,7 @@ void report_wall_sensors() {
 //***************************************************************************//
 
 void report_sensor_calibration() {
-  Serial.println(F(" lf_raw ls_raw rs_raw rf_raw | lf_cal ls_cal rs_cal rf_cal"));
+  Serial.println(F("   lf_raw ls_raw rs_raw rf_raw |  lf_cal ls_cal rs_cal rf_cal"));
   enable_sensors();
   s_start_time = millis();
   s_report_time = s_start_time;

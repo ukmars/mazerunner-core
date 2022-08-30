@@ -83,8 +83,6 @@ void run_mouse(int function) {
       test_SS90E();
       break;
     case 5:
-      // test_turn_SS90E(SS90ER);
-
       break;
     case 6:
       break;
