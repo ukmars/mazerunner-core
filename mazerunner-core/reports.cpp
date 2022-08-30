@@ -42,11 +42,6 @@ static uint32_t s_start_time;
 static uint32_t s_report_time;
 static uint32_t s_report_interval = REPORTING_INTERVAL;
 
-void report_reset(int interval) {
-  s_report_interval = interval;
-  s_report_time = millis();
-}
-
 // note that the Serial device has a 64 character buffer and, at 115200 baud
 // 64 characters will take about 6ms to go out over the wire.
 void report_profile_header() {
@@ -85,24 +80,6 @@ void report_profile() {
 #endif
 }
 
-//***************************************************************************//
-
-void report_sensor_calibration() {
-  Serial.println(F("left left_ref front front_ref right right_ref"));
-  enable_sensors();
-  s_start_time = millis();
-  s_report_time = s_start_time;
-  while (not button_pressed()) {
-    if (millis() >= s_report_time) {
-      s_report_time += 100;
-      report_wall_sensors();
-    }
-  }
-  Serial.println();
-  wait_for_button_release();
-  delay(200);
-  disable_sensors();
-}
 //***************************************************************************//
 
 void report_sensor_track_header() {
@@ -193,50 +170,6 @@ void report_front_sensor_track() {
 
 //***************************************************************************//
 
-void report_encoder_header() {
-#if DEBUG_LOGGING == 1
-  Serial.println(F("left right position angle"));
-  s_start_time = millis();
-  s_report_time = s_start_time;
-#endif
-}
-
-void report_encoders() {
-#if DEBUG_LOGGING == 1
-  if (millis() >= s_report_time) {
-    s_report_time += s_report_interval;
-    Serial.print(millis() - s_start_time);
-    print_justified(int(robot_position()), 8);
-    print_justified(int(robot_speed()), 6);
-    print_justified(int(robot_angle()), 6);
-    Serial.println();
-  }
-#else
-  delay(2);
-#endif
-}
-
-//***************************************************************************//
-
-void report_pose() {
-#if DEBUG_LOGGING == 1
-  Serial.print(F("   Angle (deg): "));
-  Serial.print(robot_angle());
-  Serial.print(F(" Position (mm): "));
-  Serial.print(robot_position());
-  Serial.println();
-  Serial.print(F(" fwd : "));
-  Serial.print(forward.position());
-  Serial.print(F(" rot : "));
-  Serial.print(rotation.position());
-  Serial.println();
-#else
-  delay(2);
-#endif
-}
-
-//***************************************************************************//
-
 void report_wall_sensors() {
   int left_front = g_lfs;
   int left = g_lss;
@@ -249,18 +182,36 @@ void report_wall_sensors() {
   int right_front_raw = g_rfs_raw;
 
   Serial.print('\n');
-  print_justified(left_front_raw, 5);
-  print_justified(left_raw, 5);
-  print_justified(right_raw, 5);
-  print_justified(right_front_raw, 5);
+  print_justified(left_front_raw, 7);
+  print_justified(left_raw, 7);
+  print_justified(right_raw, 7);
+  print_justified(right_front_raw, 7);
   Serial.print(' ');
   Serial.print('|');
+  print_justified(left_front, 7);
+  print_justified(left, 7);
+  print_justified(right, 7);
+  print_justified(right_front, 7);
   Serial.print(' ');
-  print_justified(left_front, 5);
-  print_justified(left, 5);
-  print_justified(right, 5);
-  print_justified(right_front, 5);
-  Serial.print(' ');
+}
+
+//***************************************************************************//
+
+void report_sensor_calibration() {
+  Serial.println(F(" lf_raw ls_raw rs_raw rf_raw | lf_cal ls_cal rs_cal rf_cal"));
+  enable_sensors();
+  s_start_time = millis();
+  s_report_time = s_start_time;
+  while (not button_pressed()) {
+    if (millis() >= s_report_time) {
+      s_report_time += 100;
+      report_wall_sensors();
+    }
+  }
+  Serial.println();
+  wait_for_button_release();
+  delay(200);
+  disable_sensors();
 }
 
 //***************************************************************************//

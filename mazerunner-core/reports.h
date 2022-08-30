@@ -35,7 +35,6 @@
 
 #include <Arduino.h>
 
-void report_reset(int interval = 2);
 /**
  * The profile reporter will send out a table of space separated
  * data so that the results can be saved to a file or imported to
@@ -73,19 +72,6 @@ void report_wall_sensors();
 void report_sensor_calibration();
 
 /**
- * The encoder report is probably only useful for calibration.
- * Repeatedly displays the left and right encoder totals along
- * with how the robot interprets these as forward motion (mm)
- * and rotation (deg).
- *
- * Report the header first to restart the reporting timer
- *
- * @brief Sends the encoder totals with robot position and angle
- */
-void report_encoders();
-void report_encoder_header();
-
-/**
  * The controllers work by comparing the profiled positin and angle
  * with values obtained from the encoders.
  *
@@ -93,7 +79,6 @@ void report_encoder_header();
  *
  * @brief Send the profiled and actual position and angle
  */
-void report_pose();
 
 void print_hex_2(unsigned char value);
 void print_justified(int value, int width);
