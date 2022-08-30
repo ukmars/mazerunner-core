@@ -107,12 +107,12 @@ void turn(float angle, float omega, float alpha) {
  *
  * @brief turn in place. Force forward speed to zero
  */
-void spin_turn(float degrees, float speed, float acceleration) {
+void spin_turn(float angle, float omega, float alpha) {
   forward.set_target_speed(0);
   while (forward.speed() != 0) {
     delay(2);
   }
-  turn(degrees, speed, acceleration);
+  turn(angle, omega, alpha);
 };
 
 //***************************************************************************//

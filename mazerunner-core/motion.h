@@ -45,6 +45,6 @@ void wait_until_position(float position);
 void wait_until_distance(float distance);
 
 void turn_around();
-void spin_turn(float degrees, float speed, float acceleration);
+void spin_turn(float angle, float omega, float alpha);
 
 #endif
