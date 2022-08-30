@@ -102,15 +102,15 @@ static void stopAndAdjust() {
 void turnIP180() {
   static int direction = 1;
   direction *= -1; // alternate direction each time it is called
-  spin_turn(direction * 180, SPEEDMAX_SPIN_TURN, SPIN_TURN_ACCELERATION);
+  spin_turn(direction * 180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
 }
 
 void turn_IP90R() {
-  spin_turn(-90, SPEEDMAX_SPIN_TURN, SPIN_TURN_ACCELERATION);
+  spin_turn(-90, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
 }
 
 void turn_IP90L() {
-  spin_turn(90, SPEEDMAX_SPIN_TURN, SPIN_TURN_ACCELERATION);
+  spin_turn(90, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
 }
 
 //***************************************************************************//
@@ -133,7 +133,7 @@ void Mouse::end_run() {
   log_status('x');
   // Be sure robot has come to a halt.
   forward.stop();
-  spin_turn(-180, SPEEDMAX_SPIN_TURN, SPIN_TURN_ACCELERATION);
+  spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
 }
 
 /** Search turns
@@ -149,23 +149,6 @@ void Mouse::end_run() {
  * TODO: There is only just enough space to get down to turn speed. Increase turn speed to 350?
  *
  */
-
-struct TurnParameters {
-  int speed;
-  int run_in;  // (mm)
-  int run_out; // mm
-  int angle;   // deg
-  int omega;   // deg/s
-  int alpha;   // deg/s/s
-  int trigger; // sensor value
-};
-
-const TurnParameters turn_params[4] = {
-    {DEFAULT_TURN_SPEED, 25, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
-    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90ER
-    {DEFAULT_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
-    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
-};
 
 void Mouse::turn_smooth(int turn_id) {
   bool triggered = false;
@@ -233,7 +216,7 @@ void Mouse::turn_around() {
   }
   // Be sure robot has come to a halt.
   forward.stop();
-  spin_turn(-180, SPEEDMAX_SPIN_TURN, SPIN_TURN_ACCELERATION);
+  spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
   forward.start(HALF_CELL - 10.0, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
     delay(2);

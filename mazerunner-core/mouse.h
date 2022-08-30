@@ -32,13 +32,15 @@
 
 #ifndef MOUSE_H
 #define MOUSE_H
+#include "config.h"
 
 #define SEARCH_ACCELERATION 3000
-#define SPIN_TURN_ACCELERATION 3600
 #define SPEEDMAX_EXPLORE 400
 #define SPEEDMAX_STRAIGHT 800
 #define SPEEDMAX_SMOOTH_TURN 500
-#define SPEEDMAX_SPIN_TURN 360
+
+#define OMEGA_MAX_SPIN_TURN 360
+#define ALPHA_SPIN_TURN 3600
 
 enum {
   FRESH_START,
@@ -55,6 +57,22 @@ enum {
   SS90R = 3,
 };
 
+struct TurnParameters {
+  int speed;
+  int run_in;  // (mm)
+  int run_out; // mm
+  int angle;   // deg
+  int omega;   // deg/s
+  int alpha;   // deg/s/s
+  int trigger; // sensor value
+};
+
+const TurnParameters turn_params[4] = {
+    {DEFAULT_TURN_SPEED, 25, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
+    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90ER
+    {DEFAULT_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
+    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
+};
 /// TODO: should the whole mouse object be persistent?
 class Mouse {
   public:
