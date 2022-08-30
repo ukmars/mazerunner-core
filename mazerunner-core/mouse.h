@@ -60,7 +60,6 @@ class Mouse {
   public:
   Mouse();
   void init();
-  void report_status();
   void update_sensors();
   void log_status(char action);
   void set_heading(unsigned char new_heading);

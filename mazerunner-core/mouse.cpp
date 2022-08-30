@@ -346,30 +346,7 @@ void Mouse::follow_to(unsigned char target) {
   }
   disable_sensors();
 
-  report_status();
   reset_drive_system();
-}
-
-void Mouse::report_status() {
-  print_hex_2(location);
-  Serial.print(':');
-  Serial.print(dirLetters[heading]);
-  if (leftWall) {
-    Serial.print('L');
-  } else {
-    Serial.print('-');
-  }
-  if (frontWall) {
-    Serial.print('F');
-  } else {
-    Serial.print('-');
-  }
-  if (rightWall) {
-    Serial.print('R');
-  } else {
-    Serial.print('-');
-  }
-  Serial.println();
 }
 
 char hdg_letters[] = "FRAL";
@@ -470,9 +447,7 @@ int Mouse::search_to(unsigned char target) {
     enable_sensors();
     delay(250);
   }
-  disable_sensors();
 
-  report_status();
   reset_drive_system();
   return 0;
 }
