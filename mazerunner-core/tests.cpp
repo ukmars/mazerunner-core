@@ -154,41 +154,39 @@ void test_edge_detection() {
   delay(100);
 }
 
-void test_smooth_turn(int turn_id) {
+void test_SS90E() {
+  // note that changes to the speeds are likely to affect
+  // the other turn parameters
+  uint8_t side = wait_for_user_start();
   reset_drive_system();
   enable_motor_controllers();
-  enable_sensors();
-
   set_steering_mode(STEERING_OFF);
-  // run to the turn start point
-  float distance = BACK_WALL_TO_CENTER + 90 + turn_params[turn_id].run_in;
+  // move to the boundary with the next cell
+  float distance = BACK_WALL_TO_CENTER + HALF_CELL;
   forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
     delay(2);
   }
+  forward.set_position(FULL_CELL);
 
-  // log where we are and what the sensors see at the start of the turn
-  if (turn_id == SS90ER) {
-    Serial.print('R');
+  if (side == RIGHT_START) {
+    emily.turn_smooth(SS90ER);
   } else {
-    Serial.print('L');
+    emily.turn_smooth(SS90EL);
   }
-  print_justified(forward.position(), 4);
-  Serial.print(' ');
-  print_justified(g_front_sum, 3);
-
-  // perform the turn
-  rotation.start(turn_params[turn_id].angle, turn_params[turn_id].omega, 0, turn_params[turn_id].alpha);
-  while (not rotation.is_finished()) {
-    delay(2);
-  }
-  // and do the leadout plus one cell
-  forward.start(turn_params[turn_id].run_out + FULL_CELL, forward.speed(), 0, SEARCH_ACCELERATION);
+  // after the turn, estimate the angle error by looking for
+  // changes in the side sensor readings
+  int sensor_left = g_lss;
+  int sensor_right = g_rss;
+  // move two cells. The resting position of the mouse have the
+  // same offset as the turn ending
+  forward.start(2 * FULL_CELL, DEFAULT_TURN_SPEED, 0, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
     delay(2);
   }
-  // and finally record where we finished
-  print_justified(forward.position(), 4);
-  Serial.println();
+  sensor_left -= g_lss;
+  sensor_right -= g_rss;
+  print_justified(sensor_left, 5);
+  print_justified(sensor_right, 5);
   reset_drive_system();
 }

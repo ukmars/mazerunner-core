@@ -80,10 +80,10 @@ void run_mouse(int function) {
       emily.follow_to(maze_goal());
       break;
     case 4:
-      test_smooth_turn(SS90EL);
+      test_SS90E();
       break;
     case 5:
-      test_smooth_turn(SS90ER);
+      // test_turn_SS90E(SS90ER);
 
       break;
     case 6:

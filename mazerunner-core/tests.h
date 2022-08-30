@@ -33,7 +33,7 @@
 #define TEST_H
 
 void test_spin_turn(float angle);
-void test_smooth_turn(int turn_id);
+void test_SS90E();
 void test_edge_detection();
 void test_sensor_spin_calibrate();
 #endif
