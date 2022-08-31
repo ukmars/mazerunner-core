@@ -1,12 +1,18 @@
-# ukmarsbot-mazerunner
+# NOT READY FOR RELEASE - TEST CODE ONLY
+
+---
+
+# Mazerunner Core
 
 This repository will hold a version of the mazerunner code for a version of UKMARSBOT that can run in a classic micromouse maze.
 
 The code assumes you have a standard UKMARSBOT assembled, using an Arduino nano with a basic or advanced wall sensor connected.
 
+All the project code is in the directory `mazerunner-core`
+
 ### Arduino IDE users
 
-For the impatient, if you are wanting to run this code in the Arduino IDE then you can download or clone the complete repository and simply open the mazerunner-core.ino file. The rduino IDE will be able to build and flash the prject. It will also open all the other files in the mazerunner-core directory. That may be surprising to you but it is just trying to be helpful.
+For the impatient, if you are wanting to run this code in the Arduino IDE then you can download or clone the complete repository and simply open the `mazerunner-core.ino` file. The rduino IDE will be able to build and flash the prject. It will also open all the other files in the `mazerunner-core` directory. That may be surprising to you but it is just trying to be helpful.
 
 
 ### Platform IO users
@@ -15,9 +21,14 @@ The project is maintained and developed using PlatformIO with Visual Studio Code
 
 ## Initial Configuration
 
-Before flashing your robot, look in the config.h file. In here you can place entries that let you maintain your own robot-specific config file containing a number of default settings describing things like the motor gear ratio, wheel diameter and wheel spacing. Check that these are at least close to the values required for your robot.
+Before flashing your robot, look in the config.h file. In here you can place entries that let you maintain your own robot-specific config file containing a number of default settings describing things like the motor gear ratio, wheel diameter and wheel spacing. 
 
-Because it is not possible to know how you wired your motors and encoders, you will also find defaults for the motor and encoder polarity. You will need to first check  that moving the wheels forwards by hand increases the corresponding encoder count. If not, change the encoder polarity settings as appropriate. If the robot then moves in the wrong direction or just turns instead of moving forward, adjust the relevant otor polarity settings.
+Each physical robot has its own config file. in the main config.h, add an entry for your robot name and create a corresponding config file in the `config` directory. You can start by copying one of the existing config files
+Check that these are at least close to the values required for your robot.
+
+Because it is not possible to know how you wired your motors and encoders, you will also find defaults for the motor and encoder polarity. You will need to first check that moving the wheels forwards by hand increases the corresponding encoder count. If not, change the encoder polarity settings as appropriate. If the robot then moves in the wrong direction or just turns instead of moving forward, adjust the relevant motor polarity settings.
+
+You will also find a directory called `board`. In there is an entry for the UKMARSBOT V1.x hardware. If you are using a different processor, or even a different robot, this is where you can define the pinouts and other hardware related items. It is used in a similar way to the `config` directory in that you can define a board name in `config.h`, add a suitale board definitions file and then make appropriate aliases for the hardware pins in the robot's own config file. It may sound awkward but it should be easier than messing in one bit configuration file and it will certainly help if you are running more than one robot.
 
 ## Getting started
 
