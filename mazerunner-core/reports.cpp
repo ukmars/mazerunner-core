@@ -36,6 +36,7 @@
 #include "src/motors.h"
 #include "src/profile.h"
 #include "src/sensors.h"
+#include "utils.h"
 #include <Arduino.h>
 
 static uint32_t s_start_time;
@@ -195,34 +196,6 @@ void report_sensor_calibration() {
 }
 
 //***************************************************************************//
-
-// simple formatting functions for printing maze costs
-void print_hex_2(unsigned char value) {
-  if (value < 16) {
-    Serial.print('0');
-  }
-  Serial.print(value, HEX);
-}
-
-void print_justified(int32_t value, int width) {
-  int v = value;
-  int w = width;
-  w--;
-  if (v < 0) {
-    w--;
-  }
-  while (v /= 10) {
-    w--;
-  }
-  while (w > 0) {
-    Serial.write(' ');
-    --w;
-  }
-  Serial.print(value);
-}
-void print_justified(int value, int width) {
-  print_justified(int32_t(value), width);
-}
 
 /***
  * printing functions.

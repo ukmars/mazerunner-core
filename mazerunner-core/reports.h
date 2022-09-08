@@ -79,8 +79,6 @@ void report_sensor_calibration();
  * @brief Send the profiled and actual position and angle
  */
 
-void print_hex_2(unsigned char value);
-void print_justified(int value, int width);
 void print_maze_plain();
 void print_maze_with_costs();
 void print_maze_with_directions();
