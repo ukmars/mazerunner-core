@@ -58,9 +58,9 @@ void report_profile() {
     s_report_time += s_report_interval;
     Serial.print(millis() - s_start_time);
     Serial.print(' ');
-    Serial.print(robot_position());
+    Serial.print(encoders.robot_position());
     Serial.print(' ');
-    Serial.print(robot_angle());
+    Serial.print(encoders.robot_angle());
     Serial.print(' ');
     Serial.print(forward.position());
     Serial.print(' ');
@@ -96,9 +96,9 @@ void report_sensor_track(bool use_raw = false) {
     s_report_time += s_report_interval;
     Serial.print(millis() - s_start_time);
     Serial.print(' ');
-    Serial.print(robot_position());
+    Serial.print(encoders.robot_position());
     Serial.print(' ');
-    Serial.print(robot_angle());
+    Serial.print(encoders.robot_angle());
     if (use_raw) {
       Serial.print(' ');
       Serial.print(g_lss_raw);
@@ -143,7 +143,7 @@ void report_front_sensor_track() {
     s_report_time += s_report_interval;
     Serial.print(millis() - s_start_time);
     Serial.print(' ');
-    Serial.print(fabsf(robot_position()));
+    Serial.print(fabsf(encoders.robot_position()));
     Serial.print(' ');
     Serial.print(g_lfs);
     Serial.print(' ');
@@ -189,19 +189,19 @@ void report_wall_sensors() {
 
 void report_sensor_calibration() {
   Serial.println(F("   lf_raw ls_raw rs_raw rf_raw |  lf_cal ls_cal rs_cal rf_cal"));
-  enable_sensors();
+  sensors.enable_sensors();
   s_start_time = millis();
   s_report_time = s_start_time;
-  while (not button_pressed()) {
+  while (not sensors.button_pressed()) {
     if (millis() >= s_report_time) {
       s_report_time += 100;
       report_wall_sensors();
     }
   }
   Serial.println();
-  wait_for_button_release();
+  sensors.wait_for_button_release();
   delay(200);
-  disable_sensors();
+  sensors.disable_sensors();
 }
 
 //***************************************************************************//

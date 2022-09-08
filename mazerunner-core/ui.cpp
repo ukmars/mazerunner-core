@@ -146,7 +146,7 @@ uint8_t read_float(const char *line, float &value) {
 
 int cli_run_user(const Args args) {
   if (args.argc < 2) {
-    run_mouse(get_switches());
+    run_mouse(sensors.get_switches());
     return T_OK;
   }
   int test_number = -1;
@@ -263,10 +263,10 @@ void cli_interpret(const Args &args) {
         print_maze_with_directions();
         break;
       case 'S':
-        enable_sensors();
+        sensors.enable_sensors();
         delay(10);
         report_wall_sensors();
-        disable_sensors();
+        sensors.disable_sensors();
         break;
       case 'U':
         cli_run_user(args);
@@ -296,12 +296,12 @@ void cli_run() {
  * just sit in a loop, flashing lights waiting for the button to be pressed
  */
 void panic() {
-  while (!button_pressed()) {
+  while (!sensors.button_pressed()) {
     digitalWriteFast(LED_BUILTIN, 1);
     delay(100);
     digitalWriteFast(LED_BUILTIN, 0);
     delay(100);
   }
-  wait_for_button_release();
+  sensors.wait_for_button_release();
   digitalWriteFast(LED_BUILTIN, 0);
 }

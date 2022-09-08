@@ -52,7 +52,7 @@ void user_follow_wall() {
 }
 
 void user_log_front_sensor() {
-  enable_sensors();
+  sensors.enable_sensors();
   motion.reset_drive_system();
   motors.enable_motor_controllers();
   report_front_sensor_track_header();
@@ -61,7 +61,7 @@ void user_log_front_sensor() {
     report_front_sensor_track();
   }
   motion.reset_drive_system();
-  disable_sensors();
+  sensors.disable_sensors();
 }
 
 void run_mouse(int function) {
@@ -108,7 +108,7 @@ void run_mouse(int function) {
 
       break;
     default:
-      disable_sensors();
+      sensors.disable_sensors();
       motion.reset_drive_system();
       break;
   }

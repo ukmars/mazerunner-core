@@ -48,8 +48,8 @@ class Motion {
   void reset_drive_system() {
     motors.stop_motors();
     motors.disable_motor_controllers();
-    set_steering_mode(STEERING_OFF);
-    reset_encoders();
+    sensors.set_steering_mode(STEERING_OFF);
+    encoders.reset_encoders();
     motors.reset_motor_controllers();
     forward.reset();
     rotation.reset();

@@ -61,18 +61,18 @@
  */
 
 void test_sensor_spin_calibrate() {
-  enable_sensors();
+  sensors.enable_sensors();
   delay(100);
   motion.reset_drive_system();
   motors.enable_motor_controllers();
-  set_steering_mode(STEERING_OFF);
+  sensors.set_steering_mode(STEERING_OFF);
   report_sensor_track_header();
   rotation.start(360, 180, 0, 1800);
   while (not rotation.is_finished()) {
     report_sensor_track(true);
   }
   motion.reset_drive_system();
-  disable_sensors();
+  sensors.disable_sensors();
   delay(100);
 }
 
@@ -104,11 +104,11 @@ void test_edge_detection() {
   int right_edge_position = 0;
   int left_max = 0;
   int right_max = 0;
-  enable_sensors();
+  sensors.enable_sensors();
   delay(100);
   motion.reset_drive_system();
   motors.enable_motor_controllers();
-  set_steering_mode(STEERING_OFF);
+  sensors.set_steering_mode(STEERING_OFF);
   Serial.println(F("Edge positions:"));
   forward.start(FULL_CELL - 30.0, 100, 0, 1000);
   while (not forward.is_finished()) {
@@ -150,17 +150,17 @@ void test_edge_detection() {
   Serial.println();
 
   motion.reset_drive_system();
-  disable_sensors();
+  sensors.disable_sensors();
   delay(100);
 }
 
 void test_SS90E() {
   // note that changes to the speeds are likely to affect
   // the other turn parameters
-  uint8_t side = wait_for_user_start();
+  uint8_t side = sensors.wait_for_user_start();
   motion.reset_drive_system();
   motors.enable_motor_controllers();
-  set_steering_mode(STEERING_OFF);
+  sensors.set_steering_mode(STEERING_OFF);
   // move to the boundary with the next cell
   float distance = BACK_WALL_TO_CENTER + HALF_CELL;
   forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);

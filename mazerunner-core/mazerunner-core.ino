@@ -43,6 +43,9 @@
 #include <Arduino.h>
 
 // Global objects
+Systick systick;
+Encoders encoders;
+Sensors sensors;
 Motion motion;
 Motors motors;
 Profile forward;
@@ -54,18 +57,18 @@ float g_right_motor_volts;
 
 void setup() {
   Serial.begin(BAUDRATE);
-  setup_systick();
+  systick.begin();
   pinMode(USER_IO_6, OUTPUT);
   pinMode(EMITTER_A, OUTPUT);
   pinMode(EMITTER_B, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  enable_sensors();
+  sensors.enable_sensors();
   maze.initialise_maze();
   motors.setup_motors();
-  setup_encoders();
-  setup_adc();
+  encoders.setup_encoders();
+  sensors.setup_adc();
   Serial.println();
-  disable_sensors();
+  sensors.disable_sensors();
   Serial.println(F("RDY"));
 }
 
@@ -74,11 +77,11 @@ void loop() {
   if (Serial.available()) {
     cli_run();
   }
-  if (button_pressed()) {
-    wait_for_button_release();
-    int function = get_switches();
+  if (sensors.button_pressed()) {
+    sensors.wait_for_button_release();
+    int function = sensors.get_switches();
     if (function > 1) {
-      wait_for_user_start(); // cover front sensor with hand to start
+      sensors.wait_for_user_start(); // cover front sensor with hand to start
     }
     run_mouse(function);
   }

@@ -85,7 +85,7 @@ class Motors {
   }
 
   float position_controller() {
-    s_fwd_error += forward.increment() - robot_fwd_increment();
+    s_fwd_error += forward.increment() - encoders.robot_fwd_increment();
     float diff = s_fwd_error - s_old_fwd_error;
     s_old_fwd_error = s_fwd_error;
     float output = FWD_KP * s_fwd_error + FWD_KD * diff;
@@ -93,7 +93,7 @@ class Motors {
   }
 
   float angle_controller(float steering_adjustment) {
-    s_rot_error += rotation.increment() - robot_rot_increment();
+    s_rot_error += rotation.increment() - encoders.robot_rot_increment();
     s_rot_error += steering_adjustment;
     float diff = s_rot_error - s_old_rot_error;
     s_old_rot_error = s_rot_error;

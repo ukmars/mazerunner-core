@@ -79,7 +79,7 @@ void print_walls() {
  */
 static void stopAndAdjust() {
   float remaining = (FULL_CELL + HALF_CELL) - forward.position();
-  set_steering_mode(STEERING_OFF);
+  sensors.set_steering_mode(STEERING_OFF);
   forward.start(remaining, forward.speed(), 0, forward.acceleration());
   while (not forward.is_finished()) {
     if (g_front_sum > (FRONT_REFERENCE - 150)) {
@@ -117,7 +117,7 @@ void turn_IP90L() {
 
 void Mouse::end_run() {
   bool has_wall = frontWall;
-  set_steering_mode(STEERING_OFF);
+  sensors.set_steering_mode(STEERING_OFF);
   log_status('T');
   float remaining = (FULL_CELL + HALF_CELL) - forward.position();
   forward.start(remaining, forward.speed(), 30, forward.acceleration());
@@ -152,7 +152,7 @@ void Mouse::end_run() {
 
 void Mouse::turn_smooth(int turn_id) {
   bool triggered = false;
-  set_steering_mode(STEERING_OFF);
+  sensors.set_steering_mode(STEERING_OFF);
   forward.set_target_speed(DEFAULT_TURN_SPEED);
 
   float trigger = turn_params[turn_id].trigger;
@@ -201,7 +201,7 @@ void Mouse::turn_smooth(int turn_id) {
  */
 void Mouse::turn_around() {
   bool has_wall = frontWall;
-  set_steering_mode(STEERING_OFF);
+  sensors.set_steering_mode(STEERING_OFF);
   log_status('A');
   float remaining = (FULL_CELL + HALF_CELL) - forward.position();
   forward.start(remaining, forward.speed(), 30, forward.acceleration());
@@ -232,7 +232,7 @@ Mouse::Mouse() {
 
 void Mouse::init() {
   handStart = false;
-  set_steering_mode(STEERING_OFF);
+  sensors.set_steering_mode(STEERING_OFF);
   location = 0;
   heading = NORTH;
   p_mouse_state = SEARCHING;
@@ -269,7 +269,7 @@ void Mouse::follow_to(unsigned char target) {
   maze.flood_maze(maze.maze_goal());
   // wait_for_user_start();
   delay(1000);
-  enable_sensors();
+  sensors.enable_sensors();
   motion.reset_drive_system();
   motors.enable_motor_controllers();
   forward.start(BACK_WALL_TO_CENTER, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
@@ -281,12 +281,12 @@ void Mouse::follow_to(unsigned char target) {
   motion.wait_until_position(FULL_CELL - 10);
   // at the start of this loop we are always at the sensing point
   while (location != target) {
-    if (button_pressed()) {
+    if (sensors.button_pressed()) {
       break;
     }
     Serial.println();
     log_status('-');
-    set_steering_mode(STEER_NORMAL);
+    sensors.set_steering_mode(STEER_NORMAL);
     location = maze.neighbour(location, heading);
     update_sensors();
     update_map();
@@ -322,12 +322,12 @@ void Mouse::follow_to(unsigned char target) {
   Serial.println();
   Serial.println(F("Arrived!  "));
   for (int i = 0; i < 4; i++) {
-    disable_sensors();
+    sensors.disable_sensors();
     delay(250);
-    enable_sensors();
+    sensors.enable_sensors();
     delay(250);
   }
-  disable_sensors();
+  sensors.disable_sensors();
 
   motion.reset_drive_system();
 }
@@ -359,7 +359,7 @@ int Mouse::search_to(unsigned char target) {
 
   maze.flood_maze(target);
   delay(1000);
-  enable_sensors();
+  sensors.enable_sensors();
   motion.reset_drive_system();
   motors.enable_motor_controllers();
   if (not handStart) {
@@ -378,12 +378,12 @@ int Mouse::search_to(unsigned char target) {
   motion.wait_until_position(FULL_CELL - 10);
   // TODO. the robot needs to start each iteration at the sensing point
   while (location != target) {
-    if (button_pressed()) {
+    if (sensors.button_pressed()) {
       break;
     }
     Serial.println();
     log_status('-');
-    set_steering_mode(STEER_NORMAL);
+    sensors.set_steering_mode(STEER_NORMAL);
     location = maze.neighbour(location, heading);
     update_sensors();
     update_map();
@@ -422,7 +422,7 @@ int Mouse::search_to(unsigned char target) {
       }
     }
   }
-  disable_sensors();
+  sensors.disable_sensors();
   Serial.println();
   Serial.println(F("Arrived!  "));
   for (int i = 0; i < 4; i++) {
@@ -535,7 +535,7 @@ void Mouse::update_map() {
  * reader as an exercise to do something useful with that.
  */
 int Mouse::search_maze() {
-  wait_for_user_start();
+  sensors.wait_for_user_start();
   Serial.println("Search TO");
   handStart = true;
   location = START;
