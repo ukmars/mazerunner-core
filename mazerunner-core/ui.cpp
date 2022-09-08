@@ -32,10 +32,10 @@
 
 #include "ui.h"
 #include "config.h"
-#include "digitalWriteFast.h"
-#include "maze.h"
 #include "reports.h"
-#include "sensors.h"
+#include "src/digitalWriteFast.h"
+#include "src/maze.h"
+#include "src/sensors.h"
 #include "tests.h"
 #include "user.h"
 #include <Arduino.h>

@@ -31,13 +31,13 @@
  */
 #include "tests.h"
 #include "config.h"
-#include "encoders.h"
-#include "motion.h"
-#include "motors.h"
 #include "mouse.h"
-#include "profile.h"
 #include "reports.h"
-#include "sensors.h"
+#include "src/encoders.h"
+#include "src/motion.h"
+#include "src/motors.h"
+#include "src/profile.h"
+#include "src/sensors.h"
 
 //***************************************************************************//
 
@@ -63,7 +63,7 @@
 void test_sensor_spin_calibrate() {
   enable_sensors();
   delay(100);
-  reset_drive_system();
+  motion.reset_drive_system();
   enable_motor_controllers();
   set_steering_mode(STEERING_OFF);
   report_sensor_track_header();
@@ -71,7 +71,7 @@ void test_sensor_spin_calibrate() {
   while (not rotation.is_finished()) {
     report_sensor_track(true);
   }
-  reset_drive_system();
+  motion.reset_drive_system();
   disable_sensors();
   delay(100);
 }
@@ -106,7 +106,7 @@ void test_edge_detection() {
   int right_max = 0;
   enable_sensors();
   delay(100);
-  reset_drive_system();
+  motion.reset_drive_system();
   enable_motor_controllers();
   set_steering_mode(STEERING_OFF);
   Serial.println(F("Edge positions:"));
@@ -149,7 +149,7 @@ void test_edge_detection() {
   }
   Serial.println();
 
-  reset_drive_system();
+  motion.reset_drive_system();
   disable_sensors();
   delay(100);
 }
@@ -158,7 +158,7 @@ void test_SS90E() {
   // note that changes to the speeds are likely to affect
   // the other turn parameters
   uint8_t side = wait_for_user_start();
-  reset_drive_system();
+  motion.reset_drive_system();
   enable_motor_controllers();
   set_steering_mode(STEERING_OFF);
   // move to the boundary with the next cell
@@ -170,9 +170,9 @@ void test_SS90E() {
   forward.set_position(FULL_CELL);
 
   if (side == RIGHT_START) {
-    emily.turn_smooth(SS90ER);
+    mouse.turn_smooth(SS90ER);
   } else {
-    emily.turn_smooth(SS90EL);
+    mouse.turn_smooth(SS90EL);
   }
   // after the turn, estimate the angle error by looking for
   // changes in the side sensor readings
@@ -188,5 +188,5 @@ void test_SS90E() {
   sensor_right -= g_rss;
   print_justified(sensor_left, 5);
   print_justified(sensor_right, 5);
-  reset_drive_system();
+  motion.reset_drive_system();
 }

@@ -31,11 +31,11 @@
  */
 
 #include "reports.h"
-#include "encoders.h"
-#include "maze.h"
-#include "motors.h"
-#include "profile.h"
-#include "sensors.h"
+#include "src/encoders.h"
+#include "src/maze.h"
+#include "src/motors.h"
+#include "src/profile.h"
+#include "src/sensors.h"
 #include <Arduino.h>
 
 static uint32_t s_start_time;

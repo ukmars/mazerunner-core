@@ -31,14 +31,14 @@
  */
 #include "user.h"
 #include "config.h"
-#include "encoders.h"
-#include "maze.h"
-#include "motion.h"
-#include "motors.h"
 #include "mouse.h"
-#include "profile.h"
 #include "reports.h"
-#include "sensors.h"
+#include "src/encoders.h"
+#include "src/maze.h"
+#include "src/motion.h"
+#include "src/motors.h"
+#include "src/profile.h"
+#include "src/sensors.h"
 #include "tests.h"
 #include <Arduino.h>
 
@@ -53,14 +53,14 @@ void user_follow_wall() {
 
 void user_log_front_sensor() {
   enable_sensors();
-  reset_drive_system();
+  motion.reset_drive_system();
   enable_motor_controllers();
   report_front_sensor_track_header();
   forward.start(-200, 100, 0, 500);
   while (not forward.is_finished()) {
     report_front_sensor_track();
   }
-  reset_drive_system();
+  motion.reset_drive_system();
   disable_sensors();
 }
 
@@ -74,10 +74,10 @@ void run_mouse(int function) {
       report_sensor_calibration();
       break;
     case 2:
-      emily.search_maze();
+      mouse.search_maze();
       break;
     case 3:
-      emily.follow_to(maze_goal());
+      mouse.follow_to(maze_goal());
       break;
     case 4:
       test_SS90E();
@@ -109,7 +109,7 @@ void run_mouse(int function) {
       break;
     default:
       disable_sensors();
-      reset_drive_system();
+      motion.reset_drive_system();
       break;
   }
 };

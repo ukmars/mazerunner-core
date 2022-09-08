@@ -50,11 +50,6 @@ extern const uint8_t japan2007[];
 extern uint8_t cost[256];
 extern uint8_t walls[256];
 
-// tables give new direction from current heading and next turn
-const unsigned char DtoR[] = {1, 2, 3, 0};
-const unsigned char DtoB[] = {2, 3, 0, 1};
-const unsigned char DtoL[] = {3, 0, 1, 2};
-
 inline void mark_cell_visited(uint8_t cell) {
   walls[cell] |= VISITED;
 }

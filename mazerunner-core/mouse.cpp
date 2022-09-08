@@ -32,16 +32,16 @@
 #include "mouse.h"
 #include "Arduino.h"
 #include "config.h"
-#include "encoders.h"
-#include "maze.h"
-#include "motion.h"
-#include "motors.h"
-#include "profile.h"
 #include "reports.h"
-#include "sensors.h"
+#include "src/encoders.h"
+#include "src/maze.h"
+#include "src/motion.h"
+#include "src/motors.h"
+#include "src/profile.h"
+#include "src/sensors.h"
 #include "ui.h"
 
-Mouse emily;
+Mouse mouse;
 
 char path[128];
 char commands[128];
@@ -102,15 +102,15 @@ static void stopAndAdjust() {
 void turnIP180() {
   static int direction = 1;
   direction *= -1; // alternate direction each time it is called
-  spin_turn(direction * 180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+  motion.spin_turn(direction * 180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
 }
 
 void turn_IP90R() {
-  spin_turn(-90, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+  motion.spin_turn(-90, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
 }
 
 void turn_IP90L() {
-  spin_turn(90, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+  motion.spin_turn(90, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
 }
 
 //***************************************************************************//
@@ -133,7 +133,7 @@ void Mouse::end_run() {
   log_status('x');
   // Be sure robot has come to a halt.
   forward.stop();
-  spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+  motion.spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
 }
 
 /** Search turns
@@ -216,7 +216,7 @@ void Mouse::turn_around() {
   }
   // Be sure robot has come to a halt.
   forward.stop();
-  spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+  motion.spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
   forward.start(HALF_CELL - 10.0, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
     delay(2);
@@ -270,7 +270,7 @@ void Mouse::follow_to(unsigned char target) {
   // wait_for_user_start();
   delay(1000);
   enable_sensors();
-  reset_drive_system();
+  motion.reset_drive_system();
   enable_motor_controllers();
   forward.start(BACK_WALL_TO_CENTER, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
@@ -278,7 +278,7 @@ void Mouse::follow_to(unsigned char target) {
   }
   forward.set_position(HALF_CELL);
   Serial.println(F("Off we go..."));
-  wait_until_position(FULL_CELL - 10);
+  motion.wait_until_position(FULL_CELL - 10);
   // at the start of this loop we are always at the sensing point
   while (location != target) {
     if (button_pressed()) {
@@ -307,7 +307,7 @@ void Mouse::follow_to(unsigned char target) {
     } else if (!frontWall) {
       forward.adjust_position(-FULL_CELL);
       log_status('F');
-      wait_until_position(FULL_CELL - 10.0);
+      motion.wait_until_position(FULL_CELL - 10.0);
       log_status('x');
     } else if (!rightWall) {
       turn_smooth(SS90ER);
@@ -329,7 +329,7 @@ void Mouse::follow_to(unsigned char target) {
   }
   disable_sensors();
 
-  reset_drive_system();
+  motion.reset_drive_system();
 }
 
 char hdg_letters[] = "FRAL";
@@ -360,7 +360,7 @@ int Mouse::search_to(unsigned char target) {
   flood_maze(target);
   delay(1000);
   enable_sensors();
-  reset_drive_system();
+  motion.reset_drive_system();
   enable_motor_controllers();
   if (not handStart) {
     // back up to the wall behind
@@ -375,7 +375,7 @@ int Mouse::search_to(unsigned char target) {
   }
   forward.set_position(HALF_CELL);
   Serial.println(F("Off we go..."));
-  wait_until_position(FULL_CELL - 10);
+  motion.wait_until_position(FULL_CELL - 10);
   // TODO. the robot needs to start each iteration at the sensing point
   while (location != target) {
     if (button_pressed()) {
@@ -402,7 +402,7 @@ int Mouse::search_to(unsigned char target) {
           forward.adjust_position(-FULL_CELL);
           log_status('F');
           log_status('x');
-          wait_until_position(FULL_CELL - 10);
+          motion.wait_until_position(FULL_CELL - 10);
           break;
         case 1: // right
           turn_smooth(SS90ER);
@@ -432,7 +432,7 @@ int Mouse::search_to(unsigned char target) {
     delay(250);
   }
 
-  reset_drive_system();
+  motion.reset_drive_system();
   return 0;
 }
 

@@ -31,11 +31,11 @@
  */
 
 #include "motors.h"
-#include "config.h"
+#include "..//config.h"
 #include "digitalWriteFast.h"
-#include "encoders.h"
 #include "profile.h"
 #include "sensors.h"
+#include "encoders.h"
 #include <Arduino.h>
 
 // these are maintained only for logging

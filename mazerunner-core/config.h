@@ -38,55 +38,39 @@
 /***
  * The config.h file defines the actual robot variant which will be the target for the build.
  *
- * A 'proper' build setup would probably define this on the command line or in a make file.
- *
- * The other information in here holds system-wide configuration values that are not dependent
- * upon the target robot. That is things like the serial port baud rate and loop interval.
- *
- *
+ * Start with the pinouts for the robot. These the
+ * Pin definitions for the UKMARSBOT V1.x mainboard
  */
 
-/***
- * The defaults.h file holds the default settings values for the robot.
- * Here you can have different settings for individual robot variants. For
- * example, a variants with different gear ratios or wheel sizes
- *
- * The defaults shown here are compiled into the constant default Settings structure.
- * Normally, at start up there will be a copy of the last used settings structure
- * stored in EEPROM which is copied into the settings structure in RAM. If no valid
- * settings structure is found in EEPROM, the flash settings data is copied into
- * EEPROM and then loaded into RAM.
- * *
- * This cumbersome process makes it possible to have settings changed while the robot
- * is running and then save those settings to EEPROM so that they survive a reset.
- *
- * Remember always that just connecting the USB to the computer will cause a reset so
- * take care to use the auxiiary serial port (and possibly bluetooth) to make these
- * kinds of modifications.
- *
- * see the "settings.h" file for more details.
- */
+const int SERIAL_TX = 0;
+const int SERIAL_RX = 1;
+const int ENCODER_LEFT_CLK = 2;
+const int ENCODER_RIGHT_CLK = 3;
+const int ENCODER_LEFT_B = 4;
+const int ENCODER_RIGHT_B = 5;
+const int USER_IO_6 = 6;
+const int MOTOR_LEFT_DIR = 7;
+const int MOTOR_RIGHT_DIR = 8;
+const int MOTOR_LEFT_PWM = 9;
+const int MOTOR_RIGHT_PWM = 10;
+const int USER_IO_11 = 11;
+const int USER_IO_12 = 12;
+const int SENSOR0 = A0;
+const int SENSOR1 = A1;
+const int SENSOR2 = A2;
+const int SENSOR3 = A3;
+const int SENSOR4 = A4;
+const int SENSOR5 = A5;
+const int FUNCTION_PIN = A6;
+const int BATTERY_VOLTS = A7;
 
-/*************************************************************************/
-#define ROBOT_ARIADNE 1
-#define ROBOT_CLARA 3
-#define ROBOT_DOROTHY 4
-#define ROBOT_EMILY 5
-
-#define ROBOT_NAME ROBOT_EMILY
-
-/*************************************************************************/
-#define MODE_TEST 0
-#define MODE_RUN 1
-
-#define ROBOT_MODE MODE_RUN
-
-/*************************************************************************/
 /***
  * It is possible that you might want to run the robot in a number of
- * different mazes with different calibration values
+ * different mazes with different calibration values. The config file
+ * can have different sensor defaults for each of these environments
+ * so here you can define which set will be used.
  */
-// list the available event/maze names
+
 #define EVENT_HOME 1
 #define EVENT_UK 2
 #define EVENT_PORTUGAL 3
@@ -94,33 +78,38 @@
 #define EVENT UK
 
 /*************************************************************************/
-#define BOARD_UKMARSBOT_V1 1
+/***
+ * Since you may build for different physical robots, their characteristics
+ * are kept in their own config files. Add you robot to the list and create
+ * a corresponding config file with its custom values.
+ *
+ * If you have only one robot then you can reduce this section to a single
+ * include line.
+ */
+#define ROBOT_DOROTHY 4
+#define ROBOT_EMILY 5
 
-#define BOARD BOARD_UKMARSBOT_V1
-/*************************************************************************/
+#define ROBOT_NAME ROBOT_EMILY
 
-#if BOARD == BOARD_UKMARSBOT_V1
-#include "board/ukmarsbot-v1.h"
-#else
-#error "UNKOWN BOARD TYPE"
-#endif
-
-#if ROBOT_NAME == ROBOT_ARIADNE
-#include "config/ariadne.h"
-#elif ROBOT_NAME == ROBOT_CLARA
-#include "config/dorothy.h"
+#if ROBOT_NAME == ROBOT_DOROTHY
+#include "config-dorothy.h"
 #elif ROBOT_NAME == ROBOT_EMILY
-#include "config/emily.h"
+#include "config-emily.h"
 #else
 #error "NO ROBOT DEFINED"
 #endif
 
-//***************************************************************************//
-const uint32_t BAUDRATE = 115200;
+/*************************************************************************/
 
-// sometimes the controller needs the interval, sometimes the frequency
-// define one and pre-calculate the other. The compiler does the work and no flash or
-// RAM storage is used. Constants are used for better type checking and traceability.
+//***************************************************************************//
+/***
+ * these are the defaults for some system-wide settings regardless of the robot
+ * or environment. It would be best not to mess with these without good reason.
+ * Sometimes the controller needs the interval, sometimes the frequency
+ * define one and pre-calculate the other. The compiler does the work and no flash or
+ * RAM storage is used. Constants are used for better type checking and traceability.
+ */
+
 const float LOOP_FREQUENCY = 500.0;
 const float LOOP_INTERVAL = (1.0 / LOOP_FREQUENCY);
 
@@ -130,8 +119,6 @@ const float LOOP_INTERVAL = (1.0 / LOOP_FREQUENCY);
 const float FULL_CELL = 180.0f;
 const float HALF_CELL = FULL_CELL / 2.0;
 
-// the position in the cell where the sensors are sampled.
-const float SENSING_POSITION = 170.0;
 //***************************************************************************//
 
 #endif

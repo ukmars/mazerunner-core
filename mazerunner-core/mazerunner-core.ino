@@ -30,16 +30,20 @@
  * SOFTWARE.
  */
 #include "config.h"
-#include "encoders.h"
-#include "maze.h"
-#include "motors.h"
 #include "reports.h"
-#include "sensors.h"
-#include "systick.h"
+#include "src/encoders.h"
+#include "src/maze.h"
+#include "src/motion.h"
+#include "src/motors.h"
+#include "src/sensors.h"
+#include "src/systick.h"
 #include "tests.h"
 #include "ui.h"
 #include "user.h"
 #include <Arduino.h>
+
+// Global objects
+Motion motion;
 
 void setup() {
   Serial.begin(BAUDRATE);

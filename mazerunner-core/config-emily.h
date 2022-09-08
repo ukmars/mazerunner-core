@@ -1,6 +1,7 @@
 #ifndef EMILY_H
 #define EMILY_H
 
+const uint32_t BAUDRATE = 115200;
 const int SENSOR_COUNT = 4;
 const float MAX_MOTOR_VOLTS = 6.0;
 
@@ -9,7 +10,6 @@ const float MAX_MOTOR_VOLTS = 6.0;
 #define DEBUG_LOGGING 1
 // time between logged lined when reporting is enabled (milliseconds)
 const int REPORTING_INTERVAL = 10;
-
 
 const int EEPROM_ADDR_SETTINGS = 0x0000;
 #define SETTINGS_SIGNATURE 0xF1F0C00F
@@ -38,7 +38,6 @@ const int EEPROM_ADDR_SETTINGS = 0x0000;
 // time delay for sensors to respond to emitters
 #define DEFAULTS_EMITTER_ON_TIME 50
 
-
 //*** MOTION CONTROL CONSTANTS **********************************************//
 
 // forward motion controller constants
@@ -54,9 +53,6 @@ const float STEERING_KP = 0.25;
 const float STEERING_KD = 0.00;
 const float STEERING_ADJUST_LIMIT = 10.0; // deg/s
 
-
-
-
 // encoder polarity is either 1 or -1 and is used to account for reversal of the encoder phases
 #define ENCODER_LEFT_POLARITY (-1)
 #define ENCODER_RIGHT_POLARITY (1)
@@ -65,7 +61,6 @@ const float STEERING_ADJUST_LIMIT = 10.0; // deg/s
 // setting a positive voltage always moves the robot forwards
 #define MOTOR_LEFT_POLARITY (-1)
 #define MOTOR_RIGHT_POLARITY (1)
-
 
 //***************************************************************************//
 
@@ -77,57 +72,57 @@ const int DEFAULT_MAX_SPEED = 800;
 const int DEFAULT_SEARCH_ACCEL = 2000;
 //***************************************************************************//
 
-
-
 //***** SENSOR CALIBRATION **************************************************//
+// the position in the cell where the sensors are sampled.
+const float SENSING_POSITION = 170.0;
+
 // wall sensor thresholds and constants
 // if you have the basic sensor board enter the same value for both front constants
 #if EVENT == HOME
-    // RAW values for the front sensor when the robot is backed up to a wall
-    const int FRONT_LEFT_CALIBRATION = 97;
-    const int FRONT_RIGHT_CALIBRATION = 48;
-    // RAW values for the side sensors when the robot is centred in a cell
-    // and there is no wall ahead
-    const int LEFT_CALIBRATION = 87;
-    const int RIGHT_CALIBRATION = 80;
-    // SS90E turn thresholds. This is the front sum reading to trigger a turn
-    // it changes a bit if there is an adjacent wall. The threshold is set for
-    // when the robot is 20mm past the threshold.
-    const int TURN_THRESHOLD_SS90E = 115;
-    const int EXTRA_WALL_ADJUST = 6;
+// RAW values for the front sensor when the robot is backed up to a wall
+const int FRONT_LEFT_CALIBRATION = 97;
+const int FRONT_RIGHT_CALIBRATION = 48;
+// RAW values for the side sensors when the robot is centred in a cell
+// and there is no wall ahead
+const int LEFT_CALIBRATION = 87;
+const int RIGHT_CALIBRATION = 80;
+// SS90E turn thresholds. This is the front sum reading to trigger a turn
+// it changes a bit if there is an adjacent wall. The threshold is set for
+// when the robot is 20mm past the threshold.
+const int TURN_THRESHOLD_SS90E = 115;
+const int EXTRA_WALL_ADJUST = 6;
 
 #elif EVENT == UK
 
-    // RAW values for the front sensor when the robot is backed up to a wall
-    const int FRONT_LEFT_CALIBRATION = 83;
-    const int FRONT_RIGHT_CALIBRATION = 39;
-    // RAW side sensor values when robot is centred in a cell and wall ahead
-    const int LEFT_CALIBRATION = 80;
-    const int RIGHT_CALIBRATION = 72;
+// RAW values for the front sensor when the robot is backed up to a wall
+const int FRONT_LEFT_CALIBRATION = 83;
+const int FRONT_RIGHT_CALIBRATION = 39;
+// RAW side sensor values when robot is centred in a cell and wall ahead
+const int LEFT_CALIBRATION = 80;
+const int RIGHT_CALIBRATION = 72;
 
-    // SS90E turn thresholds. This is the front sum reading to trigger a turn
-    // it changes a bit if there is an adjacent wall. The threshold is set for
-    // when the robot is 20mm past the threshold.
-    const int TURN_THRESHOLD_SS90E = 100;
-    const int EXTRA_WALL_ADJUST = 6;
+// SS90E turn thresholds. This is the front sum reading to trigger a turn
+// it changes a bit if there is an adjacent wall. The threshold is set for
+// when the robot is 20mm past the threshold.
+const int TURN_THRESHOLD_SS90E = 100;
+const int EXTRA_WALL_ADJUST = 6;
 
 #elif EVENT == PORTUGAL
-    // wall sensor thresholds and constants
-    // RAW values for the front sensor when the robot is backed up to a wall
-    const int FRONT_LEFT_CALIBRATION = 97;
-    const int FRONT_RIGHT_CALIBRATION = 48;
-    // RAW values for the side sensors when the robot is centred in a cell
-    // and there is no wall ahead
-    const int LEFT_CALIBRATION = 87;
-    const int RIGHT_CALIBRATION = 80;
-    // SS90E turn thresholds. This is the front sum reading to trigger a turn
-    // it changes a bit if there is an adjacent wall. The threshold is set for
-    // when the robot is 20mm past the threshold.
-    const int TURN_THRESHOLD_SS90E = 115;
-    const int EXTRA_WALL_ADJUST = 6;
+// wall sensor thresholds and constants
+// RAW values for the front sensor when the robot is backed up to a wall
+const int FRONT_LEFT_CALIBRATION = 97;
+const int FRONT_RIGHT_CALIBRATION = 48;
+// RAW values for the side sensors when the robot is centred in a cell
+// and there is no wall ahead
+const int LEFT_CALIBRATION = 87;
+const int RIGHT_CALIBRATION = 80;
+// SS90E turn thresholds. This is the front sum reading to trigger a turn
+// it changes a bit if there is an adjacent wall. The threshold is set for
+// when the robot is 20mm past the threshold.
+const int TURN_THRESHOLD_SS90E = 115;
+const int EXTRA_WALL_ADJUST = 6;
 
 #endif
-
 
 //***** SENSOR SCALING ******************************************************//
 // This is the normalised value seen by the front sensor when the mouse is
@@ -157,12 +152,9 @@ const float right_edge_pos = 93.0f;
 // with robot against back wall, how much travel is there to the cell center?
 const int BACK_WALL_TO_CENTER = 48;
 
-
-
 // The robot is likely to have wheels of different diameters and that must be
 // compensated for if the robot is to reliably drive in a straight line
 const float ROTATION_BIAS = 0.0025; // Negative makes robot curve to left
-
 
 //***************************************************************************//
 // Battery resistor bridge //Derek Hall//
@@ -196,7 +188,6 @@ const float ADC_REF_VOLTS = 5.0; // Reference voltage of ADC
 
 const float BATTERY_MULTIPLIER = (ADC_REF_VOLTS / ADC_FSR / BATTERY_DIVIDER_RATIO);
 
-
 // these are aliases of convenience
 // the BASIC sensor board has two LEDs
 // const int LED_LEFT = USER_IO_6;
@@ -205,10 +196,9 @@ const float BATTERY_MULTIPLIER = (ADC_REF_VOLTS / ADC_FSR / BATTERY_DIVIDER_RATI
 const int LED_LEFT = USER_IO_6;
 const int LED_RIGHT = USER_IO_6;
 
-
 //***** SENSOR HARDWARE *****************************************************//
 // the ADC channels corresponding to the sensor inputs. There are 8 available
-// Channels 0..3 are normally used for sensors. 
+// Channels 0..3 are normally used for sensors.
 // Channels 4 and 5 are available if you do not want to add an I2C device
 // Channel 6 is pre-allocated to the Battery monitor
 // Channel 7 is re-allocated to the function switch and button
@@ -231,7 +221,5 @@ const int LED_RIGHT = USER_IO_6;
 // ADVANCED
 const int EMITTER_A = USER_IO_11;
 const int EMITTER_B = USER_IO_12;
-
-
 
 #endif
