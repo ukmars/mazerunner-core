@@ -52,6 +52,7 @@ Profile forward;
 Profile rotation;
 Maze maze PERSISTENT;
 Mouse mouse;
+UI ui;
 // these are maintained only for logging
 float g_left_motor_volts;
 float g_right_motor_volts;
@@ -76,7 +77,7 @@ void setup() {
 void loop() {
 
   if (Serial.available()) {
-    cli_run();
+    ui.cli_run();
   }
   if (sensors.button_pressed()) {
     sensors.wait_for_button_release();
