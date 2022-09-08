@@ -44,6 +44,7 @@
 
 // Global objects
 Motion motion;
+Maze maze PERSISTENT;
 
 void setup() {
   Serial.begin(BAUDRATE);
@@ -53,7 +54,7 @@ void setup() {
   pinMode(EMITTER_B, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   enable_sensors();
-  initialise_maze();
+  maze.initialise_maze();
   setup_motors();
   setup_encoders();
   setup_adc();

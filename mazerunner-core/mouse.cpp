@@ -265,8 +265,8 @@ void Mouse::follow_to(unsigned char target) {
   handStart = true;
   location = 0;
   heading = NORTH;
-  initialise_maze();
-  flood_maze(maze_goal());
+  maze.initialise_maze();
+  maze.flood_maze(maze.maze_goal());
   // wait_for_user_start();
   delay(1000);
   enable_sensors();
@@ -287,11 +287,11 @@ void Mouse::follow_to(unsigned char target) {
     Serial.println();
     log_status('-');
     set_steering_mode(STEER_NORMAL);
-    location = neighbour(location, heading);
+    location = maze.neighbour(location, heading);
     update_sensors();
     update_map();
-    flood_maze(maze_goal());
-    unsigned char newHeading = direction_to_smallest(location, heading);
+    maze.flood_maze(maze.maze_goal());
+    unsigned char newHeading = maze.direction_to_smallest(location, heading);
     unsigned char hdgChange = (newHeading - heading) & 0x3;
     Serial.print(hdgChange);
     Serial.write(' ');
@@ -357,7 +357,7 @@ char hdg_letters[] = "FRAL";
  */
 int Mouse::search_to(unsigned char target) {
 
-  flood_maze(target);
+  maze.flood_maze(target);
   delay(1000);
   enable_sensors();
   motion.reset_drive_system();
@@ -384,11 +384,11 @@ int Mouse::search_to(unsigned char target) {
     Serial.println();
     log_status('-');
     set_steering_mode(STEER_NORMAL);
-    location = neighbour(location, heading);
+    location = maze.neighbour(location, heading);
     update_sensors();
     update_map();
-    flood_maze(target);
-    unsigned char newHeading = direction_to_smallest(location, heading);
+    maze.flood_maze(target);
+    unsigned char newHeading = maze.direction_to_smallest(location, heading);
     unsigned char hdgChange = (newHeading - heading) & 0x3;
     Serial.print(hdg_letters[hdgChange]);
     Serial.write(' ');
@@ -466,53 +466,53 @@ void Mouse::update_map() {
   switch (heading) {
     case NORTH:
       if (frontWall) {
-        set_wall_present(location, NORTH);
+        maze.set_wall_present(location, NORTH);
       }
       if (rightWall) {
-        set_wall_present(location, EAST);
+        maze.set_wall_present(location, EAST);
       }
       if (leftWall) {
-        set_wall_present(location, WEST);
+        maze.set_wall_present(location, WEST);
       }
       break;
     case EAST:
       if (frontWall) {
-        set_wall_present(location, EAST);
+        maze.set_wall_present(location, EAST);
       }
       if (rightWall) {
-        set_wall_present(location, SOUTH);
+        maze.set_wall_present(location, SOUTH);
       }
       if (leftWall) {
-        set_wall_present(location, NORTH);
+        maze.set_wall_present(location, NORTH);
       }
       break;
     case SOUTH:
       if (frontWall) {
-        set_wall_present(location, SOUTH);
+        maze.set_wall_present(location, SOUTH);
       }
       if (rightWall) {
-        set_wall_present(location, WEST);
+        maze.set_wall_present(location, WEST);
       }
       if (leftWall) {
-        set_wall_present(location, EAST);
+        maze.set_wall_present(location, EAST);
       }
       break;
     case WEST:
       if (frontWall) {
-        set_wall_present(location, WEST);
+        maze.set_wall_present(location, WEST);
       }
       if (rightWall) {
-        set_wall_present(location, NORTH);
+        maze.set_wall_present(location, NORTH);
       }
       if (leftWall) {
-        set_wall_present(location, SOUTH);
+        maze.set_wall_present(location, SOUTH);
       }
       break;
     default:
       // This is an error. We should handle it.
       break;
   }
-  walls[location] |= VISITED;
+  maze.walls[location] |= VISITED;
 }
 
 /***
@@ -540,7 +540,7 @@ int Mouse::search_maze() {
   handStart = true;
   location = START;
   heading = NORTH;
-  search_to(maze_goal());
+  search_to(maze.maze_goal());
   handStart = false;
   search_to(START);
   stop_motors();

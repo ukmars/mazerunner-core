@@ -243,7 +243,7 @@ void printNorthWalls(int row) {
   for (int col = 0; col < 16; col++) {
     unsigned char cell = row + 16 * col;
     Serial.print('o');
-    if (is_wall(cell, NORTH)) {
+    if (maze.is_wall(cell, NORTH)) {
       Serial.print(("---"));
     } else {
       Serial.print(("   "));
@@ -256,7 +256,7 @@ void printSouthWalls(int row) {
   for (int col = 0; col < 16; col++) {
     unsigned char cell = row + 16 * col;
     Serial.print('o');
-    if (is_wall(cell, SOUTH)) {
+    if (maze.is_wall(cell, SOUTH)) {
       Serial.print(("---"));
     } else {
       Serial.print(("   "));
@@ -271,7 +271,7 @@ void print_maze_plain() {
     printNorthWalls(row);
     for (int col = 0; col < 16; col++) {
       unsigned char cell = static_cast<unsigned char>(row + 16 * col);
-      if (is_exit(cell, WEST)) {
+      if (maze.is_exit(cell, WEST)) {
         Serial.print(("    "));
       } else {
         Serial.print(("|   "));
@@ -291,12 +291,12 @@ void print_maze_with_costs() {
     printNorthWalls(row);
     for (int col = 0; col < 16; col++) {
       unsigned char cell = static_cast<unsigned char>(row + 16 * col);
-      if (is_exit(cell, WEST)) {
+      if (maze.is_exit(cell, WEST)) {
         Serial.print(' ');
       } else {
         Serial.print('|');
       }
-      print_justified(cost[cell], 3);
+      print_justified(maze.cost[cell], 3);
     }
     Serial.println('|');
   }
@@ -309,18 +309,18 @@ static char dirChars[] = "^>v<*";
 
 void print_maze_with_directions() {
   Serial.println();
-  flood_maze(maze_goal());
+  maze.flood_maze(maze.maze_goal());
   for (int row = 15; row >= 0; row--) {
     printNorthWalls(row);
     for (int col = 0; col < 16; col++) {
       unsigned char cell = row + 16 * col;
-      if (is_wall(cell, WEST)) {
+      if (maze.is_wall(cell, WEST)) {
         Serial.print('|');
       } else {
         Serial.print(' ');
       }
-      unsigned char direction = direction_to_smallest(cell, NORTH);
-      if (cell == maze_goal()) {
+      unsigned char direction = maze.direction_to_smallest(cell, NORTH);
+      if (cell == maze.maze_goal()) {
         direction = 4;
       }
       Serial.print(' ');
@@ -340,7 +340,7 @@ void print_maze_wall_data() {
   for (int row = 15; row >= 0; row--) {
     for (int col = 0; col < 16; col++) {
       int cell = row + 16 * col;
-      print_hex_2(walls[cell]);
+      print_hex_2(maze.walls[cell]);
       Serial.print(' ');
     }
     Serial.println();

@@ -77,7 +77,7 @@ void run_mouse(int function) {
       mouse.search_maze();
       break;
     case 3:
-      mouse.follow_to(maze_goal());
+      mouse.follow_to(maze.maze_goal());
       break;
     case 4:
       test_SS90E();

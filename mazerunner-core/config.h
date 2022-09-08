@@ -121,4 +121,11 @@ const float HALF_CELL = FULL_CELL / 2.0;
 
 //***************************************************************************//
 
+/***
+ * This piece of magic lets you define a variable, such as the maze, that can
+ * survive a processor reset. The downside is that you MUST take care to
+ * properly initialise it when necesary
+ */
+#define PERSISTENT __attribute__((section(".noinit")))
+
 #endif
