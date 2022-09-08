@@ -83,12 +83,10 @@ class Systick {
     // TODO: make sure all variables are interrupt-safe if they are used outside IRQs
     // grab the encoder values first because they will continue to change
     encoders.update_encoders();
-    sensors.update_battery_voltage();
     forward.update();
     rotation.update();
-    sensors.update_wall_sensors();
-    sensors.calculate_steering_adjustment();
-    motors.update_motor_controllers(sensors.g_steering_adjustment);
+    sensors.update();
+    motors.update_motor_controllers(sensors.steering_feedback());
     sensors.start_sensor_cycle();
     // NOTE: no code should follow this line;
   }

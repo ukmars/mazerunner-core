@@ -61,18 +61,8 @@ class Sensors;
 extern Sensors sensors;
 
 class Sensors {
-  private:
-  float last_steering_error = 0;
-  volatile bool m_enabled = false;
-  volatile int m_adc_reading[6];
-  volatile int m_battery_adc;
-  volatile int m_switches_adc;
-  volatile float m_battery_volts;
-  volatile float m_battery_compensation;
-  volatile float m_cross_track_error;
 
   public:
-
   /*** wall sensor variables ***/
 
   volatile SensorChannel lfs;
@@ -80,20 +70,22 @@ class Sensors {
   volatile SensorChannel rss;
   volatile SensorChannel rfs;
 
-  volatile bool has_front_wall;
-  volatile bool has_left_wall;
-  volatile bool has_right_wall;
+  volatile bool see_front_wall;
+  volatile bool see_left_wall;
+  volatile bool see_right_wall;
 
   volatile int g_front_sum;
 
   /*** steering variables ***/
   uint8_t g_steering_mode = STEER_NORMAL;
 
-  volatile float g_steering_adjustment;
+  float steering_feedback() {
+    return m_steering_feedback;
+  }
 
-
-  float get_cross_track_error(){ return m_cross_track_error;};
+  float get_cross_track_error() { return m_cross_track_error; };
   float get_battery_scale() { return m_battery_compensation; };
+
   /**
    *  The default for the Arduino is to give a slow ADC clock for maximum
    *  SNR in the results. That typically means a prescale value of 128
@@ -160,23 +152,23 @@ class Sensors {
     // TODO: are these limits appropriate, or even needed?
     adjustment = constrain(adjustment, -STEERING_ADJUST_LIMIT, STEERING_ADJUST_LIMIT);
     last_steering_error = m_cross_track_error;
-    g_steering_adjustment = adjustment;
+    m_steering_feedback = adjustment;
     return adjustment;
   }
 
   void set_steering_mode(uint8_t mode) {
     last_steering_error = m_cross_track_error;
-    g_steering_adjustment = 0;
+    m_steering_feedback = 0;
     g_steering_mode = mode;
   }
 
   //***************************************************************************//
 
-  void enable_sensors() {
+  void enable() {
     m_enabled = true;
   }
 
-  void disable_sensors() {
+  void disable() {
     m_enabled = false;
   }
 
@@ -196,9 +188,13 @@ class Sensors {
    * @brief update the global wall sensor values.
    * @return robot cross-track-error. Too far left is negative.
    */
-  float update_wall_sensors() {
+  void update() {
+    update_battery_voltage();
     if (not m_enabled) {
-      return 0;
+      // NOTE: No values will be updated although the ADC is working
+      m_cross_track_error = 0;
+      m_steering_feedback = 0;
+      return;
     }
 
     // they should never be negative
@@ -223,21 +219,21 @@ class Sensors {
     lfs.value = (int)(lfs.raw * FRONT_LEFT_SCALE);
 
     // set the wall detection flags
-    has_left_wall = lss.value > LEFT_THRESHOLD;
-    has_right_wall = rss.value > RIGHT_THRESHOLD;
+    see_left_wall = lss.value > LEFT_THRESHOLD;
+    see_right_wall = rss.value > RIGHT_THRESHOLD;
     g_front_sum = lfs.value + rfs.value;
-    has_front_wall = g_front_sum > FRONT_THRESHOLD;
+    see_front_wall = g_front_sum > FRONT_THRESHOLD;
 
     // calculate the alignment errors - too far left is negative
     int error = 0;
     int right_error = SIDE_NOMINAL - rss.value;
     int left_error = SIDE_NOMINAL - lss.value;
     if (g_steering_mode == STEER_NORMAL) {
-      if (sensors.has_left_wall && sensors.has_right_wall) {
+      if (sensors.see_left_wall && sensors.see_right_wall) {
         error = left_error - right_error;
-      } else if (sensors.has_left_wall) {
+      } else if (sensors.see_left_wall) {
         error = 2 * left_error;
-      } else if (sensors.has_right_wall) {
+      } else if (sensors.see_right_wall) {
         error = -2 * right_error;
       }
     } else if (g_steering_mode == STEER_LEFT_WALL) {
@@ -252,45 +248,10 @@ class Sensors {
       error = 0;
     }
     m_cross_track_error = error;
-    return error;
+    calculate_steering_adjustment();
   }
 
   //***************************************************************************//
-
-  /***
-   * NOTE: Manual analogue conversions
-   * All eight available ADC channels are automatically converted
-   * by the sensor interrupt. Attempting to performa a manual ADC
-   * conversion with the Arduino AnalogueIn() function will disrupt
-   * that process so avoid doing that.
-   */
-
-  const uint8_t ADC_REF = DEFAULT;
-
-  void start_adc(uint8_t pin) {
-    if (pin >= 14)
-      pin -= 14; // allow for channel or pin numbers
-                 // set the analog reference (high two bits of ADMUX) and select the
-                 // channel (low 4 bits).  Result is right-adjusted
-    ADMUX = (ADC_REF << 6) | (pin & 0x07);
-    // start the conversion
-    sbi(ADCSRA, ADSC);
-  }
-
-  int get_adc_result() {
-    // ADSC is cleared when the conversion finishes
-    // while (bit_is_set(ADCSRA, ADSC));
-
-    // we have to read ADCL first; doing so locks both ADCL
-    // and ADCH until ADCH is read.  reading ADCL second would
-    // cause the results of each conversion to be discarded,
-    // as ADCL and ADCH would be locked when it completed.
-    uint8_t low = ADCL;
-    uint8_t high = ADCH;
-
-    // combine the two bytes
-    return (high << 8) | low;
-  }
 
   uint8_t sensor_phase = 0;
   inline bool button_pressed() {
@@ -323,10 +284,9 @@ class Sensors {
     return lfs.raw < 100 && sensors.rfs.raw > 100;
   }
 
-
   uint8_t wait_for_user_start() {
-    digitalWrite(LED_LEFT,1);
-    enable_sensors();
+    digitalWrite(LED_LEFT, 1);
+    enable();
     int count = 0;
     uint8_t choice = NO_START;
     while (choice == NO_START) {
@@ -349,16 +309,52 @@ class Sensors {
         break;
       }
     }
-    disable_sensors();
-    digitalWrite(LED_LEFT,0);
+    disable();
+    digitalWrite(LED_LEFT, 0);
     delay(250);
     return choice;
   }
 
+  //***************************************************************************//
   void start_sensor_cycle() {
     sensor_phase = 0;     // sync up the start of the sensor sequence
     bitSet(ADCSRA, ADIE); // enable the ADC interrupt
-    start_adc(0);         // begin a conversion to get things started
+    start_conversion(0);  // begin a conversion to get things started
+  }
+
+  /***
+   * NOTE: Manual analogue conversions
+   * All eight available ADC channels are automatically converted
+   * by the sensor interrupt. Attempting to performa a manual ADC
+   * conversion with the Arduino AnalogueIn() function will disrupt
+   * that process so avoid doing that.
+   */
+
+  const uint8_t ADC_REF = DEFAULT;
+
+  void start_conversion(uint8_t pin) {
+    if (pin >= 14)
+      pin -= 14; // allow for channel or pin numbers
+                 // set the analog reference (high two bits of ADMUX) and select the
+                 // channel (low 4 bits).  Result is right-adjusted
+    ADMUX = (ADC_REF << 6) | (pin & 0x07);
+    // start the conversion
+    sbi(ADCSRA, ADSC);
+  }
+
+  int get_adc_result() {
+    // ADSC is cleared when the conversion finishes
+    // while (bit_is_set(ADCSRA, ADSC));
+
+    // we have to read ADCL first; doing so locks both ADCL
+    // and ADCH until ADCH is read.  reading ADCL second would
+    // cause the results of each conversion to be discarded,
+    // as ADCL and ADCH would be locked when it completed.
+    uint8_t low = ADCL;
+    uint8_t high = ADCH;
+
+    // combine the two bytes
+    return (high << 8) | low;
   }
 
   /** @brief Sample all the sensor channels with and without the emitter on
@@ -390,41 +386,40 @@ class Sensors {
    * If different types of sensor are used or the I2C is needed, there
    * will need to be changes here.
    */
-  void update() {
-    // digitalWriteFast(13, 1);
+  void update_channel() {
     switch (sensor_phase) {
       case 0:
         // always start conversions as soon as  possible so they get a
         // full 50us to convert
-        start_adc(BATTERY_VOLTS);
+        start_conversion(BATTERY_VOLTS);
         break;
       case 1:
         m_battery_adc = get_adc_result();
-        start_adc(FUNCTION_PIN);
+        start_conversion(FUNCTION_PIN);
         break;
       case 2:
         m_switches_adc = get_adc_result();
-        start_adc(A0);
+        start_conversion(A0);
         break;
       case 3:
         m_adc_reading[0] = get_adc_result();
-        start_adc(A1);
+        start_conversion(A1);
         break;
       case 4:
         m_adc_reading[1] = get_adc_result();
-        start_adc(A2);
+        start_conversion(A2);
         break;
       case 5:
         m_adc_reading[2] = get_adc_result();
-        start_adc(A3);
+        start_conversion(A3);
         break;
       case 6:
         m_adc_reading[3] = get_adc_result();
-        start_adc(A4);
+        start_conversion(A4);
         break;
       case 7:
         m_adc_reading[4] = get_adc_result();
-        start_adc(A5);
+        start_conversion(A5);
         break;
       case 8:
         m_adc_reading[5] = get_adc_result();
@@ -433,31 +428,31 @@ class Sensors {
           digitalWriteFast(EMITTER_A, 1);
           digitalWriteFast(EMITTER_B, 1);
         }
-        start_adc(A7); // dummy read of the battery to provide delay
+        start_conversion(A7); // dummy read of the battery to provide delay
         // wait at least one cycle for the detectors to respond
         break;
       case 9:
-        start_adc(A0);
+        start_conversion(A0);
         break;
       case 10:
         m_adc_reading[0] = get_adc_result() - m_adc_reading[0];
-        start_adc(A1);
+        start_conversion(A1);
         break;
       case 11:
         m_adc_reading[1] = get_adc_result() - m_adc_reading[1];
-        start_adc(A2);
+        start_conversion(A2);
         break;
       case 12:
         m_adc_reading[2] = get_adc_result() - m_adc_reading[2];
-        start_adc(A3);
+        start_conversion(A3);
         break;
       case 13:
         m_adc_reading[3] = get_adc_result() - m_adc_reading[3];
-        start_adc(A4);
+        start_conversion(A4);
         break;
       case 14:
         m_adc_reading[4] = get_adc_result() - m_adc_reading[4];
-        start_adc(A5);
+        start_conversion(A5);
         break;
       case 15:
         m_adc_reading[5] = get_adc_result() - m_adc_reading[5];
@@ -469,8 +464,18 @@ class Sensors {
         break;
     }
     sensor_phase++;
-    // digitalWriteFast(13, 0);
   }
+
+  private:
+  float last_steering_error = 0;
+  volatile bool m_enabled = false;
+  volatile int m_adc_reading[6];
+  volatile int m_battery_adc;
+  volatile int m_switches_adc;
+  volatile float m_battery_volts;
+  volatile float m_battery_compensation;
+  volatile float m_cross_track_error;
+  volatile float m_steering_feedback;
 };
 
 #endif

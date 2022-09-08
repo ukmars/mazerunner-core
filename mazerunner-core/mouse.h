@@ -142,24 +142,24 @@ class Mouse {
         break;
       default:
         // just to be safe...
-        sensors.disable_sensors();
+        sensors.disable();
         motion.reset_drive_system();
         break;
     }
   }
 
   void print_walls() {
-    if (sensors.has_left_wall) {
+    if (sensors.see_left_wall) {
       Serial.print('L');
     } else {
       Serial.print('-');
     }
-    if (sensors.has_front_wall) {
+    if (sensors.see_front_wall) {
       Serial.print('F');
     } else {
       Serial.print('-');
     }
-    if (sensors.has_right_wall) {
+    if (sensors.see_right_wall) {
       Serial.print('R');
     } else {
       Serial.print('-');
@@ -186,7 +186,7 @@ class Mouse {
       }
       delay(2);
     }
-    if (sensors.has_front_wall) {
+    if (sensors.see_front_wall) {
       while (sensors.g_front_sum < FRONT_REFERENCE) {
         forward.start(10, 50, 0, 1000);
         delay(2);
@@ -255,10 +255,10 @@ class Mouse {
     forward.set_target_speed(DEFAULT_TURN_SPEED);
 
     float trigger = turn_params[turn_id].trigger;
-    if (sensors.has_left_wall) {
+    if (sensors.see_left_wall) {
       trigger += 10;
     }
-    if (sensors.has_right_wall) {
+    if (sensors.see_right_wall) {
       trigger += 6;
     }
 
@@ -337,9 +337,9 @@ class Mouse {
   }
 
   void update_sensors() {
-    rightWall = (sensors.has_right_wall);
-    leftWall = (sensors.has_left_wall);
-    frontWall = (sensors.has_front_wall);
+    rightWall = (sensors.see_right_wall);
+    leftWall = (sensors.see_left_wall);
+    frontWall = (sensors.see_front_wall);
   }
 
   void log_status(char action) {
@@ -367,7 +367,7 @@ class Mouse {
     maze.flood_maze(maze.maze_goal());
     // wait_for_user_start();
     delay(1000);
-    sensors.enable_sensors();
+    sensors.enable();
     motion.reset_drive_system();
     motors.enable_motor_controllers();
     forward.start(BACK_WALL_TO_CENTER, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
@@ -420,12 +420,12 @@ class Mouse {
     Serial.println();
     Serial.println(F("Arrived!  "));
     for (int i = 0; i < 4; i++) {
-      sensors.disable_sensors();
+      sensors.disable();
       delay(250);
-      sensors.enable_sensors();
+      sensors.enable();
       delay(250);
     }
-    sensors.disable_sensors();
+    sensors.disable();
 
     motion.reset_drive_system();
   }
@@ -455,7 +455,7 @@ class Mouse {
 
     maze.flood_maze(target);
     delay(1000);
-    sensors.enable_sensors();
+    sensors.enable();
     motion.reset_drive_system();
     motors.enable_motor_controllers();
     if (not handStart) {
@@ -518,7 +518,7 @@ class Mouse {
         }
       }
     }
-    sensors.disable_sensors();
+    sensors.disable();
     Serial.println();
     Serial.println(F("Arrived!  "));
     for (int i = 0; i < 4; i++) {
@@ -656,7 +656,7 @@ class Mouse {
   }
 
   void user_log_front_sensor() {
-    sensors.enable_sensors();
+    sensors.enable();
     motion.reset_drive_system();
     motors.enable_motor_controllers();
     reporter.report_front_sensor_track_header();
@@ -665,7 +665,7 @@ class Mouse {
       reporter.report_front_sensor_track();
     }
     motion.reset_drive_system();
-    sensors.disable_sensors();
+    sensors.disable();
   }
 
   /**
@@ -688,7 +688,7 @@ class Mouse {
    */
 
   void test_sensor_spin_calibrate() {
-    sensors.enable_sensors();
+    sensors.enable();
     delay(100);
     motion.reset_drive_system();
     motors.enable_motor_controllers();
@@ -699,7 +699,7 @@ class Mouse {
       reporter.report_sensor_track(true);
     }
     motion.reset_drive_system();
-    sensors.disable_sensors();
+    sensors.disable();
     delay(100);
   }
 
@@ -731,7 +731,7 @@ class Mouse {
     int right_edge_position = 0;
     int left_max = 0;
     int right_max = 0;
-    sensors.enable_sensors();
+    sensors.enable();
     delay(100);
     motion.reset_drive_system();
     motors.enable_motor_controllers();
@@ -777,7 +777,7 @@ class Mouse {
     Serial.println();
 
     motion.reset_drive_system();
-    sensors.disable_sensors();
+    sensors.disable();
     delay(100);
   }
 

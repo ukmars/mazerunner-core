@@ -110,10 +110,10 @@ class UI {
         maze.print_maze_with_directions();
         break;
       case 'S':
-        sensors.enable_sensors();
+        sensors.enable();
         delay(10);
         reporter.report_wall_sensors();
-        sensors.disable_sensors();
+        sensors.disable();
         break;
       default:
         break;

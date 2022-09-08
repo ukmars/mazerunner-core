@@ -61,13 +61,13 @@ void setup() {
   pinMode(EMITTER_A, OUTPUT);
   pinMode(EMITTER_B, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  sensors.enable_sensors();
+  sensors.enable();
   maze.initialise_maze();
   motors.setup_motors();
   encoders.setup_encoders();
   sensors.setup_adc();
   Serial.println();
-  sensors.disable_sensors();
+  sensors.disable();
   Serial.println(F("RDY"));
 }
 
@@ -105,5 +105,5 @@ ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
 }
 
 ISR(ADC_vect) {
-  sensors.update();
+  sensors.update_channel();
 }

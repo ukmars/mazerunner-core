@@ -129,7 +129,7 @@ class Reporter {
       Serial.print(' ');
       Serial.print(sensors.get_cross_track_error());
       Serial.print(' ');
-      Serial.print(sensors.g_steering_adjustment);
+      Serial.print(sensors.steering_feedback());
       Serial.println();
     }
 #else
@@ -187,7 +187,7 @@ class Reporter {
 
   void report_sensor_calibration() {
     Serial.println(F("   lf_raw ls_raw rs_raw rf_raw |  lf_cal ls_cal rs_cal rf_cal"));
-    sensors.enable_sensors();
+    sensors.enable();
     s_start_time = millis();
     s_report_time = s_start_time;
     while (not sensors.button_pressed()) {
@@ -199,7 +199,7 @@ class Reporter {
     Serial.println();
     sensors.wait_for_button_release();
     delay(200);
-    sensors.disable_sensors();
+    sensors.disable();
   }
 };
 /**
