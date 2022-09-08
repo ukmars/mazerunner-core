@@ -30,6 +30,7 @@
  * SOFTWARE.
  */
 #include "config.h"
+#include "mouse.h"
 #include "reports.h"
 #include "src/encoders.h"
 #include "src/maze.h"
@@ -50,6 +51,7 @@ Motors motors;
 Profile forward;
 Profile rotation;
 Maze maze PERSISTENT;
+Mouse mouse;
 // these are maintained only for logging
 float g_left_motor_volts;
 float g_right_motor_volts;

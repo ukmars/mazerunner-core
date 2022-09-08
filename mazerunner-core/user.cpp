@@ -39,6 +39,7 @@
 #include "src/motors.h"
 #include "src/profile.h"
 #include "src/sensors.h"
+#include "utils.h"
 #include <Arduino.h>
 
 // to avoid conflicts with other code, you might want to name all the functions
