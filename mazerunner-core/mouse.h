@@ -86,7 +86,7 @@ const TurnParameters turn_params[4] = {
 };
 
 class Mouse;
-extern Mouse bob;
+extern Mouse mouse;
 
 class Mouse {
   public:
@@ -96,6 +96,17 @@ class Mouse {
   bool frontWall;
   bool rightWall;
   bool handStart;
+
+  Mouse() {
+    init();
+  }
+
+  void init() {
+    handStart = false;
+    sensors.set_steering_mode(STEERING_OFF);
+    location = 0;
+    heading = NORTH;
+  }
 
   void execute_cmd(int cmd, const Args &args) {
     if (cmd == 0) {
@@ -120,25 +131,6 @@ class Mouse {
         break;
       case 6:
         test_sensor_spin_calibrate();
-        break;
-      case 7:
-        break;
-      case 8:
-        break;
-      case 9:
-        break;
-      case 10:
-        break;
-      case 11:
-        break;
-      case 12:
-        break;
-      case 13:
-        break;
-      case 14:
-        break;
-      case 15:
-
         break;
       default:
         // just to be safe...
@@ -165,6 +157,7 @@ class Mouse {
       Serial.print('-');
     }
   }
+
   //***************************************************************************//
   /**
    * Used to bring the mouse to a halt, centred in a cell.
@@ -195,10 +188,11 @@ class Mouse {
   }
 
   /**
-   * These convenience functions only perform the turn
+   * These convenience functions will bring the robot to a halt
+   * before actually turning.
    */
 
-  void turnIP180() {
+  void turn_IP180() {
     static int direction = 1;
     direction *= -1; // alternate direction each time it is called
     motion.spin_turn(direction * 180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
@@ -213,27 +207,6 @@ class Mouse {
   }
 
   //***************************************************************************//
-
-  void end_run() {
-    bool has_wall = frontWall;
-    sensors.set_steering_mode(STEERING_OFF);
-    log_status('T');
-    float remaining = (FULL_CELL + HALF_CELL) - forward.position();
-    forward.start(remaining, forward.speed(), 30, forward.acceleration());
-    if (has_wall) {
-      while (sensors.g_front_sum < 850) {
-        delay(2);
-      }
-    } else {
-      while (not forward.is_finished()) {
-        delay(2);
-      }
-    }
-    log_status('x');
-    // Be sure robot has come to a halt.
-    forward.stop();
-    motion.spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
-  }
 
   /** Search turns
    *
@@ -323,18 +296,28 @@ class Mouse {
     forward.set_position(FULL_CELL - 10.0);
   }
 
-  //***************************************************************************//
-
-  Mouse() {
-    init();
-  }
-
-  void init() {
-    handStart = false;
+  void end_run() {
+    bool has_wall = frontWall;
     sensors.set_steering_mode(STEERING_OFF);
-    location = 0;
-    heading = NORTH;
+    log_status('T');
+    float remaining = (FULL_CELL + HALF_CELL) - forward.position();
+    forward.start(remaining, forward.speed(), 30, forward.acceleration());
+    if (has_wall) {
+      while (sensors.g_front_sum < 850) {
+        delay(2);
+      }
+    } else {
+      while (not forward.is_finished()) {
+        delay(2);
+      }
+    }
+    log_status('x');
+    // Be sure robot has come to a halt.
+    forward.stop();
+    motion.spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
   }
+
+  //***************************************************************************//
 
   void update_sensors() {
     rightWall = (sensors.see_right_wall);
@@ -549,7 +532,7 @@ class Mouse {
         turn_IP90R();
         break;
       case 2: // behind
-        turnIP180();
+        turn_IP180();
         break;
       case 3: // left
         turn_IP90L();
@@ -818,7 +801,5 @@ class Mouse {
     motion.reset_drive_system();
   }
 };
-
-extern Mouse mouse;
 
 #endif // MOUSE_H
