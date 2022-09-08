@@ -102,12 +102,7 @@ class Mouse {
       return;
     }
     sensors.wait_for_user_start(); // cover front sensor with hand to start
-    // run_mouse(function);
-    // NOTE: will start on button click
     switch (cmd) {
-      case 0:
-        Serial.println(F("OK"));
-        break;
       case 1:
         reporter.report_sensor_calibration();
         break;
@@ -118,19 +113,19 @@ class Mouse {
         follow_to(maze.maze_goal());
         break;
       case 4:
-        // test_SS90E();
+        test_SS90E();
         break;
       case 5:
+        test_edge_detection();
         break;
       case 6:
+        test_sensor_spin_calibrate();
         break;
       case 7:
         break;
       case 8:
-        // test_edge_detection();
         break;
       case 9:
-        // test_sensor_spin_calibrate();
         break;
       case 10:
         break;
@@ -146,6 +141,7 @@ class Mouse {
 
         break;
       default:
+        // just to be safe...
         sensors.disable_sensors();
         motion.reset_drive_system();
         break;

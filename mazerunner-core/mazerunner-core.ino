@@ -77,11 +77,7 @@ void loop() {
   }
   if (sensors.button_pressed()) {
     sensors.wait_for_button_release();
-    int function = sensors.get_switches();
-    Serial.print(function);
-    mouse.execute_cmd(function, Args{0});
-
-    // mouse.run(function);
+    mouse.execute_cmd(sensors.get_switches(), Args{0});
   }
 }
 

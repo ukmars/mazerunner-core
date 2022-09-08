@@ -39,22 +39,18 @@
 #include "reports.h"
 #include "src/digitalWriteFast.h"
 #include "src/sensors.h"
+#include "src/utils.h"
 #include <Arduino.h>
 #include <stdint.h>
 
-#define MAX_DIGITS 8
-
+// #define MAX_DIGITS 8
 const int INPUT_BUFFER_SIZE = 32;
 
 class UI {
 
-  private:
-  char m_buffer[INPUT_BUFFER_SIZE];
-  uint8_t m_index = 0;
-
   public:
   void interpret_line() {
-    Args args = split_line();
+    Args args = get_tokens();
     switch (args.argc) {
       case 0:
         break;
@@ -67,8 +63,8 @@ class UI {
         run_long_cmd(args);
         break;
     }
-    cli_clear_input();
-    cli_prompt();
+    clear_input();
+    prompt();
   }
 
   /***
@@ -101,7 +97,7 @@ class UI {
     char c = args.argv[0][0];
     switch (c) {
       case '?':
-        cli_help();
+        help();
         break;
       case 'W':
         maze.print_maze_plain();
@@ -124,7 +120,7 @@ class UI {
     }
   }
 
-  void cli_clear_input() {
+  void clear_input() {
     m_index = 0;
     m_buffer[m_index] = 0;
   }
@@ -164,7 +160,7 @@ class UI {
     return 0;
   }
 
-  Args split_line() {
+  Args get_tokens() {
     Args args = {0};
     char *line = m_buffer;
     char *token;
@@ -183,13 +179,13 @@ class UI {
     return args;
   }
 
-  void cli_prompt() {
+  void prompt() {
     Serial.print('\n');
     Serial.print('>');
     Serial.print(' ');
   }
 
-  void cli_help() {
+  void help() {
     Serial.println(F("W   : display maze walls"));
     Serial.println(F("X   : reset maze"));
     Serial.println(F("R   : display maze with directions"));
@@ -213,94 +209,9 @@ class UI {
     Serial.println(F("      15 = "));
   }
 
-  /***
-   * Scan a character array for a float.
-   * This is a much simplified and limited version of the library function atof()
-   * It will not convert exponents and has a limited range of valid values.
-   * They should be more than adequate for the robot parameters however.
-   * Begin scan at line[pos]
-   * Assumes no leading spaces.
-   * Only scans MAX_DIGITS characters
-   * Stops at first non-digit, or decimal point.
-   * MODIFIES pos so that it points to the first character after the number
-   * MODIFIES value ONLY IF a valid float is converted
-   * RETURNS  boolean status indicating success or error
-   *
-   * optimisations are possible but may not be worth the effort
-   */
-  uint8_t read_float(const char *line, float &value) {
-
-    char *ptr = (char *)line;
-    char c = *ptr++;
-    uint8_t digits = 0;
-
-    bool is_minus = false;
-    if (c == '-') {
-      is_minus = true;
-      c = *ptr++;
-    }
-
-    uint32_t a = 0.0;
-    int exponent = 0;
-    while (c >= '0' and c <= '9') {
-      if (digits++ < MAX_DIGITS) {
-        a = a * 10 + (c - '0');
-      }
-      c = *ptr++;
-    };
-    if (c == '.') {
-      c = *ptr++;
-      while (c >= '0' and c <= '9') {
-        if (digits++ < MAX_DIGITS) {
-          a = a * 10 + (c - '0');
-          exponent = exponent - 1;
-        }
-        c = *ptr++;
-      }
-    }
-    float b = a;
-    while (exponent < 0) {
-      b *= 0.1;
-      exponent++;
-    }
-    if (digits > 0) {
-      value = is_minus ? -b : b;
-    }
-    return digits;
-  }
-
-  /***
-   * Scan a character array for an integer.
-   * Begin scn at line[pos]
-   * Assumes no leading spaces.
-   * Stops at first non-digit.
-   * MODIFIES pos so that it points to the first non-digit
-   * MODIFIES value ONLY IF a valid integer is converted
-   * RETURNS  boolean status indicating success or error
-   *
-   * optimisations are possible but may not be worth the effort
-   */
-  uint8_t read_integer(const char *line, int &value) {
-    char *ptr = (char *)line;
-    char c = *ptr++;
-    bool is_minus = false;
-    uint8_t digits = 0;
-    if (c == '-') {
-      is_minus = true;
-      c = *ptr++;
-    }
-    int32_t number = 0;
-    while (c >= '0' and c <= '9') {
-      if (digits++ < MAX_DIGITS) {
-        number = 10 * number + (c - '0');
-      }
-      c = *ptr++;
-    }
-    if (digits > 0) {
-      value = is_minus ? -number : number;
-    }
-    return digits;
-  }
+  private:
+  char m_buffer[INPUT_BUFFER_SIZE];
+  uint8_t m_index = 0;
 };
 
 extern UI ui;
