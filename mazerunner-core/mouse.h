@@ -41,7 +41,6 @@
 #include "src/motors.h"
 #include "src/profile.h"
 #include "src/sensors.h"
-#include "ui.h"
 #include "utils.h"
 
 #define SEARCH_ACCELERATION 3000
@@ -85,29 +84,73 @@ const TurnParameters turn_params[4] = {
     {DEFAULT_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
     {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
 };
-/// TODO: should the whole mouse object be persistent?
+
+class Mouse;
+extern Mouse bob;
+
 class Mouse {
   public:
-  // Mouse();
-  // void init();
-  // void update_sensors();
-  // void log_status(char action);
-  // void set_heading(unsigned char new_heading);
-  // void turn_to_face(unsigned char new_heading);
-  // void turn_smooth(int turn_id);
-  // void turn_around();
-  // void end_run();
-  // int search_to(unsigned char target);
-  // void follow_to(unsigned char target);
-  // void update_map();
-  // int search_maze();
-
   unsigned char heading;
   unsigned char location;
   bool leftWall;
   bool frontWall;
   bool rightWall;
   bool handStart;
+
+  void execute_cmd(int cmd, const Args &args) {
+    if (cmd == 0) {
+      return;
+    }
+    sensors.wait_for_user_start(); // cover front sensor with hand to start
+    // run_mouse(function);
+    // NOTE: will start on button click
+    switch (cmd) {
+      case 0:
+        Serial.println(F("OK"));
+        break;
+      case 1:
+        reporter.report_sensor_calibration();
+        break;
+      case 2:
+        search_maze();
+        break;
+      case 3:
+        follow_to(maze.maze_goal());
+        break;
+      case 4:
+        // test_SS90E();
+        break;
+      case 5:
+        break;
+      case 6:
+        break;
+      case 7:
+        break;
+      case 8:
+        // test_edge_detection();
+        break;
+      case 9:
+        // test_sensor_spin_calibrate();
+        break;
+      case 10:
+        break;
+      case 11:
+        break;
+      case 12:
+        break;
+      case 13:
+        break;
+      case 14:
+        break;
+      case 15:
+
+        break;
+      default:
+        sensors.disable_sensors();
+        motion.reset_drive_system();
+        break;
+    }
+  }
 
   void print_walls() {
     if (sensors.has_left_wall) {
@@ -588,8 +631,6 @@ class Mouse {
    * cells, regardless of visited state,  does not pass through any
    * unvisited cells.
    *
-   * The walls can be saved to EEPROM after each pass. It left to the
-   * reader as an exercise to do something useful with that.
    */
   int search_maze() {
     sensors.wait_for_user_start();
@@ -602,6 +643,183 @@ class Mouse {
     search_to(START);
     motors.stop_motors();
     return 0;
+  }
+
+  /***
+   * just sit in a loop, flashing lights waiting for the button to be pressed
+   */
+  void panic() {
+    while (!sensors.button_pressed()) {
+      digitalWriteFast(LED_BUILTIN, 1);
+      delay(100);
+      digitalWriteFast(LED_BUILTIN, 0);
+      delay(100);
+    }
+    sensors.wait_for_button_release();
+    digitalWriteFast(LED_BUILTIN, 0);
+  }
+
+  void user_log_front_sensor() {
+    sensors.enable_sensors();
+    motion.reset_drive_system();
+    motors.enable_motor_controllers();
+    reporter.report_front_sensor_track_header();
+    forward.start(-200, 100, 0, 500);
+    while (not forward.is_finished()) {
+      reporter.report_front_sensor_track();
+    }
+    motion.reset_drive_system();
+    sensors.disable_sensors();
+  }
+
+  /**
+   * By turning in place through 360 degrees, it should be possible to get a
+   * sensor calibration for all sensors?
+   *
+   * At the least, it will tell you about the range of values reported and help
+   * with alignment, You should be able to see clear maxima 180 degrees apart as
+   * well as the left and right values crossing when the robot is parallel to
+   * walls either side.
+   *
+   * Use either the normal report_sensor_track() for the normalised readings
+   * or report_sensor_track_raw() for the readings straight off the sensor.
+   *
+   * Sensor sensitivity should be set so that the peaks from raw readings do
+   * not exceed about 700-800 so that there is enough headroom to cope with
+   * high ambient light levels.
+   *
+   * @brief turn in place while streaming sensors
+   */
+
+  void test_sensor_spin_calibrate() {
+    sensors.enable_sensors();
+    delay(100);
+    motion.reset_drive_system();
+    motors.enable_motor_controllers();
+    sensors.set_steering_mode(STEERING_OFF);
+    reporter.report_sensor_track_header();
+    rotation.start(360, 180, 0, 1800);
+    while (not rotation.is_finished()) {
+      reporter.report_sensor_track(true);
+    }
+    motion.reset_drive_system();
+    sensors.disable_sensors();
+    delay(100);
+  }
+
+  //***************************************************************************//
+  /**
+   * Edge detection test displays the position at which an edge is found when
+   * the robot is travelling down a straight.
+   *
+   * Start with the robot backed up to a wall.
+   * Runs forward for 150mm and records the robot position when the trailing
+   * edge of the adjacent wall(s) is found.
+   *
+   * The value is only recorded to the nearest millimeter to avoid any
+   * suggestion of better accuracy than that being available.
+   *
+   * Note that UKMARSBOT, with its back to a wall, has its wheels 43mm from
+   * the cell boundary.
+   *
+   * This value can be used to permit forward error correction of the robot
+   * position while exploring.
+   *
+   * @brief find sensor wall edge detection positions
+   */
+
+  void test_edge_detection() {
+    bool left_edge_found = false;
+    bool right_edge_found = false;
+    int left_edge_position = 0;
+    int right_edge_position = 0;
+    int left_max = 0;
+    int right_max = 0;
+    sensors.enable_sensors();
+    delay(100);
+    motion.reset_drive_system();
+    motors.enable_motor_controllers();
+    sensors.set_steering_mode(STEERING_OFF);
+    Serial.println(F("Edge positions:"));
+    forward.start(FULL_CELL - 30.0, 100, 0, 1000);
+    while (not forward.is_finished()) {
+      if (sensors.lss.value > left_max) {
+        left_max = sensors.lss.value;
+      }
+
+      if (sensors.rss.value > right_max) {
+        right_max = sensors.rss.value;
+      }
+
+      if (not left_edge_found) {
+        if (sensors.lss.value < left_max / 2) {
+          left_edge_position = int(0.5 + forward.position());
+          left_edge_found = true;
+        }
+      }
+      if (not right_edge_found) {
+        if (sensors.rss.value < right_max / 2) {
+          right_edge_position = int(0.5 + forward.position());
+          right_edge_found = true;
+        }
+      }
+      delay(5);
+    }
+    Serial.print(F("Left: "));
+    if (left_edge_found) {
+      Serial.print(BACK_WALL_TO_CENTER + left_edge_position);
+    } else {
+      Serial.print('-');
+    }
+
+    Serial.print(F("  Right: "));
+    if (right_edge_found) {
+      Serial.print(BACK_WALL_TO_CENTER + right_edge_position);
+    } else {
+      Serial.print('-');
+    }
+    Serial.println();
+
+    motion.reset_drive_system();
+    sensors.disable_sensors();
+    delay(100);
+  }
+
+  void test_SS90E() {
+    // note that changes to the speeds are likely to affect
+    // the other turn parameters
+    uint8_t side = sensors.wait_for_user_start();
+    motion.reset_drive_system();
+    motors.enable_motor_controllers();
+    sensors.set_steering_mode(STEERING_OFF);
+    // move to the boundary with the next cell
+    float distance = BACK_WALL_TO_CENTER + HALF_CELL;
+    forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
+    while (not forward.is_finished()) {
+      delay(2);
+    }
+    forward.set_position(FULL_CELL);
+
+    if (side == RIGHT_START) {
+      turn_smooth(SS90ER);
+    } else {
+      turn_smooth(SS90EL);
+    }
+    // after the turn, estimate the angle error by looking for
+    // changes in the side sensor readings
+    int sensor_left = sensors.lss.value;
+    int sensor_right = sensors.rss.value;
+    // move two cells. The resting position of the mouse have the
+    // same offset as the turn ending
+    forward.start(2 * FULL_CELL, DEFAULT_TURN_SPEED, 0, SEARCH_ACCELERATION);
+    while (not forward.is_finished()) {
+      delay(2);
+    }
+    sensor_left -= sensors.lss.value;
+    sensor_right -= sensors.rss.value;
+    print_justified(sensor_left, 5);
+    print_justified(sensor_right, 5);
+    motion.reset_drive_system();
   }
 };
 

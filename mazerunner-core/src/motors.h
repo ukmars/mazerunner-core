@@ -44,8 +44,6 @@ enum { PWM_488_HZ,
        PWM_3906_HZ,
        PWM_31250_HZ };
 
-extern float g_left_motor_volts;
-extern float g_right_motor_volts;
 
 
 class Motors {
@@ -55,6 +53,10 @@ class Motors {
   float s_old_rot_error;
   float s_fwd_error;
   float s_rot_error;
+  // these are maintained only for logging
+float g_left_motor_volts;
+float g_right_motor_volts;
+
 
   void enable_motor_controllers() {
     s_controllers_output_enabled = true;

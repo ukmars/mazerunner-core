@@ -323,7 +323,9 @@ class Sensors {
     return lfs.raw < 100 && sensors.rfs.raw > 100;
   }
 
+
   uint8_t wait_for_user_start() {
+    digitalWrite(LED_LEFT,1);
     enable_sensors();
     int count = 0;
     uint8_t choice = NO_START;
@@ -348,6 +350,7 @@ class Sensors {
       }
     }
     disable_sensors();
+    digitalWrite(LED_LEFT,0);
     delay(250);
     return choice;
   }

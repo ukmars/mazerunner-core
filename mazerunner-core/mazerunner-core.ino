@@ -39,7 +39,6 @@
 #include "src/sensors.h"
 #include "src/systick.h"
 #include "ui.h"
-#include "user.h"
 #include <Arduino.h>
 
 // Global objects
@@ -54,9 +53,6 @@ Maze maze PERSISTENT;
 Mouse mouse;
 UI ui;
 Reporter reporter;
-// these are maintained only for logging
-float g_left_motor_volts;
-float g_right_motor_volts;
 
 void setup() {
   Serial.begin(BAUDRATE);
@@ -76,22 +72,19 @@ void setup() {
 }
 
 void loop() {
-
-  if (Serial.available()) {
-    ui.cli_run();
+  if (ui.read_line() > 0) {
+    ui.interpret_line();
   }
   if (sensors.button_pressed()) {
     sensors.wait_for_button_release();
     int function = sensors.get_switches();
-    if (function > 1) {
-      sensors.wait_for_user_start(); // cover front sensor with hand to start
-    }
-    run_mouse(function);
+    Serial.print(function);
+    mouse.execute_cmd(function, Args{0});
+
+    // mouse.run(function);
   }
 }
 
-static int encoder_left_counter;
-static int encoder_right_counter;
 /**
  * Measurements indicate that even at 1500mm/s thetotal load due to
  * the encoder interrupts is less than 3% of the available bandwidth.

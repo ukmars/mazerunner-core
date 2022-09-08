@@ -1,6 +1,13 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+const int MAX_ARGC = 16;
+
+struct Args {
+  char *argv[MAX_ARGC];
+  int argc;
+};
+
 // simple formatting functions for printing maze costs
 inline void print_hex_2(unsigned char value) {
   if (value < 16) {

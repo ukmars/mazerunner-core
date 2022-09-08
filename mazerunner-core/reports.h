@@ -78,9 +78,9 @@ class Reporter {
       Serial.print(' ');
       Serial.print(rotation.speed());
       Serial.print(' ');
-      Serial.print(50 * (g_right_motor_volts + g_left_motor_volts));
+      Serial.print(50 * (motors.g_right_motor_volts + motors.g_left_motor_volts));
       Serial.print(' ');
-      Serial.print(50 * (g_right_motor_volts - g_left_motor_volts));
+      Serial.print(50 * (motors.g_right_motor_volts - motors.g_left_motor_volts));
       Serial.println();
     }
 #else

@@ -35,39 +35,183 @@
 
 #include "config.h"
 #include "maze.h"
+#include "mouse.h"
 #include "reports.h"
 #include "src/digitalWriteFast.h"
 #include "src/sensors.h"
-#include "user.h"
 #include <Arduino.h>
 #include <stdint.h>
 
 #define MAX_DIGITS 8
 
-const int MAX_ARGC = 16;
-struct Args {
-  const char *argv[MAX_ARGC];
-  int argc;
-};
-
 const int INPUT_BUFFER_SIZE = 32;
-
-// These are the error codes produced by commands to pass into interpreter error.
-enum {
-  T_SILENT_ERROR = -1, // Special error code designed for ?, h and unimplemented commands that report their own errors.
-  T_OK = 0,            // Normal 'no error' return code.
-  T_OUT_OF_RANGE = 1,
-  T_READ_NOT_SUPPORTED = 2,
-  T_LINE_TOO_LONG = 3,
-  T_UNKNOWN_COMMAND = 4,
-  T_UNEXPECTED_TOKEN = 5
-};
 
 class UI {
 
+  private:
+  char m_buffer[INPUT_BUFFER_SIZE];
+  uint8_t m_index = 0;
+
   public:
-  char s_input_line[INPUT_BUFFER_SIZE];
-  uint8_t s_index = 0;
+  void interpret_line() {
+    Args args = split_line();
+    switch (args.argc) {
+      case 0:
+        break;
+      case 1:
+        if (strlen(args.argv[0]) == 1) {
+          run_short_cmd(args);
+        }
+        break;
+      default:
+        run_long_cmd(args);
+        break;
+    }
+    cli_clear_input();
+    cli_prompt();
+  }
+
+  /***
+   * Run a complex command. These all start with a string and have
+   * arguments. The command string can be a single letter.
+   *
+   * The arguments will be passed on to the robot.
+   *
+   * e.g. 'F 4 500 1000 3000' might mean:
+   *  - Run function 4 (as if the function switches had been set)
+   *  - pass integer arguments 500,1000,3000
+   *
+   * Most simply, just send 'F n' where n is the function switch value
+   *
+   */
+  void run_long_cmd(const Args args) {
+    int function = -1;
+    int digits = read_integer(args.argv[1], function);
+    if (digits > 0) {
+      mouse.execute_cmd(function, args);
+    }
+  }
+
+  /***
+   * Simple commands represented by a single character
+   *
+   */
+  void run_short_cmd(const Args &args) {
+    // These are all the single-character commands
+    char c = args.argv[0][0];
+    switch (c) {
+      case '?':
+        cli_help();
+        break;
+      case 'W':
+        maze.print_maze_plain();
+        break;
+      case 'X':
+        Serial.println(F("Reset Maze"));
+        maze.initialise_maze();
+        break;
+      case 'R':
+        maze.print_maze_with_directions();
+        break;
+      case 'S':
+        sensors.enable_sensors();
+        delay(10);
+        reporter.report_wall_sensors();
+        sensors.disable_sensors();
+        break;
+      default:
+        break;
+    }
+  }
+
+  void cli_clear_input() {
+    m_index = 0;
+    m_buffer[m_index] = 0;
+  }
+
+  /***
+   * Read characters from the serial port into the buffer.
+   * return 1 if there is a complete line avaialble
+   * return 0 if not
+   *
+   */
+  int read_line() {
+    while (Serial.available()) {
+      char c = Serial.read();
+      // TODO : add single character priority commands like Abort
+      if (c == '\n') {
+        Serial.println();
+        return 1;
+      } else if (c == 8) {
+        if (m_index > 0) {
+          m_buffer[m_index] = 0;
+          m_index--;
+          Serial.print(c);
+          Serial.print(' ');
+          Serial.print(c);
+        }
+      } else if (isPrintable(c)) {
+        c = toupper(c);
+        Serial.print(c);
+        if (m_index < INPUT_BUFFER_SIZE - 1) {
+          m_buffer[m_index++] = c;
+          m_buffer[m_index] = 0;
+        }
+      } else {
+        // drop the character silently
+      }
+    }
+    return 0;
+  }
+
+  Args split_line() {
+    Args args = {0};
+    char *line = m_buffer;
+    char *token;
+    // special case for the single character settings commands
+    if (m_buffer[0] == '$') {
+      args.argv[args.argc] = (char *)"$";
+      args.argc++;
+      line++;
+    }
+    for (token = strtok(line, " ,="); token != NULL; token = strtok(NULL, " ,=")) {
+      args.argv[args.argc] = token;
+      args.argc++;
+      if (args.argc == MAX_ARGC)
+        break;
+    }
+    return args;
+  }
+
+  void cli_prompt() {
+    Serial.print('\n');
+    Serial.print('>');
+    Serial.print(' ');
+  }
+
+  void cli_help() {
+    Serial.println(F("W   : display maze walls"));
+    Serial.println(F("X   : reset maze"));
+    Serial.println(F("R   : display maze with directions"));
+    Serial.println(F("S   : show sensor readings"));
+    Serial.println(F("F n : Run user function n"));
+    Serial.println(F("       0 = ---"));
+    Serial.println(F("       1 = Sensor Calibration"));
+    Serial.println(F("       2 = Search to the goal and back"));
+    Serial.println(F("       3 = Follow a wall to the goal"));
+    Serial.println(F("       4 = "));
+    Serial.println(F("       5 = "));
+    Serial.println(F("       6 = "));
+    Serial.println(F("       7 = "));
+    Serial.println(F("       8 = "));
+    Serial.println(F("       9 = "));
+    Serial.println(F("      10 = "));
+    Serial.println(F("      11 = "));
+    Serial.println(F("      12 = "));
+    Serial.println(F("      13 = "));
+    Serial.println(F("      14 = "));
+    Serial.println(F("      15 = "));
+  }
 
   /***
    * Scan a character array for a float.
@@ -157,168 +301,8 @@ class UI {
     }
     return digits;
   }
-  //***************************************************************************//
-
-  int cli_run_user(const Args args) {
-    if (args.argc < 2) {
-      run_mouse(sensors.get_switches());
-      return T_OK;
-    }
-    int test_number = -1;
-    read_integer(args.argv[1], test_number);
-    if (test_number < 0) {
-      return T_UNEXPECTED_TOKEN;
-    }
-    run_mouse(test_number);
-    return T_OK;
-  }
-
-  void cli_clear_input() {
-    s_index = 0;
-    s_input_line[s_index] = 0;
-  }
-
-  int cli_read_line() {
-    while (Serial.available()) {
-      char c = Serial.read();
-      // TODO : add single character priority commands like Abort
-      if (c == '\n') {
-        Serial.println();
-        return 1;
-      } else if (c == 8) {
-        if (s_index > 0) {
-          s_input_line[s_index] = 0;
-          s_index--;
-          Serial.print(c);
-          Serial.print(' ');
-          Serial.print(c);
-        }
-      } else if (isPrintable(c)) {
-        c = toupper(c);
-        Serial.print(c);
-        if (s_index < INPUT_BUFFER_SIZE - 1) {
-          s_input_line[s_index++] = c;
-          s_input_line[s_index] = 0;
-        }
-      } else {
-        // drop the character silently
-      }
-    }
-    return 0;
-  }
-
-  Args cli_split_line() {
-    Args args = {0};
-    char *line = s_input_line;
-    char *token;
-    // special case for the single character settings commands
-    if (s_input_line[0] == '$') {
-      args.argv[args.argc] = "$";
-      args.argc++;
-      line++;
-    }
-    for (token = strtok(line, " ,="); token != NULL; token = strtok(NULL, " ,=")) {
-      args.argv[args.argc] = token;
-      args.argc++;
-      if (args.argc == MAX_ARGC)
-        break;
-    }
-    return args;
-  }
-
-  void cli_prompt() {
-    Serial.print('\n');
-    Serial.print('>');
-    Serial.print(' ');
-  }
-
-  void cli_help() {
-    Serial.println(F("$   : settings"));
-    Serial.println(F("W   : display maze walls"));
-    Serial.println(F("X   : reset maze"));
-    Serial.println(F("R   : display maze with directions"));
-    Serial.println(F("S   : show sensor readings"));
-    Serial.println(F("U n : Run user function n"));
-    Serial.println(F("       0 = ---"));
-    Serial.println(F("       1 = "));
-    Serial.println(F("       2 = "));
-    Serial.println(F("       3 = "));
-    Serial.println(F("       4 = "));
-    Serial.println(F("       5 = "));
-    Serial.println(F("       6 = "));
-    Serial.println(F("       7 = "));
-    Serial.println(F("       8 = "));
-    Serial.println(F("       9 = "));
-    Serial.println(F("      10 = "));
-    Serial.println(F("      11 = "));
-    Serial.println(F("      12 = "));
-    Serial.println(F("      13 = "));
-    Serial.println(F("      14 = "));
-    Serial.println(F("      15 = "));
-  }
-
-  void cli_interpret(const Args &args) {
-    if (strlen(args.argv[0]) == 1) {
-      // These are all single-character commands
-      char c = args.argv[0][0]; //  first character of first token
-      switch (c) {
-        case '?':
-          cli_help();
-          break;
-        case '$':
-          break;
-        case 'W':
-          maze.print_maze_plain();
-          break;
-        case 'X':
-          Serial.println(F("Reset Maze"));
-          maze.initialise_maze();
-          break;
-        case 'R':
-          maze.print_maze_with_directions();
-          break;
-        case 'S':
-          sensors.enable_sensors();
-          delay(10);
-          reporter.report_wall_sensors();
-          sensors.disable_sensors();
-          break;
-        case 'U':
-          cli_run_user(args);
-          break;
-        default:
-          break;
-      }
-      return;
-    }
-    // parse multi-character commands here
-    // TODO - remove these debugging lines
-    for (int i = 0; i < args.argc; i++) {
-      Serial.println(args.argv[i]);
-    }
-  }
-
-  void cli_run() {
-    if (cli_read_line() > 0) {
-      Args args = cli_split_line();
-      cli_interpret(args);
-      cli_clear_input();
-      cli_prompt();
-    }
-  }
-
-  /***
-   * just sit in a loop, flashing lights waiting for the button to be pressed
-   */
-  void panic() {
-    while (!sensors.button_pressed()) {
-      digitalWriteFast(LED_BUILTIN, 1);
-      delay(100);
-      digitalWriteFast(LED_BUILTIN, 0);
-      delay(100);
-    }
-    sensors.wait_for_button_release();
-    digitalWriteFast(LED_BUILTIN, 0);
-  }
 };
+
+extern UI ui;
+
 #endif /* UI_H_ */
