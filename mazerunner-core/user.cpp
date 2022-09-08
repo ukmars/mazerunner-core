@@ -55,10 +55,10 @@ void user_log_front_sensor() {
   sensors.enable_sensors();
   motion.reset_drive_system();
   motors.enable_motor_controllers();
-  report_front_sensor_track_header();
+  reporter.report_front_sensor_track_header();
   forward.start(-200, 100, 0, 500);
   while (not forward.is_finished()) {
-    report_front_sensor_track();
+    reporter.report_front_sensor_track();
   }
   motion.reset_drive_system();
   sensors.disable_sensors();
@@ -71,7 +71,7 @@ void run_mouse(int function) {
       Serial.println(F("OK"));
       break;
     case 1:
-      report_sensor_calibration();
+      reporter.report_sensor_calibration();
       break;
     case 2:
       mouse.search_maze();
@@ -139,10 +139,10 @@ void test_sensor_spin_calibrate() {
   motion.reset_drive_system();
   motors.enable_motor_controllers();
   sensors.set_steering_mode(STEERING_OFF);
-  report_sensor_track_header();
+  reporter.report_sensor_track_header();
   rotation.start(360, 180, 0, 1800);
   while (not rotation.is_finished()) {
-    report_sensor_track(true);
+    reporter.report_sensor_track(true);
   }
   motion.reset_drive_system();
   sensors.disable_sensors();

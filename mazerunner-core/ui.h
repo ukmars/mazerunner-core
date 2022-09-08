@@ -280,7 +280,7 @@ class UI {
         case 'S':
           sensors.enable_sensors();
           delay(10);
-          report_wall_sensors();
+          reporter.report_wall_sensors();
           sensors.disable_sensors();
           break;
         case 'U':

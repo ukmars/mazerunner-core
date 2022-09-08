@@ -53,6 +53,7 @@ Profile rotation;
 Maze maze PERSISTENT;
 Mouse mouse;
 UI ui;
+Reporter reporter;
 // these are maintained only for logging
 float g_left_motor_volts;
 float g_right_motor_volts;
