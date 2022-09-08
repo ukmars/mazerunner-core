@@ -41,7 +41,7 @@
 #include "src/motors.h"
 #include "src/profile.h"
 #include "src/sensors.h"
-#include "utils.h"
+#include "src/utils.h"
 
 #define SEARCH_ACCELERATION 3000
 #define SPEEDMAX_EXPLORE 400

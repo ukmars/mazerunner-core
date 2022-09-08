@@ -28,7 +28,7 @@
 #define MAZE_H
 
 #include "src/queue.h"
-#include "utils.h"
+#include "src/utils.h"
 #include <stdint.h>
 
 #define MAZE_WIDTH 16
