@@ -39,12 +39,6 @@
 #include <util/atomic.h>
 #include <wiring_private.h>
 
-// struct Sensor {
-//   int raw;       // whatever the ADC gives us
-//   int value;     // normalised to 100 at reference position
-//   bool has_wall; // true if a wall is present
-// };
-
 enum {
   STEER_NORMAL,
   STEER_LEFT_WALL,
@@ -57,42 +51,13 @@ const uint8_t NO_START = 0;
 const uint8_t LEFT_START = 1;
 const uint8_t RIGHT_START = 2;
 
-//***************************************************************************//
-extern volatile float g_battery_voltage;
-extern volatile float g_battery_scale; // adjusts PWM for voltage changes
-//***************************************************************************//
-
-
-
-/*** wall sensor variables ***/
-extern volatile int g_lfs;
-extern volatile int g_lss;
-extern volatile int g_rss;
-extern volatile int g_rfs;
-
-extern volatile int g_front_sum;
-
-/*** These are the values before normalisation */
-extern volatile int g_lfs_raw;
-extern volatile int g_lss_raw;
-extern volatile int g_rss_raw;
-extern volatile int g_rfs_raw;
-
-// true if a wall is present
-extern volatile bool g_front_has_wall;
-
-extern volatile bool g_lfs_has_wall;
-extern volatile bool g_lss_has_wall;
-extern volatile bool g_rss_has_wall;
-extern volatile bool g_rfs_has_wall;
-
-/*** steering variables ***/
-extern uint8_t g_steering_mode;
-extern bool g_steering_enabled;
-extern volatile float g_cross_track_error;
-extern volatile float g_steering_adjustment;
 
 //***************************************************************************//
+struct SensorChannel {
+  int raw;   // whatever the ADC gives us
+  int value; // normalised to 100 at reference position
+};
+
 class Sensors;
 extern Sensors sensors;
 class Sensors {
@@ -104,38 +69,29 @@ class Sensors {
   volatile int switches_adc_reading;
 
   public:
+  volatile float g_battery_voltage;
+  volatile float g_battery_scale;
+
+  /*** wall sensor variables ***/
+
+  volatile SensorChannel lfs;
+  volatile SensorChannel lss;
+  volatile SensorChannel rss;
+  volatile SensorChannel rfs;
+
+
+  volatile bool has_front_wall;
+  volatile bool has_left_wall;
+  volatile bool has_right_wall;
+
+
+  volatile int g_front_sum;
+
+  /*** steering variables ***/
+  uint8_t g_steering_mode = STEER_NORMAL;
   
-volatile float g_battery_voltage;
-volatile float g_battery_scale;
-
-volatile int g_ws_lfs;
-volatile int g_ws_lss;
-volatile int g_ws_rss;
-volatile int g_ws_rfs;
-
-/*** wall sensor variables ***/
-volatile int g_lfs;
-volatile int g_lss;
-volatile int g_rss;
-volatile int g_rfs;
-
-volatile int g_front_sum;
-
-volatile int g_lfs_raw;
-volatile int g_lss_raw;
-volatile int g_rss_raw;
-volatile int g_rfs_raw;
-
-/*** true if a wall is present ***/
-volatile bool g_lss_has_wall;
-volatile bool g_front_has_wall;
-volatile bool g_rss_has_wall;
-
-/*** steering variables ***/
-uint8_t g_steering_mode = STEER_NORMAL;
-bool g_steering_enabled;
-volatile float g_cross_track_error;
-volatile float g_steering_adjustment;
+  volatile float g_cross_track_error;
+  volatile float g_steering_adjustment;
 
   /**
    *  The default for the Arduino is to give a slow ADC clock for maximum
@@ -195,14 +151,15 @@ volatile float g_steering_adjustment;
    * @param error calculated from wall sensors, Negative if too far right
    * @return steering adjustment in degrees
    */
-  float calculate_steering_adjustment(float error) {
+  float calculate_steering_adjustment() {
     // always calculate the adjustment for testing. It may not get used.
-    float pTerm = STEERING_KP * error;
-    float dTerm = STEERING_KD * (error - last_steering_error);
+    float pTerm = STEERING_KP * g_cross_track_error;
+    float dTerm = STEERING_KD * (g_cross_track_error - last_steering_error);
     float adjustment = (pTerm + dTerm) * LOOP_INTERVAL;
     // TODO: are these limits appropriate, or even needed?
     adjustment = constrain(adjustment, -STEERING_ADJUST_LIMIT, STEERING_ADJUST_LIMIT);
-    last_steering_error = error;
+    last_steering_error = g_cross_track_error;
+    g_steering_adjustment = adjustment;
     return adjustment;
   }
 
@@ -253,33 +210,33 @@ volatile float g_steering_adjustment;
     // if there is only a single front sensor (Basic sensor board) then the value is
     // just used twice
     // keep these values for calibration assistance
-    g_rfs_raw = adc[RFS_CHANNEL];
-    g_rss_raw = adc[RSS_CHANNEL];
-    g_lss_raw = adc[LSS_CHANNEL];
-    g_lfs_raw = adc[LFS_CHANNEL];
+    rfs.raw = adc[RFS_CHANNEL];
+    rss.raw = adc[RSS_CHANNEL];
+    lss.raw = adc[LSS_CHANNEL];
+    lfs.raw = adc[LFS_CHANNEL];
 
     // normalise to a nominal value of 100
-    g_rfs = (int)(g_rfs_raw * FRONT_RIGHT_SCALE);
-    g_rss = (int)(g_rss_raw * RIGHT_SCALE);
-    g_lss = (int)(g_lss_raw * LEFT_SCALE);
-    g_lfs = (int)(g_lfs_raw * FRONT_LEFT_SCALE);
+    rfs.value = (int)(rfs.raw * FRONT_RIGHT_SCALE);
+    rss.value = (int)(rss.raw * RIGHT_SCALE);
+    lss.value = (int)(lss.raw * LEFT_SCALE);
+    lfs.value = (int)(lfs.raw * FRONT_LEFT_SCALE);
 
     // set the wall detection flags
-    g_lss_has_wall = g_lss > LEFT_THRESHOLD;
-    g_rss_has_wall = g_rss > RIGHT_THRESHOLD;
-    g_front_sum = g_lfs + g_rfs;
-    g_front_has_wall = g_front_sum > FRONT_THRESHOLD;
+    has_left_wall = lss.value > LEFT_THRESHOLD;
+    has_right_wall = rss.value > RIGHT_THRESHOLD;
+    g_front_sum = lfs.value + rfs.value;
+    has_front_wall = g_front_sum > FRONT_THRESHOLD;
 
     // calculate the alignment errors - too far left is negative
     int error = 0;
-    int right_error = SIDE_NOMINAL - g_rss;
-    int left_error = SIDE_NOMINAL - g_lss;
+    int right_error = SIDE_NOMINAL - rss.value;
+    int left_error = SIDE_NOMINAL - lss.value;
     if (g_steering_mode == STEER_NORMAL) {
-      if (g_lss_has_wall && g_rss_has_wall) {
+      if (sensors.has_left_wall && sensors.has_right_wall) {
         error = left_error - right_error;
-      } else if (g_lss_has_wall) {
+      } else if (sensors.has_left_wall) {
         error = 2 * left_error;
-      } else if (g_rss_has_wall) {
+      } else if (sensors.has_right_wall) {
         error = -2 * right_error;
       }
     } else if (g_steering_mode == STEER_LEFT_WALL) {
@@ -293,6 +250,7 @@ volatile float g_steering_adjustment;
     if (g_front_sum > 100) {
       error = 0;
     }
+    g_cross_track_error = error;
     return error;
   }
 
@@ -306,9 +264,9 @@ volatile float g_steering_adjustment;
    * that process so avoid doing that.
    */
 
-   const uint8_t ADC_REF = DEFAULT;
+  const uint8_t ADC_REF = DEFAULT;
 
-   void start_adc(uint8_t pin) {
+  void start_adc(uint8_t pin) {
     if (pin >= 14)
       pin -= 14; // allow for channel or pin numbers
                  // set the analog reference (high two bits of ADMUX) and select the
@@ -318,7 +276,7 @@ volatile float g_steering_adjustment;
     sbi(ADCSRA, ADSC);
   }
 
-   int get_adc_result() {
+  int get_adc_result() {
     // ADSC is cleared when the conversion finishes
     // while (bit_is_set(ADCSRA, ADSC));
 
@@ -335,63 +293,63 @@ volatile float g_steering_adjustment;
 
   uint8_t sensor_phase = 0;
   inline bool button_pressed() {
-  return get_switches() == 16;
-}
-
- void wait_for_button_press() {
-  while (not(button_pressed())) {
-    delay(10);
-  };
-}
-
- void wait_for_button_release() {
-  while (button_pressed()) {
-    delay(10);
-  };
-}
-
- void wait_for_button_click() {
-  wait_for_button_press();
-  wait_for_button_release();
-  delay(250);
-}
-
- bool occluded_left() {
-  return g_lfs_raw > 100 && g_rfs_raw < 100;
-}
-
- bool occluded_right() {
-  return g_lfs_raw < 100 && g_rfs_raw > 100;
-}
-
- uint8_t wait_for_user_start() {
-  enable_sensors();
-  int count = 0;
-  uint8_t choice = NO_START;
-  while (choice == NO_START) {
-    count = 0;
-    while (occluded_left()) {
-      count++;
-      delay(20);
-    }
-    if (count > 5) {
-      choice = LEFT_START;
-      break;
-    }
-    count = 0;
-    while (occluded_right()) {
-      count++;
-      delay(20);
-    }
-    if (count > 5) {
-      choice = RIGHT_START;
-      break;
-    }
+    return get_switches() == 16;
   }
-  disable_sensors();
-  delay(250);
-  return choice;
-}
+
+  void wait_for_button_press() {
+    while (not(button_pressed())) {
+      delay(10);
+    };
+  }
+
+  void wait_for_button_release() {
+    while (button_pressed()) {
+      delay(10);
+    };
+  }
+
+  void wait_for_button_click() {
+    wait_for_button_press();
+    wait_for_button_release();
+    delay(250);
+  }
+
+  bool occluded_left() {
+    return lfs.raw > 100 && sensors.rfs.raw < 100;
+  }
+
+  bool occluded_right() {
+    return lfs.raw < 100 && sensors.rfs.raw > 100;
+  }
+
+  uint8_t wait_for_user_start() {
+    enable_sensors();
+    int count = 0;
+    uint8_t choice = NO_START;
+    while (choice == NO_START) {
+      count = 0;
+      while (occluded_left()) {
+        count++;
+        delay(20);
+      }
+      if (count > 5) {
+        choice = LEFT_START;
+        break;
+      }
+      count = 0;
+      while (occluded_right()) {
+        count++;
+        delay(20);
+      }
+      if (count > 5) {
+        choice = RIGHT_START;
+        break;
+      }
+    }
+    disable_sensors();
+    delay(250);
+    return choice;
+  }
 
   void start_sensor_cycle() {
     sensor_phase = 0;     // sync up the start of the sensor sequence

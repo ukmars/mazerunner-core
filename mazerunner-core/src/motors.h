@@ -141,14 +141,14 @@ class Motors {
   void set_left_motor_volts(float volts) {
     volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
     g_left_motor_volts = volts;
-    int motorPWM = (int)(volts * g_battery_scale);
+    int motorPWM = (int)(volts * sensors.g_battery_scale);
     set_left_motor_pwm(motorPWM);
   }
 
   void set_right_motor_volts(float volts) {
     volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
     g_right_motor_volts = volts;
-    int motorPWM = (int)(volts * g_battery_scale);
+    int motorPWM = (int)(volts * sensors.g_battery_scale);
     set_right_motor_pwm(motorPWM);
   }
 

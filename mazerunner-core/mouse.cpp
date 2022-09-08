@@ -50,17 +50,17 @@ char p_mouse_state __attribute__((section(".noinit")));
 static char dirLetters[] = "NESW";
 
 void print_walls() {
-  if (g_lss_has_wall) {
+  if (sensors.has_left_wall) {
     Serial.print('L');
   } else {
     Serial.print('-');
   }
-  if (g_front_has_wall) {
+  if (sensors.has_front_wall) {
     Serial.print('F');
   } else {
     Serial.print('-');
   }
-  if (g_rss_has_wall) {
+  if (sensors.has_right_wall) {
     Serial.print('R');
   } else {
     Serial.print('-');
@@ -82,13 +82,13 @@ static void stopAndAdjust() {
   sensors.set_steering_mode(STEERING_OFF);
   forward.start(remaining, forward.speed(), 0, forward.acceleration());
   while (not forward.is_finished()) {
-    if (g_front_sum > (FRONT_REFERENCE - 150)) {
+    if (sensors.g_front_sum > (FRONT_REFERENCE - 150)) {
       break;
     }
     delay(2);
   }
-  if (g_front_has_wall) {
-    while (g_front_sum < FRONT_REFERENCE) {
+  if (sensors.has_front_wall) {
+    while (sensors.g_front_sum < FRONT_REFERENCE) {
       forward.start(10, 50, 0, 1000);
       delay(2);
     }
@@ -122,7 +122,7 @@ void Mouse::end_run() {
   float remaining = (FULL_CELL + HALF_CELL) - forward.position();
   forward.start(remaining, forward.speed(), 30, forward.acceleration());
   if (has_wall) {
-    while (g_front_sum < 850) {
+    while (sensors.g_front_sum < 850) {
       delay(2);
     }
   } else {
@@ -156,16 +156,16 @@ void Mouse::turn_smooth(int turn_id) {
   forward.set_target_speed(DEFAULT_TURN_SPEED);
 
   float trigger = turn_params[turn_id].trigger;
-  if (g_lss_has_wall) {
+  if (sensors.has_left_wall) {
     trigger += 10;
   }
-  if (g_rss_has_wall) {
+  if (sensors.has_right_wall) {
     trigger += 6;
   }
 
   float turn_point = FULL_CELL + turn_params[turn_id].run_in;
   while (forward.position() < turn_point) {
-    if (g_front_sum > trigger) {
+    if (sensors.g_front_sum > trigger) {
       forward.set_state(CS_FINISHED);
       triggered = true;
       break;
@@ -206,7 +206,7 @@ void Mouse::turn_around() {
   float remaining = (FULL_CELL + HALF_CELL) - forward.position();
   forward.start(remaining, forward.speed(), 30, forward.acceleration());
   if (has_wall) {
-    while (g_front_sum < FRONT_REFERENCE) {
+    while (sensors.g_front_sum < FRONT_REFERENCE) {
       delay(2);
     }
   } else {
@@ -239,9 +239,9 @@ void Mouse::init() {
 }
 
 void Mouse::update_sensors() {
-  rightWall = (g_rss_has_wall);
-  leftWall = (g_lss_has_wall);
-  frontWall = (g_front_has_wall);
+  rightWall = (sensors.has_right_wall);
+  leftWall = (sensors.has_left_wall);
+  frontWall = (sensors.has_front_wall);
 }
 
 void Mouse::log_status(char action) {
@@ -251,7 +251,7 @@ void Mouse::log_status(char action) {
   print_hex_2(location);
   Serial.print(' ');
   Serial.print(dirLetters[heading]);
-  print_justified(g_front_sum, 4);
+  print_justified(sensors.g_front_sum, 4);
   Serial.print('@');
   print_justified((int)forward.position(), 4);
   Serial.print(' ');

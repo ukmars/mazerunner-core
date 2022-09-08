@@ -86,9 +86,9 @@ class Systick {
     sensors.update_battery_voltage();
     forward.update();
     rotation.update();
-    g_cross_track_error = sensors.update_wall_sensors();
-    g_steering_adjustment = sensors.calculate_steering_adjustment(g_cross_track_error);
-    motors.update_motor_controllers(g_steering_adjustment);
+    sensors.update_wall_sensors();
+    sensors.calculate_steering_adjustment();
+    motors.update_motor_controllers(sensors.g_steering_adjustment);
     sensors.start_sensor_cycle();
     // NOTE: no code should follow this line;
   }

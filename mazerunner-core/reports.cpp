@@ -101,27 +101,27 @@ void report_sensor_track(bool use_raw = false) {
     Serial.print(encoders.robot_angle());
     if (use_raw) {
       Serial.print(' ');
-      Serial.print(g_lss_raw);
+      Serial.print(sensors.lss.raw);
       Serial.print(' ');
-      Serial.print(g_rss_raw);
+      Serial.print(sensors.rss.raw);
       Serial.print(' ');
-      Serial.print(g_lfs_raw);
+      Serial.print(sensors.lfs.raw);
       Serial.print(' ');
-      Serial.print(g_rfs_raw);
+      Serial.print(sensors.rfs.raw);
     } else {
       Serial.print(' ');
-      Serial.print(g_lss);
+      Serial.print(sensors.lss.value);
       Serial.print(' ');
-      Serial.print(g_rss);
+      Serial.print(sensors.rss.value);
       Serial.print(' ');
-      Serial.print(g_lfs);
+      Serial.print(sensors.lfs.value);
       Serial.print(' ');
-      Serial.print(g_rfs);
+      Serial.print(sensors.rfs.value);
     }
     Serial.print(' ');
-    Serial.print(g_cross_track_error);
+    Serial.print(sensors.g_cross_track_error);
     Serial.print(' ');
-    Serial.print(g_steering_adjustment);
+    Serial.print(sensors.g_steering_adjustment);
     Serial.println();
   }
 #else
@@ -145,9 +145,9 @@ void report_front_sensor_track() {
     Serial.print(' ');
     Serial.print(fabsf(encoders.robot_position()));
     Serial.print(' ');
-    Serial.print(g_lfs);
+    Serial.print(sensors.lfs.value);
     Serial.print(' ');
-    Serial.print(g_lfs_raw);
+    Serial.print(sensors.lfs.raw);
     Serial.println();
   }
 #else
@@ -158,30 +158,20 @@ void report_front_sensor_track() {
 //***************************************************************************//
 
 void report_wall_sensors() {
-  int left_front = g_lfs;
-  int left = g_lss;
-  int right = g_rss;
-  int right_front = g_rfs;
-
-  int left_front_raw = g_lfs_raw;
-  int left_raw = g_lss_raw;
-  int right_raw = g_rss_raw;
-  int right_front_raw = g_rfs_raw;
-
   Serial.print('\n');
   Serial.print('R');
   Serial.print(' ');
-  print_justified(left_front_raw, 7);
-  print_justified(left_raw, 7);
-  print_justified(right_raw, 7);
-  print_justified(right_front_raw, 7);
+  print_justified(sensors.lfs.raw, 7);
+  print_justified(sensors.lss.raw, 7);
+  print_justified(sensors.rss.raw, 7);
+  print_justified(sensors.rfs.raw, 7);
   Serial.print(' ');
   Serial.print('-');
   Serial.print('>');
-  print_justified(left_front, 7);
-  print_justified(left, 7);
-  print_justified(right, 7);
-  print_justified(right_front, 7);
+  print_justified(sensors.lfs.value, 7);
+  print_justified(sensors.lss.value, 7);
+  print_justified(sensors.rss.value, 7);
+  print_justified(sensors.rfs.value, 7);
   Serial.print(' ');
 }
 

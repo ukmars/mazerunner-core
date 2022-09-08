@@ -112,22 +112,22 @@ void test_edge_detection() {
   Serial.println(F("Edge positions:"));
   forward.start(FULL_CELL - 30.0, 100, 0, 1000);
   while (not forward.is_finished()) {
-    if (g_lss > left_max) {
-      left_max = g_lss;
+    if (sensors.lss.value > left_max) {
+      left_max = sensors.lss.value;
     }
 
-    if (g_rss > right_max) {
-      right_max = g_rss;
+    if (sensors.rss.value > right_max) {
+      right_max = sensors.rss.value;
     }
 
     if (not left_edge_found) {
-      if (g_lss < left_max / 2) {
+      if (sensors.lss.value < left_max / 2) {
         left_edge_position = int(0.5 + forward.position());
         left_edge_found = true;
       }
     }
     if (not right_edge_found) {
-      if (g_rss < right_max / 2) {
+      if (sensors.rss.value < right_max / 2) {
         right_edge_position = int(0.5 + forward.position());
         right_edge_found = true;
       }
@@ -176,16 +176,16 @@ void test_SS90E() {
   }
   // after the turn, estimate the angle error by looking for
   // changes in the side sensor readings
-  int sensor_left = g_lss;
-  int sensor_right = g_rss;
+  int sensor_left = sensors.lss.value;
+  int sensor_right = sensors.rss.value;
   // move two cells. The resting position of the mouse have the
   // same offset as the turn ending
   forward.start(2 * FULL_CELL, DEFAULT_TURN_SPEED, 0, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
     delay(2);
   }
-  sensor_left -= g_lss;
-  sensor_right -= g_rss;
+  sensor_left -= sensors.lss.value;
+  sensor_right -= sensors.rss.value;
   print_justified(sensor_left, 5);
   print_justified(sensor_right, 5);
   motion.reset_drive_system();
