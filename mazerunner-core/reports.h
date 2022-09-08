@@ -70,18 +70,4 @@ void report_wall_sensors();
 // used for setting up the sensor calibration
 void report_sensor_calibration();
 
-/**
- * The controllers work by comparing the profiled positin and angle
- * with values obtained from the encoders.
- *
- * All four values are reported here.
- *
- * @brief Send the profiled and actual position and angle
- */
-
-void print_maze_plain();
-void print_maze_with_costs();
-void print_maze_with_directions();
-void print_maze_wall_data();
-
 #endif

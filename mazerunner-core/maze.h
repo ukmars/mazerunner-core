@@ -28,6 +28,7 @@
 #define MAZE_H
 
 #include "src/queue.h"
+#include "utils.h"
 #include <stdint.h>
 
 #define MAZE_WIDTH 16
@@ -44,6 +45,8 @@
 
 #define INVALID_DIRECTION (0)
 #define MAX_COST 255
+
+const char dirChars[] = "^>v<*";
 
 struct MazeWalls {
   static uint8_t w[256] __attribute__((section(".noinit")));
@@ -324,6 +327,115 @@ class Maze {
       smallestDirection = 0;
     }
     return smallestDirection;
+  }
+
+  void printNorthWalls(int row) {
+    for (int col = 0; col < 16; col++) {
+      unsigned char cell = row + 16 * col;
+      Serial.print('o');
+      if (is_wall(cell, NORTH)) {
+        Serial.print(("---"));
+      } else {
+        Serial.print(("   "));
+      }
+    }
+    Serial.println('o');
+  }
+
+  void printSouthWalls(int row) {
+    for (int col = 0; col < 16; col++) {
+      unsigned char cell = row + 16 * col;
+      Serial.print('o');
+      if (is_wall(cell, SOUTH)) {
+        Serial.print(("---"));
+      } else {
+        Serial.print(("   "));
+      }
+    }
+    Serial.println('o');
+  }
+
+  void print_maze_plain() {
+    Serial.println();
+    for (int row = 15; row >= 0; row--) {
+      printNorthWalls(row);
+      for (int col = 0; col < 16; col++) {
+        unsigned char cell = static_cast<unsigned char>(row + 16 * col);
+        if (is_exit(cell, WEST)) {
+          Serial.print(("    "));
+        } else {
+          Serial.print(("|   "));
+        }
+      }
+      Serial.println('|');
+    }
+    printSouthWalls(0);
+    Serial.println();
+    ;
+  }
+
+  void print_maze_with_costs() {
+    Serial.println();
+    ;
+    for (int row = 15; row >= 0; row--) {
+      printNorthWalls(row);
+      for (int col = 0; col < 16; col++) {
+        unsigned char cell = static_cast<unsigned char>(row + 16 * col);
+        if (is_exit(cell, WEST)) {
+          Serial.print(' ');
+        } else {
+          Serial.print('|');
+        }
+        print_justified(cost[cell], 3);
+      }
+      Serial.println('|');
+    }
+    printSouthWalls(0);
+    Serial.println();
+    ;
+  }
+
+  void print_maze_with_directions() {
+    Serial.println();
+    flood_maze(maze_goal());
+    for (int row = 15; row >= 0; row--) {
+      printNorthWalls(row);
+      for (int col = 0; col < 16; col++) {
+        unsigned char cell = row + 16 * col;
+        if (is_wall(cell, WEST)) {
+          Serial.print('|');
+        } else {
+          Serial.print(' ');
+        }
+        unsigned char direction = direction_to_smallest(cell, NORTH);
+        if (cell == maze_goal()) {
+          direction = 4;
+        }
+        Serial.print(' ');
+        Serial.print(dirChars[direction]);
+        Serial.print(' ');
+      }
+      Serial.println('|');
+    }
+    printSouthWalls(0);
+    Serial.println();
+    ;
+  }
+
+  void print_maze_wall_data() {
+    Serial.println();
+    ;
+    for (int row = 15; row >= 0; row--) {
+      for (int col = 0; col < 16; col++) {
+        int cell = row + 16 * col;
+        print_hex_2(walls[cell]);
+        Serial.print(' ');
+      }
+      Serial.println();
+      ;
+    }
+    Serial.println();
+    ;
   }
 };
 
