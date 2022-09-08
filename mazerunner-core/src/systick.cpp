@@ -85,7 +85,7 @@ ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
   rotation.update();
   g_cross_track_error = update_wall_sensors();
   g_steering_adjustment = calculate_steering_adjustment(g_cross_track_error);
-  update_motor_controllers(g_steering_adjustment);
+  motors.update_motor_controllers(g_steering_adjustment);
   start_sensor_cycle();
   // NOTE: no code should follow this line;
 }

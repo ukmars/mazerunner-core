@@ -44,7 +44,13 @@
 
 // Global objects
 Motion motion;
+Motors motors;
+Profile forward;
+Profile rotation;
 Maze maze PERSISTENT;
+// these are maintained only for logging
+float g_left_motor_volts;
+float g_right_motor_volts;
 
 void setup() {
   Serial.begin(BAUDRATE);
@@ -55,7 +61,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   enable_sensors();
   maze.initialise_maze();
-  setup_motors();
+  motors.setup_motors();
   setup_encoders();
   setup_adc();
   Serial.println();

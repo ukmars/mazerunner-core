@@ -271,7 +271,7 @@ void Mouse::follow_to(unsigned char target) {
   delay(1000);
   enable_sensors();
   motion.reset_drive_system();
-  enable_motor_controllers();
+  motors.enable_motor_controllers();
   forward.start(BACK_WALL_TO_CENTER, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
   while (not forward.is_finished()) {
     delay(2);
@@ -361,7 +361,7 @@ int Mouse::search_to(unsigned char target) {
   delay(1000);
   enable_sensors();
   motion.reset_drive_system();
-  enable_motor_controllers();
+  motors.enable_motor_controllers();
   if (not handStart) {
     // back up to the wall behind
     forward.start(-60, 120, 0, 1000);
@@ -543,6 +543,6 @@ int Mouse::search_maze() {
   search_to(maze.maze_goal());
   handStart = false;
   search_to(START);
-  stop_motors();
+  motors.stop_motors();
   return 0;
 }

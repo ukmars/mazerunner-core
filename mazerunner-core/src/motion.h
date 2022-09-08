@@ -46,11 +46,11 @@ class Motion {
    * @brief Reset profiles, counters and controllers. Motors off. Steering off.
    */
   void reset_drive_system() {
-    stop_motors();
-    disable_motor_controllers();
+    motors.stop_motors();
+    motors.disable_motor_controllers();
     set_steering_mode(STEERING_OFF);
     reset_encoders();
-    reset_motor_controllers();
+    motors.reset_motor_controllers();
     forward.reset();
     rotation.reset();
   }

@@ -54,7 +54,7 @@ void user_follow_wall() {
 void user_log_front_sensor() {
   enable_sensors();
   motion.reset_drive_system();
-  enable_motor_controllers();
+  motors.enable_motor_controllers();
   report_front_sensor_track_header();
   forward.start(-200, 100, 0, 500);
   while (not forward.is_finished()) {

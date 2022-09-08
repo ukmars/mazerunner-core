@@ -64,7 +64,7 @@ void test_sensor_spin_calibrate() {
   enable_sensors();
   delay(100);
   motion.reset_drive_system();
-  enable_motor_controllers();
+  motors.enable_motor_controllers();
   set_steering_mode(STEERING_OFF);
   report_sensor_track_header();
   rotation.start(360, 180, 0, 1800);
@@ -107,7 +107,7 @@ void test_edge_detection() {
   enable_sensors();
   delay(100);
   motion.reset_drive_system();
-  enable_motor_controllers();
+  motors.enable_motor_controllers();
   set_steering_mode(STEERING_OFF);
   Serial.println(F("Edge positions:"));
   forward.start(FULL_CELL - 30.0, 100, 0, 1000);
@@ -159,7 +159,7 @@ void test_SS90E() {
   // the other turn parameters
   uint8_t side = wait_for_user_start();
   motion.reset_drive_system();
-  enable_motor_controllers();
+  motors.enable_motor_controllers();
   set_steering_mode(STEERING_OFF);
   // move to the boundary with the next cell
   float distance = BACK_WALL_TO_CENTER + HALF_CELL;
