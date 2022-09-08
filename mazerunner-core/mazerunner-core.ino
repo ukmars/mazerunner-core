@@ -37,7 +37,6 @@
 #include "src/motors.h"
 #include "src/sensors.h"
 #include "src/systick.h"
-#include "tests.h"
 #include "ui.h"
 #include "user.h"
 #include <Arduino.h>

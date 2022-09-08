@@ -34,5 +34,8 @@
 #define USER_H
 
 void run_mouse(int function);
-
+void test_spin_turn(float angle);
+void test_SS90E();
+void test_edge_detection();
+void test_sensor_spin_calibrate();
 #endif
