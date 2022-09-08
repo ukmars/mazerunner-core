@@ -119,7 +119,7 @@ void report_sensor_track(bool use_raw = false) {
       Serial.print(sensors.rfs.value);
     }
     Serial.print(' ');
-    Serial.print(sensors.g_cross_track_error);
+    Serial.print(sensors.get_cross_track_error());
     Serial.print(' ');
     Serial.print(sensors.g_steering_adjustment);
     Serial.println();

@@ -51,7 +51,6 @@ const uint8_t NO_START = 0;
 const uint8_t LEFT_START = 1;
 const uint8_t RIGHT_START = 2;
 
-
 //***************************************************************************//
 struct SensorChannel {
   int raw;   // whatever the ADC gives us
@@ -60,17 +59,19 @@ struct SensorChannel {
 
 class Sensors;
 extern Sensors sensors;
+
 class Sensors {
   private:
   float last_steering_error = 0;
-  volatile bool s_sensors_enabled = false;
-  volatile int adc[6];
-  volatile int battery_adc_reading;
-  volatile int switches_adc_reading;
+  volatile bool m_enabled = false;
+  volatile int m_adc_reading[6];
+  volatile int m_battery_adc;
+  volatile int m_switches_adc;
+  volatile float m_battery_volts;
+  volatile float m_battery_compensation;
+  volatile float m_cross_track_error;
 
   public:
-  volatile float g_battery_voltage;
-  volatile float g_battery_scale;
 
   /*** wall sensor variables ***/
 
@@ -79,20 +80,20 @@ class Sensors {
   volatile SensorChannel rss;
   volatile SensorChannel rfs;
 
-
   volatile bool has_front_wall;
   volatile bool has_left_wall;
   volatile bool has_right_wall;
-
 
   volatile int g_front_sum;
 
   /*** steering variables ***/
   uint8_t g_steering_mode = STEER_NORMAL;
-  
-  volatile float g_cross_track_error;
+
   volatile float g_steering_adjustment;
 
+
+  float get_cross_track_error(){ return m_cross_track_error;};
+  float get_battery_scale() { return m_battery_compensation; };
   /**
    *  The default for the Arduino is to give a slow ADC clock for maximum
    *  SNR in the results. That typically means a prescale value of 128
@@ -102,7 +103,7 @@ class Sensors {
    *  is reduced to a value of 32. This gives an ADC clock speed of
    *  500kHz and a single conversion in around 26us. SNR is still pretty good
    *  at these speeds:
-   *  http://www.openmusiclabs.com/learning/digital/atmega-adc/
+   *  http://www.openmusiclabs.com/learning/digital/atmega-m_adc_reading/
    *
    * @brief change the ADC prescaler to give a suitable conversion rate.
    */
@@ -114,7 +115,7 @@ class Sensors {
   }
 
   /**
-   * The adc_thresholds may beed adjusting for non-standard resistors.
+   * The adc_thresholds may need adjusting for non-standard resistors.
    *
    * @brief  Convert the switch ADC reading into a switch reading.
    * @return integer in range 0..16 or -1 if there is an error
@@ -122,11 +123,11 @@ class Sensors {
   int get_switches() {
     const int adc_thesholds[] = {660, 647, 630, 614, 590, 570, 545, 522, 461, 429, 385, 343, 271, 212, 128, 44, 0};
 
-    if (switches_adc_reading > 800) {
+    if (m_switches_adc > 800) {
       return 16;
     }
     for (int i = 0; i < 16; i++) {
-      if (switches_adc_reading > (adc_thesholds[i] + adc_thesholds[i + 1]) / 2) {
+      if (m_switches_adc > (adc_thesholds[i] + adc_thesholds[i + 1]) / 2) {
         return i;
       }
     }
@@ -153,18 +154,18 @@ class Sensors {
    */
   float calculate_steering_adjustment() {
     // always calculate the adjustment for testing. It may not get used.
-    float pTerm = STEERING_KP * g_cross_track_error;
-    float dTerm = STEERING_KD * (g_cross_track_error - last_steering_error);
+    float pTerm = STEERING_KP * m_cross_track_error;
+    float dTerm = STEERING_KD * (m_cross_track_error - last_steering_error);
     float adjustment = (pTerm + dTerm) * LOOP_INTERVAL;
     // TODO: are these limits appropriate, or even needed?
     adjustment = constrain(adjustment, -STEERING_ADJUST_LIMIT, STEERING_ADJUST_LIMIT);
-    last_steering_error = g_cross_track_error;
+    last_steering_error = m_cross_track_error;
     g_steering_adjustment = adjustment;
     return adjustment;
   }
 
   void set_steering_mode(uint8_t mode) {
-    last_steering_error = g_cross_track_error;
+    last_steering_error = m_cross_track_error;
     g_steering_adjustment = 0;
     g_steering_mode = mode;
   }
@@ -172,18 +173,18 @@ class Sensors {
   //***************************************************************************//
 
   void enable_sensors() {
-    s_sensors_enabled = true;
+    m_enabled = true;
   }
 
   void disable_sensors() {
-    s_sensors_enabled = false;
+    m_enabled = false;
   }
 
   //***************************************************************************//
 
   void update_battery_voltage() {
-    g_battery_voltage = BATTERY_MULTIPLIER * battery_adc_reading;
-    g_battery_scale = 255.0 / g_battery_voltage;
+    m_battery_volts = BATTERY_MULTIPLIER * m_battery_adc;
+    m_battery_compensation = 255.0 / m_battery_volts;
   }
   /*********************************** Wall tracking **************************/
 
@@ -196,24 +197,24 @@ class Sensors {
    * @return robot cross-track-error. Too far left is negative.
    */
   float update_wall_sensors() {
-    if (not s_sensors_enabled) {
+    if (not m_enabled) {
       return 0;
     }
 
     // they should never be negative
-    adc[0] = max(0, adc[0]);
-    adc[1] = max(0, adc[1]);
-    adc[2] = max(0, adc[2]);
-    adc[3] = max(0, adc[3]);
+    m_adc_reading[0] = max(0, m_adc_reading[0]);
+    m_adc_reading[1] = max(0, m_adc_reading[1]);
+    m_adc_reading[2] = max(0, m_adc_reading[2]);
+    m_adc_reading[3] = max(0, m_adc_reading[3]);
 
     // this should be the only place that the aactual ADC channels are referenced
     // if there is only a single front sensor (Basic sensor board) then the value is
     // just used twice
     // keep these values for calibration assistance
-    rfs.raw = adc[RFS_CHANNEL];
-    rss.raw = adc[RSS_CHANNEL];
-    lss.raw = adc[LSS_CHANNEL];
-    lfs.raw = adc[LFS_CHANNEL];
+    rfs.raw = m_adc_reading[RFS_CHANNEL];
+    rss.raw = m_adc_reading[RSS_CHANNEL];
+    lss.raw = m_adc_reading[LSS_CHANNEL];
+    lfs.raw = m_adc_reading[LFS_CHANNEL];
 
     // normalise to a nominal value of 100
     rfs.value = (int)(rfs.raw * FRONT_RIGHT_SCALE);
@@ -250,7 +251,7 @@ class Sensors {
     if (g_front_sum > 100) {
       error = 0;
     }
-    g_cross_track_error = error;
+    m_cross_track_error = error;
     return error;
   }
 
@@ -395,36 +396,36 @@ class Sensors {
         start_adc(BATTERY_VOLTS);
         break;
       case 1:
-        battery_adc_reading = get_adc_result();
+        m_battery_adc = get_adc_result();
         start_adc(FUNCTION_PIN);
         break;
       case 2:
-        switches_adc_reading = get_adc_result();
+        m_switches_adc = get_adc_result();
         start_adc(A0);
         break;
       case 3:
-        adc[0] = get_adc_result();
+        m_adc_reading[0] = get_adc_result();
         start_adc(A1);
         break;
       case 4:
-        adc[1] = get_adc_result();
+        m_adc_reading[1] = get_adc_result();
         start_adc(A2);
         break;
       case 5:
-        adc[2] = get_adc_result();
+        m_adc_reading[2] = get_adc_result();
         start_adc(A3);
         break;
       case 6:
-        adc[3] = get_adc_result();
+        m_adc_reading[3] = get_adc_result();
         start_adc(A4);
         break;
       case 7:
-        adc[4] = get_adc_result();
+        m_adc_reading[4] = get_adc_result();
         start_adc(A5);
         break;
       case 8:
-        adc[5] = get_adc_result();
-        if (s_sensors_enabled) {
+        m_adc_reading[5] = get_adc_result();
+        if (m_enabled) {
           // got all the dark ones so light them up
           digitalWriteFast(EMITTER_A, 1);
           digitalWriteFast(EMITTER_B, 1);
@@ -436,27 +437,27 @@ class Sensors {
         start_adc(A0);
         break;
       case 10:
-        adc[0] = get_adc_result() - adc[0];
+        m_adc_reading[0] = get_adc_result() - m_adc_reading[0];
         start_adc(A1);
         break;
       case 11:
-        adc[1] = get_adc_result() - adc[1];
+        m_adc_reading[1] = get_adc_result() - m_adc_reading[1];
         start_adc(A2);
         break;
       case 12:
-        adc[2] = get_adc_result() - adc[2];
+        m_adc_reading[2] = get_adc_result() - m_adc_reading[2];
         start_adc(A3);
         break;
       case 13:
-        adc[3] = get_adc_result() - adc[3];
+        m_adc_reading[3] = get_adc_result() - m_adc_reading[3];
         start_adc(A4);
         break;
       case 14:
-        adc[4] = get_adc_result() - adc[4];
+        m_adc_reading[4] = get_adc_result() - m_adc_reading[4];
         start_adc(A5);
         break;
       case 15:
-        adc[5] = get_adc_result() - adc[5];
+        m_adc_reading[5] = get_adc_result() - m_adc_reading[5];
         digitalWriteFast(EMITTER_A, 0);
         digitalWriteFast(EMITTER_B, 0);
         bitClear(ADCSRA, ADIE); // turn off the interrupt
