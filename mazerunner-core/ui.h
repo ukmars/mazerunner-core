@@ -34,9 +34,9 @@
 #define UI_H_
 
 #include "config.h"
+#include "maze.h"
 #include "reports.h"
 #include "src/digitalWriteFast.h"
-#include "src/maze.h"
 #include "src/sensors.h"
 #include "user.h"
 #include <Arduino.h>

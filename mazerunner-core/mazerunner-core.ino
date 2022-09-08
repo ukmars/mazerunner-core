@@ -30,10 +30,10 @@
  * SOFTWARE.
  */
 #include "config.h"
+#include "maze.h"
 #include "mouse.h"
 #include "reports.h"
 #include "src/encoders.h"
-#include "src/maze.h"
 #include "src/motion.h"
 #include "src/motors.h"
 #include "src/sensors.h"

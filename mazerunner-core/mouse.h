@@ -34,9 +34,9 @@
 #define MOUSE_H
 #include "Arduino.h"
 #include "config.h"
+#include "maze.h"
 #include "reports.h"
 #include "src/encoders.h"
-#include "src/maze.h"
 #include "src/motion.h"
 #include "src/motors.h"
 #include "src/profile.h"

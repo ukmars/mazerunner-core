@@ -31,8 +31,8 @@
  */
 
 #include "reports.h"
+#include "maze.h"
 #include "src/encoders.h"
-#include "src/maze.h"
 #include "src/motors.h"
 #include "src/profile.h"
 #include "src/sensors.h"
