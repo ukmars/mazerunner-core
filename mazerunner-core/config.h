@@ -75,7 +75,7 @@ const int BATTERY_VOLTS = A7;
 #define EVENT_UK 2
 #define EVENT_PORTUGAL 3
 // choose the one you will be using
-#define EVENT UK
+#define EVENT EVENT_UK
 
 /*************************************************************************/
 /***
@@ -88,6 +88,7 @@ const int BATTERY_VOLTS = A7;
  */
 #define ROBOT_DOROTHY 4
 #define ROBOT_EMILY 5
+#define ROBOT_FRANK 6
 
 #define ROBOT_NAME ROBOT_EMILY
 
@@ -95,6 +96,8 @@ const int BATTERY_VOLTS = A7;
 #include "config-dorothy.h"
 #elif ROBOT_NAME == ROBOT_EMILY
 #include "config-emily.h"
+#elif ROBOT_NAME == ROBOT_FRANK
+#include "config-frank.h"
 #else
 #error "NO ROBOT DEFINED"
 #endif

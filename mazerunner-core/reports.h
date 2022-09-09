@@ -53,7 +53,7 @@ public:
   // note that the Serial device has a 64 character buffer and, at 115200 baud
   // 64 characters will take about 6ms to go out over the wire.
   void report_profile_header() {
-#if DEBUG_LOGGING == 1
+#if DEBUG_LOGGING == LOGGING_ON
     Serial.println(F("time robotPos robotAngle fwdPos  fwdSpeed rotpos rotSpeed fwdVolts rotVolts"));
     s_start_time = millis();
     s_report_time = s_start_time;
@@ -61,7 +61,7 @@ public:
   }
 
   void report_profile() {
-#if DEBUG_LOGGING == 1
+#if DEBUG_LOGGING == LOGGING_ON
     if (millis() >= s_report_time) {
       s_report_time += s_report_interval;
       Serial.print(millis() - s_start_time);
@@ -91,7 +91,7 @@ public:
   //***************************************************************************//
 
   void report_sensor_track_header() {
-#if DEBUG_LOGGING == 1
+#if DEBUG_LOGGING == LOGGING_ON
     Serial.println(F("time pos angle left right front error adjustment"));
     s_start_time = millis();
     s_report_time = s_start_time;
@@ -99,7 +99,7 @@ public:
   }
 
   void report_sensor_track(bool use_raw = false) {
-#if DEBUG_LOGGING == 1
+#if DEBUG_LOGGING == LOGGING_ON
     if (millis() >= s_report_time) {
       s_report_time += s_report_interval;
       Serial.print(millis() - s_start_time);
@@ -138,7 +138,7 @@ public:
   }
 
   void report_front_sensor_track_header() {
-#if DEBUG_LOGGING == 1
+#if DEBUG_LOGGING == LOGGING_ON
     Serial.println(F("time pos front_normal front_raw"));
     s_start_time = millis();
     s_report_time = s_start_time;
@@ -146,7 +146,7 @@ public:
   }
 
   void report_front_sensor_track() {
-#if DEBUG_LOGGING == 1
+#if DEBUG_LOGGING == LOGGING_ON
     if (millis() >= s_report_time) {
       s_report_time += s_report_interval;
       Serial.print(millis() - s_start_time);
