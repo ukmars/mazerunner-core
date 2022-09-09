@@ -48,21 +48,16 @@
 
 const char dirChars[] = "^>v<*";
 
-struct MazeWalls {
-  static uint8_t w[256] __attribute__((section(".noinit")));
-  uint8_t &operator[](uint8_t i) { return w[i]; }
-};
-
 class Maze {
   private:
   uint8_t s_goal = 0x077;
-
-  public:
   uint8_t cost[256];
   uint8_t walls[256];
-  // MazeWalls walls;
-  // uint8_t walls[256] __attribute__((section(".noinit")));
-  // uint8_t walls[256] __attribute__((section(".noinit"))); // the maze walls are preserved after a reset
+
+  public:
+  Maze() {
+  }
+
   void set_maze_goal(uint8_t goal_cell) {
     s_goal = goal_cell;
   }
