@@ -86,55 +86,25 @@ class Encoders;
 extern Encoders encoders;
 class Encoders {
 public:
-  const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
-  const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
-  const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
-
   void setup() {
-    // left
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       // left
       pinMode(ENCODER_LEFT_CLK, INPUT);
       pinMode(ENCODER_LEFT_B, INPUT);
-      // configure the pin change
+      // pin change interrupt
       bitClear(EICRA, ISC01);
       bitSet(EICRA, ISC00);
-      // enable the interrupt
       bitSet(EIMSK, INT0);
-      m_left_counter = 0;
+
       // right
       pinMode(ENCODER_RIGHT_CLK, INPUT);
       pinMode(ENCODER_RIGHT_B, INPUT);
-      // configure the pin change
+      // pin change interrupt
       bitClear(EICRA, ISC11);
       bitSet(EICRA, ISC10);
-      // enable the interrupt
       bitSet(EIMSK, INT1);
-      m_right_counter = 0;
     }
     reset();
-  }
-
-  void update_left() {
-    static bool oldA = false;
-    static bool oldB = false;
-    bool newB = digitalReadFast(ENCODER_LEFT_B);
-    bool newA = digitalReadFast(ENCODER_LEFT_CLK) ^ newB;
-    int delta = ENCODER_LEFT_POLARITY * ((oldA ^ newB) - (newA ^ oldB));
-    m_left_counter += delta;
-    oldA = newA;
-    oldB = newB;
-  }
-
-  void update_right() {
-    static bool oldA = false;
-    static bool oldB = false;
-    bool newB = digitalReadFast(ENCODER_RIGHT_B);
-    bool newA = digitalReadFast(ENCODER_RIGHT_CLK) ^ newB;
-    int delta = ENCODER_RIGHT_POLARITY * ((oldA ^ newB) - (newA ^ oldB));
-    m_right_counter += delta;
-    oldA = newA;
-    oldB = newB;
   }
 
   void reset() {
@@ -146,7 +116,28 @@ public:
     }
   }
 
-  // units are all in counts and counts per second
+  void left_input_change() {
+    static bool oldA = false;
+    static bool oldB = false;
+    bool newB = digitalReadFast(ENCODER_LEFT_B);
+    bool newA = digitalReadFast(ENCODER_LEFT_CLK) ^ newB;
+    int delta = ENCODER_LEFT_POLARITY * ((oldA ^ newB) - (newA ^ oldB));
+    m_left_counter += delta;
+    oldA = newA;
+    oldB = newB;
+  }
+
+  void right_input_change() {
+    static bool oldA = false;
+    static bool oldB = false;
+    bool newB = digitalReadFast(ENCODER_RIGHT_B);
+    bool newA = digitalReadFast(ENCODER_RIGHT_CLK) ^ newB;
+    int delta = ENCODER_RIGHT_POLARITY * ((oldA ^ newB) - (newA ^ oldB));
+    m_right_counter += delta;
+    oldA = newA;
+    oldB = newB;
+  }
+
   void update() {
     int left_delta = 0;
     int right_delta = 0;
@@ -159,10 +150,10 @@ public:
     }
     float left_change = left_delta * MM_PER_COUNT_LEFT;
     float right_change = right_delta * MM_PER_COUNT_RIGHT;
-    m_fwd_increment = 0.5 * (right_change + left_change);
-    m_rot_increment = (right_change - left_change) * DEG_PER_MM_DIFFERENCE;
-    m_robot_distance += m_fwd_increment;
-    m_robot_angle += m_rot_increment;
+    m_fwd_change = 0.5 * (right_change + left_change);
+    m_rot_change = (right_change - left_change) * DEG_PER_MM_DIFFERENCE;
+    m_robot_distance += m_fwd_change;
+    m_robot_angle += m_rot_change;
   }
 
   float robot_distance() {
@@ -173,25 +164,25 @@ public:
 
   float robot_speed() {
     float speed;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { speed = LOOP_FREQUENCY * m_fwd_increment; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { speed = LOOP_FREQUENCY * m_fwd_change; }
     return speed;
   }
 
   float robot_omega() {
     float omega;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { omega = LOOP_FREQUENCY * m_rot_increment; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { omega = LOOP_FREQUENCY * m_rot_change; }
     return omega;
   }
 
-  float robot_fwd_increment() {
+  float robot_fwd_change() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = m_fwd_increment; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = m_fwd_change; }
     return distance;
   }
 
-  float robot_rot_increment() {
+  float robot_rot_change() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = m_rot_increment; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = m_rot_change; }
     return distance;
   }
 
@@ -206,10 +197,10 @@ public:
 private:
   volatile float m_robot_distance;
   volatile float m_robot_angle;
-
-  float m_fwd_increment = 0;
-  float m_rot_increment = 0;
-
+  // the change in distance or angle in the last tick.
+  float m_fwd_change;
+  float m_rot_change;
+  // internal use only to track encoder input edges
   int m_left_counter;
   int m_right_counter;
 };

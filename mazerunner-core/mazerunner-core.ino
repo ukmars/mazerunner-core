@@ -100,14 +100,14 @@ void loop() {
 // runs in constant time of around 3us per interrupt.
 // would be faster with direct port access
 ISR(INT0_vect) {
-  encoders.update_left();
+  encoders.left_input_change();
 }
 
 // INT1 will respond to the XOR-ed pulse train from the right encoder
 // runs in constant time of around 3us per interrupt.
 // would be faster with direct port access
 ISR(INT1_vect) {
-  encoders.update_right();
+  encoders.right_input_change();
 }
 
 ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {

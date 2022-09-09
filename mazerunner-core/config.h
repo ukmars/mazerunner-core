@@ -110,17 +110,21 @@ const int BATTERY_VOLTS = A7;
  * RAM storage is used. Constants are used for better type checking and traceability.
  */
 
-const float LOOP_FREQUENCY = 500.0;
-const float LOOP_INTERVAL = (1.0 / LOOP_FREQUENCY);
+const float LOOP_FREQUENCY = 500.0f;
+const float LOOP_INTERVAL = (1.0f / LOOP_FREQUENCY);
 
 //***************************************************************************//
 
 // This is the size fo each cell in the maze. Normally 180mm for a classic maze
 const float FULL_CELL = 180.0f;
-const float HALF_CELL = FULL_CELL / 2.0;
+const float HALF_CELL = FULL_CELL / 2.0f;
 
 //***************************************************************************//
+const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
+const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
+const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 
+//***************************************************************************//
 /***
  * This piece of magic lets you define a variable, such as the maze, that can
  * survive a processor reset. The downside is that you MUST take care to
