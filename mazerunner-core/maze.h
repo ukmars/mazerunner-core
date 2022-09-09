@@ -49,37 +49,33 @@
 const char dirChars[] = "^>v<*";
 
 class Maze {
-private:
-  uint8_t s_goal = 0x077;
-  uint8_t cost[256];
-  uint8_t walls[256];
 
 public:
   Maze() {
   }
 
   void set_maze_goal(uint8_t goal_cell) {
-    s_goal = goal_cell;
+    m_goal = goal_cell;
   }
 
   uint8_t maze_goal() {
-    return s_goal;
+    return m_goal;
   }
 
   void mark_cell_visited(uint8_t cell) {
-    walls[cell] |= VISITED;
+    m_walls[cell] |= VISITED;
   }
 
   bool cell_is_visited(uint8_t cell) {
-    return (walls[cell] & VISITED) == VISITED;
+    return (m_walls[cell] & VISITED) == VISITED;
   }
 
   bool is_exit(uint8_t cell, uint8_t direction) {
-    return ((walls[cell] & (1 << direction)) == 0);
+    return ((m_walls[cell] & (1 << direction)) == 0);
   }
 
   bool is_wall(uint8_t cell, uint8_t direction) {
-    return ((walls[cell] & (1 << direction)) != 0);
+    return ((m_walls[cell] & (1 << direction)) != 0);
   }
   /***
    * Set a single wall in the maze. Each wall is set from two directions
@@ -94,20 +90,20 @@ public:
     uint16_t nextCell = neighbour(cell, direction);
     switch (direction) {
       case NORTH:
-        walls[cell] |= (1 << NORTH);
-        walls[nextCell] |= (1 << SOUTH);
+        m_walls[cell] |= (1 << NORTH);
+        m_walls[nextCell] |= (1 << SOUTH);
         break;
       case EAST:
-        walls[cell] |= (1 << EAST);
-        walls[nextCell] |= (1 << WEST);
+        m_walls[cell] |= (1 << EAST);
+        m_walls[nextCell] |= (1 << WEST);
         break;
       case SOUTH:
-        walls[cell] |= (1 << SOUTH);
-        walls[nextCell] |= (1 << NORTH);
+        m_walls[cell] |= (1 << SOUTH);
+        m_walls[nextCell] |= (1 << NORTH);
         break;
       case WEST:
-        walls[cell] |= (1 << WEST);
-        walls[nextCell] |= (1 << EAST);
+        m_walls[cell] |= (1 << WEST);
+        m_walls[nextCell] |= (1 << EAST);
         break;
       default:; // do nothing - although this is an error
         break;
@@ -122,26 +118,26 @@ public:
    * already a wall present
    *
    * No check is made on the provided value for direction. Take care not
-   * to clear walls around maze boundary.
+   * to clear m_walls around maze boundary.
    */
   void set_wall_absent(uint8_t cell, uint8_t direction) {
     uint16_t nextCell = neighbour(cell, direction);
     switch (direction) {
       case NORTH:
-        walls[cell] &= ~(1 << NORTH);
-        walls[nextCell] &= ~(1 << SOUTH);
+        m_walls[cell] &= ~(1 << NORTH);
+        m_walls[nextCell] &= ~(1 << SOUTH);
         break;
       case EAST:
-        walls[cell] &= ~(1 << EAST);
-        walls[nextCell] &= ~(1 << WEST);
+        m_walls[cell] &= ~(1 << EAST);
+        m_walls[nextCell] &= ~(1 << WEST);
         break;
       case SOUTH:
-        walls[cell] &= ~(1 << SOUTH);
-        walls[nextCell] &= ~(1 << NORTH);
+        m_walls[cell] &= ~(1 << SOUTH);
+        m_walls[nextCell] &= ~(1 << NORTH);
         break;
       case WEST:
-        walls[cell] &= ~(1 << WEST);
-        walls[nextCell] &= ~(1 << EAST);
+        m_walls[cell] &= ~(1 << WEST);
+        m_walls[nextCell] &= ~(1 << EAST);
         break;
       default:; // do nothing - although this is an error
         break;
@@ -149,25 +145,25 @@ public:
   }
 
   /***
-   * Initialise a maze and the costs with border walls and the start cell
+   * Initialise a maze and the costs with border m_walls and the start cell
    *
-   * If a test maze is provided, the walls will all be set up from that
+   * If a test maze is provided, the m_walls will all be set up from that
    * No attempt is made to verufy the correctness of a test maze.
    *
    */
   void initialise_maze() {
     for (int i = 0; i < 256; i++) {
-      cost[i] = 0;
-      walls[i] = 0;
+      m_cost[i] = 0;
+      m_walls[i] = 0;
     }
-    // place the boundary walls.
+    // place the boundary m_walls.
     for (uint8_t i = 0; i < 16; i++) {
       set_wall_present(i, WEST);
       set_wall_present(15 * 16 + i, EAST);
       set_wall_present(i * 16, SOUTH);
       set_wall_present((16 * i + 15), NORTH);
     }
-    // and the start cell walls.
+    // and the start cell m_walls.
     set_wall_present(START, EAST);
     set_wall_absent(START, NORTH);
   }
@@ -218,26 +214,26 @@ public:
    */
   uint8_t neighbour_cost(uint8_t cell, uint8_t direction) {
     uint8_t result = MAX_COST;
-    uint8_t wallData = walls[cell];
+    uint8_t wallData = m_walls[cell];
     switch (direction) {
       case NORTH:
         if ((wallData & (1 << NORTH)) == 0) {
-          result = cost[cell_north(cell)];
+          result = m_cost[cell_north(cell)];
         }
         break;
       case EAST:
         if ((wallData & (1 << EAST)) == 0) {
-          result = cost[cell_east(cell)];
+          result = m_cost[cell_east(cell)];
         }
         break;
       case SOUTH:
         if ((wallData & (1 << SOUTH)) == 0) {
-          result = cost[cell_south(cell)];
+          result = m_cost[cell_south(cell)];
         }
         break;
       case WEST:
         if ((wallData & (1 << WEST)) == 0) {
-          result = cost[cell_west(cell)];
+          result = m_cost[cell_west(cell)];
         }
         break;
       default:
@@ -248,7 +244,7 @@ public:
   }
 
   /***
-   * Very simple cell counting flood fills cost array with the
+   * Very simple cell counting flood fills m_cost array with the
    * manhattan distance from every cell to the target.
    *
    * Although the queue looks complicated, this is a fast flood that
@@ -259,20 +255,20 @@ public:
    */
   void flood_maze(uint8_t target) {
     for (int i = 0; i < 256; i++) {
-      cost[i] = MAX_COST;
+      m_cost[i] = MAX_COST;
     }
     Queue<uint8_t> queue;
-    cost[target] = 0;
+    m_cost[target] = 0;
     queue.add(target);
     while (queue.size() > 0) {
       uint8_t here = queue.head();
-      uint16_t newCost = cost[here] + 1;
+      uint16_t newCost = m_cost[here] + 1;
 
       for (uint8_t direction = 0; direction < 4; direction++) {
         if (is_exit(here, direction)) {
           uint16_t nextCell = neighbour(here, direction);
-          if (cost[nextCell] > newCost) {
-            cost[nextCell] = newCost;
+          if (m_cost[nextCell] > newCost) {
+            m_cost[nextCell] = newCost;
             queue.add(nextCell);
           }
         }
@@ -284,7 +280,7 @@ public:
    * Algorithm looks around the current cell and records the smallest
    * neighbour and its direction. By starting with the supplied direction,
    * then looking right, then left, the result will preferentially be
-   * ahead if there are multiple neighbours with the same cost.
+   * ahead if there are multiple neighbours with the same m_cost.
    *
    * @param cell
    * @param startDirection
@@ -294,7 +290,7 @@ public:
     uint8_t nextDirection = startDirection;
     uint8_t smallestDirection = INVALID_DIRECTION;
     uint16_t nextCost;
-    uint16_t smallestCost = cost[cell];
+    uint16_t smallestCost = m_cost[cell];
     nextCost = neighbour_cost(cell, nextDirection);
     if (nextCost < smallestCost) {
       smallestCost = nextCost;
@@ -350,7 +346,7 @@ public:
     Serial.println('o');
   }
 
-  void print_maze_plain() {
+  void print_plain() {
     Serial.println();
     for (int row = 15; row >= 0; row--) {
       printNorthWalls(row);
@@ -369,7 +365,7 @@ public:
     ;
   }
 
-  void print_maze_with_costs() {
+  void print_with_costs() {
     Serial.println();
     ;
     for (int row = 15; row >= 0; row--) {
@@ -381,7 +377,7 @@ public:
         } else {
           Serial.print('|');
         }
-        print_justified(cost[cell], 3);
+        print_justified(m_cost[cell], 3);
       }
       Serial.println('|');
     }
@@ -390,7 +386,7 @@ public:
     ;
   }
 
-  void print_maze_with_directions() {
+  void print_with_directions() {
     Serial.println();
     flood_maze(maze_goal());
     for (int row = 15; row >= 0; row--) {
@@ -423,7 +419,7 @@ public:
     for (int row = 15; row >= 0; row--) {
       for (int col = 0; col < 16; col++) {
         int cell = row + 16 * col;
-        print_hex_2(walls[cell]);
+        print_hex_2(m_walls[cell]);
         Serial.print(' ');
       }
       Serial.println();
@@ -432,6 +428,11 @@ public:
     Serial.println();
     ;
   }
+
+private:
+  uint8_t m_goal = 0x077;
+  uint8_t m_cost[256];
+  uint8_t m_walls[256];
 };
 
 extern Maze maze;

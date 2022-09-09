@@ -100,14 +100,17 @@ public:
         help();
         break;
       case 'W':
-        maze.print_maze_plain();
+        maze.print_plain();
         break;
       case 'X':
         Serial.println(F("Reset Maze"));
         maze.initialise_maze();
         break;
+      case 'C':
+        maze.print_with_costs();
+        break;
       case 'R':
-        maze.print_maze_with_directions();
+        maze.print_with_directions();
         break;
       case 'S':
         sensors.enable();
