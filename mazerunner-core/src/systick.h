@@ -82,7 +82,7 @@ class Systick {
     // NOTE - the code here seems to get inlined and so the function is 2800 bytes!
     // TODO: make sure all variables are interrupt-safe if they are used outside IRQs
     // grab the encoder values first because they will continue to change
-    encoders.update_encoders();
+    encoders.update();
     forward.update();
     rotation.update();
     sensors.update();

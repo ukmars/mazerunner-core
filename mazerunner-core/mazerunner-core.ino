@@ -61,8 +61,7 @@ void setup() {
   pinMode(EMITTER_A, OUTPUT);
   pinMode(EMITTER_B, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  sensors.enable();
-  maze.initialise_maze();
+  encoders.setup();
   motors.setup_motors();
   encoders.setup_encoders();
   sensors.setup_adc();

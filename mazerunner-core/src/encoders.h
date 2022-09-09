@@ -75,12 +75,11 @@
    EIMSK:INT1 (bit 1) enables the INT1 external interrupt
 
 */
-#include "..//config.h"
+#include "../config.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <stdint.h>
 #include <util/atomic.h>
-
 
 class Encoders;
 
@@ -91,59 +90,7 @@ class Encoders {
   const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
   const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 
-  // None of the variables in this file should be directly available to the rest
-  // of the code without a guard to ensure atomic access
-  private:
-  volatile float s_robot_position;
-  volatile float s_robot_angle;
-
-  float s_robot_fwd_increment = 0;
-  float s_robot_rot_increment = 0;
-
-  int encoder_left_counter;
-  int encoder_right_counter;
-
-  volatile int32_t s_left_total;
-  volatile int32_t s_right_total;
-
-  volatile int left_delta;
-  volatile int right_delta;
-
-  public:
-  void update_left() {
-    static bool oldA = false;
-    static bool oldB = false;
-    bool newB = digitalReadFast(ENCODER_LEFT_B);
-    bool newA = digitalReadFast(ENCODER_LEFT_CLK) ^ newB;
-    int delta = ENCODER_LEFT_POLARITY * ((oldA ^ newB) - (newA ^ oldB));
-    encoder_left_counter += delta;
-    oldA = newA;
-    oldB = newB;
-  }
-  void update_right() {
-    static bool oldA = false;
-    static bool oldB = false;
-    bool newB = digitalReadFast(ENCODER_RIGHT_B);
-    bool newA = digitalReadFast(ENCODER_RIGHT_CLK) ^ newB;
-    int delta = ENCODER_RIGHT_POLARITY * ((oldA ^ newB) - (newA ^ oldB));
-    encoder_right_counter += delta;
-    oldA = newA;
-    oldB = newB;
-  }
-  void reset_encoders() {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      encoder_left_counter = 0;
-      encoder_right_counter = 0;
-      s_robot_position = 0;
-      s_robot_angle = 0;
-      s_left_total = 0;
-      s_right_total = 0;
-      left_delta = 0;
-      right_delta = 0;
-    }
-  }
-
-  void setup_encoders() {
+  void setup() {
     // left
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       // left
@@ -154,7 +101,7 @@ class Encoders {
       bitSet(EICRA, ISC00);
       // enable the interrupt
       bitSet(EIMSK, INT0);
-      encoder_left_counter = 0;
+      m_left_counter = 0;
       // right
       pinMode(ENCODER_RIGHT_CLK, INPUT);
       pinMode(ENCODER_RIGHT_B, INPUT);
@@ -163,71 +110,108 @@ class Encoders {
       bitSet(EICRA, ISC10);
       // enable the interrupt
       bitSet(EIMSK, INT1);
-      encoder_right_counter = 0;
+      m_right_counter = 0;
     }
-    reset_encoders();
+    reset();
+  }
+
+  void update_left() {
+    static bool oldA = false;
+    static bool oldB = false;
+    bool newB = digitalReadFast(ENCODER_LEFT_B);
+    bool newA = digitalReadFast(ENCODER_LEFT_CLK) ^ newB;
+    int delta = ENCODER_LEFT_POLARITY * ((oldA ^ newB) - (newA ^ oldB));
+    m_left_counter += delta;
+    oldA = newA;
+    oldB = newB;
+  }
+
+  void update_right() {
+    static bool oldA = false;
+    static bool oldB = false;
+    bool newB = digitalReadFast(ENCODER_RIGHT_B);
+    bool newA = digitalReadFast(ENCODER_RIGHT_CLK) ^ newB;
+    int delta = ENCODER_RIGHT_POLARITY * ((oldA ^ newB) - (newA ^ oldB));
+    m_right_counter += delta;
+    oldA = newA;
+    oldB = newB;
+  }
+
+  void reset() {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      m_left_counter = 0;
+      m_right_counter = 0;
+      m_robot_distance = 0;
+      m_robot_angle = 0;
+    }
   }
 
   // units are all in counts and counts per second
-  void update_encoders() {
-
+  void update() {
+    int left_delta = 0;
+    int right_delta = 0;
     // Make sure values don't change while being read. Be quick.
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      left_delta = encoder_left_counter;
-      right_delta = encoder_right_counter;
-      encoder_left_counter = 0;
-      encoder_right_counter = 0;
+      left_delta = m_left_counter;
+      right_delta = m_right_counter;
+      m_left_counter = 0;
+      m_right_counter = 0;
     }
-    s_left_total += left_delta;
-    s_right_total += right_delta;
     float left_change = left_delta * MM_PER_COUNT_LEFT;
     float right_change = right_delta * MM_PER_COUNT_RIGHT;
-    s_robot_fwd_increment = 0.5 * (right_change + left_change);
-    s_robot_rot_increment = (right_change - left_change) * DEG_PER_MM_DIFFERENCE;
-    s_robot_position += s_robot_fwd_increment;
-    s_robot_angle += s_robot_rot_increment;
+    m_fwd_increment = 0.5 * (right_change + left_change);
+    m_rot_increment = (right_change - left_change) * DEG_PER_MM_DIFFERENCE;
+    m_robot_distance += m_fwd_increment;
+    m_robot_angle += m_rot_increment;
   }
 
-  float robot_position() {
+  float robot_distance() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = s_robot_position; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = m_robot_distance; }
     return distance;
   }
 
   float robot_speed() {
     float speed;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { speed = LOOP_FREQUENCY * s_robot_fwd_increment; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { speed = LOOP_FREQUENCY * m_fwd_increment; }
     return speed;
+  }
+
+  float robot_omega() {
+    float omega;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { omega = LOOP_FREQUENCY * m_rot_increment; }
+    return omega;
   }
 
   float robot_fwd_increment() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = s_robot_fwd_increment; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = m_fwd_increment; }
     return distance;
   }
 
   float robot_rot_increment() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = s_robot_rot_increment; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = m_rot_increment; }
     return distance;
   }
 
   float robot_angle() {
     float angle;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { angle = s_robot_angle; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { angle = m_robot_angle; }
     return angle;
   }
+
+  // None of the variables in this file should be directly available to the rest
+  // of the code without a guard to ensure atomic access
+  private:
+  volatile float m_robot_distance;
+  volatile float m_robot_angle;
+
+  float m_fwd_increment = 0;
+  float m_rot_increment = 0;
+
+  int m_left_counter;
+  int m_right_counter;
 };
-
-// void reset_encoders();
-// void setup_encoders();
-// void update_encoders();
-
-// float robot_fwd_increment();
-// float robot_rot_increment();
-
-// float robot_position();
-// float robot_speed();
-// float robot_angle();
 
 #endif

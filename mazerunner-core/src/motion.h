@@ -49,7 +49,7 @@ class Motion {
     motors.stop_motors();
     motors.disable_motor_controllers();
     sensors.set_steering_mode(STEERING_OFF);
-    encoders.reset_encoders();
+    encoders.reset();
     motors.reset_motor_controllers();
     forward.reset();
     rotation.reset();

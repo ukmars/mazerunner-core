@@ -66,7 +66,7 @@ class Reporter {
       s_report_time += s_report_interval;
       Serial.print(millis() - s_start_time);
       Serial.print(' ');
-      Serial.print(encoders.robot_position());
+      Serial.print(encoders.robot_distance());
       Serial.print(' ');
       Serial.print(encoders.robot_angle());
       Serial.print(' ');
@@ -104,7 +104,7 @@ class Reporter {
       s_report_time += s_report_interval;
       Serial.print(millis() - s_start_time);
       Serial.print(' ');
-      Serial.print(encoders.robot_position());
+      Serial.print(encoders.robot_distance());
       Serial.print(' ');
       Serial.print(encoders.robot_angle());
       if (use_raw) {
@@ -151,7 +151,7 @@ class Reporter {
       s_report_time += s_report_interval;
       Serial.print(millis() - s_start_time);
       Serial.print(' ');
-      Serial.print(fabsf(encoders.robot_position()));
+      Serial.print(fabsf(encoders.robot_distance()));
       Serial.print(' ');
       Serial.print(sensors.lfs.value);
       Serial.print(' ');
