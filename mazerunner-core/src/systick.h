@@ -51,6 +51,7 @@ class Systick {
     bitSet(TCCR2B, CS20);
     OCR2A = 249; // (16000000/128/500)-1 => 500Hz
     bitSet(TIMSK2, OCIE2A);
+    delay(10); // make sure it runs for a few cycles before we continue
   }
   /***
    * This is the SYSTICK ISR. It runs at 500Hz by default and is
