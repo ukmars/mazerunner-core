@@ -128,7 +128,7 @@ public:
   void stop_at(float position) {
     float remaining = position - forward.position();
     forward.start(remaining, forward.speed(), 0, forward.acceleration());
-    Serial.print("STOP AT");
+    Serial.print(F("STOP AT"));
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -149,7 +149,7 @@ public:
    */
   void stop_after(float distance) {
     forward.start(distance, forward.speed(), 0, forward.acceleration());
-    Serial.print("STOP AFTER");
+    Serial.print(F("STOP AFTER"));
     while (not forward.is_finished()) {
       delay(2);
     }

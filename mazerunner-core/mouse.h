@@ -342,7 +342,7 @@ public:
   }
 
   void follow_to(unsigned char target) {
-    Serial.println("Follow TO");
+    Serial.println(F("Follow TO"));
     handStart = true;
     location = 0;
     heading = NORTH;
@@ -611,7 +611,7 @@ public:
    */
   int search_maze() {
     sensors.wait_for_user_start();
-    Serial.println("Search TO");
+    Serial.println(F("Search TO"));
     handStart = true;
     location = START;
     heading = NORTH;
