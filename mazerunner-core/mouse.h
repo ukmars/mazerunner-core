@@ -319,7 +319,7 @@ class Mouse {
 
   //***************************************************************************//
 
-  void update_sensors() {
+  void check_the_walls() {
     rightWall = (sensors.see_right_wall);
     leftWall = (sensors.see_left_wall);
     frontWall = (sensors.see_front_wall);
@@ -369,7 +369,7 @@ class Mouse {
       log_status('-');
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);
-      update_sensors();
+      check_the_walls();
       update_map();
       maze.flood_maze(maze.maze_goal());
       unsigned char newHeading = maze.direction_to_smallest(location, heading);
@@ -464,7 +464,7 @@ class Mouse {
       log_status('-');
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);
-      update_sensors();
+      check_the_walls();
       update_map();
       maze.flood_maze(target);
       unsigned char newHeading = maze.direction_to_smallest(location, heading);
@@ -591,7 +591,7 @@ class Mouse {
         // This is an error. We should handle it.
         break;
     }
-    maze.walls[location] |= VISITED;
+    maze.mark_cell_visited(location);
   }
 
   /***
