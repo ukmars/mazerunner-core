@@ -48,7 +48,7 @@ const int INPUT_BUFFER_SIZE = 32;
 
 class UI {
 
-  public:
+public:
   void interpret_line() {
     Args args = get_tokens();
     switch (args.argc) {
@@ -209,7 +209,7 @@ class UI {
     Serial.println(F("      15 = "));
   }
 
-  private:
+private:
   char m_buffer[INPUT_BUFFER_SIZE];
   uint8_t m_index = 0;
 };

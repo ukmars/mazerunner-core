@@ -53,6 +53,7 @@ env.AddPostAction(
         "${PROJECT_SRC_DIR}/*.cpp",
         "${PROJECT_SRC_DIR}/*.h",
         "${PROJECT_SRC_DIR}/*.ino",
+        "${PROJECT_SRC_DIR}/src/*.h",
     ]), "Format sources in ${PROJECT_SRC_DIR}")
 )
 

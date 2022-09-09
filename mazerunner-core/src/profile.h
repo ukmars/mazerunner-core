@@ -51,7 +51,7 @@ enum ProfileState : uint8_t {
 };
 
 class Profile {
-  public:
+public:
   void reset() {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       m_position = 0;
@@ -206,7 +206,7 @@ class Profile {
     }
   }
 
-  private:
+private:
   volatile uint8_t m_state = CS_IDLE;
   volatile float m_speed = 0;
   volatile float m_position = 0;

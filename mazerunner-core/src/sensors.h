@@ -62,7 +62,7 @@ extern Sensors sensors;
 
 class Sensors {
 
-  public:
+public:
   /*** wall sensor variables ***/
 
   volatile SensorChannel lfs;
@@ -466,7 +466,7 @@ class Sensors {
     sensor_phase++;
   }
 
-  private:
+private:
   float last_steering_error = 0;
   volatile bool m_enabled = false;
   volatile int m_adc_reading[6];

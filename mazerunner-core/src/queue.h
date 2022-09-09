@@ -31,7 +31,7 @@
  */
 template <class item_t>
 class Queue {
-  public:
+public:
   explicit Queue(int maxSize = 64) : MAX_ITEMS(maxSize) {
     mData = new item_t[MAX_ITEMS + 1];
     clear();
@@ -70,14 +70,14 @@ class Queue {
     return result;
   }
 
-  protected:
+protected:
   item_t *mData;
   const int MAX_ITEMS;
   int mHead;
   int mTail;
   int mItemCount;
 
-  private:
+private:
   // while this is probably correct, prevent use of the copy constructor
   Queue(const Queue<item_t> &rhs) {}
 };

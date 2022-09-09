@@ -38,7 +38,7 @@
 #include "sensors.h"
 #include <Arduino.h>
 class Motion {
-  public:
+public:
   /**
    * Before the robot begins a sequence of moves, this method can be used to
    * make sure everything starts off in a known state.

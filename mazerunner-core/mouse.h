@@ -89,7 +89,7 @@ class Mouse;
 extern Mouse mouse;
 
 class Mouse {
-  public:
+public:
   unsigned char heading;
   unsigned char location;
   bool leftWall;

@@ -37,8 +37,7 @@
 #include "motors.h"
 #include "sensors.h"
 class Systick {
-  public:
-
+public:
   // don't let this start firing up before we are ready.
   // call the begin method explicitly.
   void begin() {

@@ -49,12 +49,12 @@
 const char dirChars[] = "^>v<*";
 
 class Maze {
-  private:
+private:
   uint8_t s_goal = 0x077;
   uint8_t cost[256];
   uint8_t walls[256];
 
-  public:
+public:
   Maze() {
   }
 

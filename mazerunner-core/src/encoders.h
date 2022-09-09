@@ -85,7 +85,7 @@ class Encoders;
 
 extern Encoders encoders;
 class Encoders {
-  public:
+public:
   const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
   const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
   const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
@@ -203,7 +203,7 @@ class Encoders {
 
   // None of the variables in this file should be directly available to the rest
   // of the code without a guard to ensure atomic access
-  private:
+private:
   volatile float m_robot_distance;
   volatile float m_robot_angle;
 

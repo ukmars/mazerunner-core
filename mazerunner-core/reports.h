@@ -49,7 +49,7 @@ class Reporter {
   uint32_t s_report_time;
   uint32_t s_report_interval = REPORTING_INTERVAL;
 
-  public:
+public:
   // note that the Serial device has a 64 character buffer and, at 115200 baud
   // 64 characters will take about 6ms to go out over the wire.
   void report_profile_header() {
@@ -78,9 +78,9 @@ class Reporter {
       Serial.print(' ');
       Serial.print(rotation.speed());
       Serial.print(' ');
-      Serial.print(50 * (motors.g_right_motor_volts + motors.g_left_motor_volts));
+      Serial.print(50 * (motors.get_right_motor_volts() + motors.get_left_motor_volts()));
       Serial.print(' ');
-      Serial.print(50 * (motors.g_right_motor_volts - motors.g_left_motor_volts));
+      Serial.print(50 * (motors.get_right_motor_volts() - motors.get_left_motor_volts()));
       Serial.println();
     }
 #else

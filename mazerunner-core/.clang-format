@@ -8,7 +8,8 @@ BreakBeforeBraces: Attach
 AllowShortIfStatementsOnASingleLine: false
 IndentCaseLabels: true
 ColumnLimit: 0
-AccessModifierOffset: -4
+IndentAccessModifiers: false
+
 NamespaceIndentation: All
 FixNamespaceComments: false
 SortIncludes: true
