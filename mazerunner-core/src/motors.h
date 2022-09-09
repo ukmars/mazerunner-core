@@ -44,36 +44,29 @@ enum { PWM_488_HZ,
        PWM_3906_HZ,
        PWM_31250_HZ };
 
-
-
 class Motors {
-  public:
-  bool s_controllers_output_enabled;
-  float s_old_fwd_error;
-  float s_old_rot_error;
-  float s_fwd_error;
-  float s_rot_error;
-  // these are maintained only for logging
-float g_left_motor_volts;
-float g_right_motor_volts;
-
-
+public:
   void enable_motor_controllers() {
-    s_controllers_output_enabled = true;
+    m_controller_output_enabled = true;
   }
 
   void disable_motor_controllers() {
-    s_controllers_output_enabled = false;
+    m_controller_output_enabled = false;
   }
 
   void reset_motor_controllers() {
-    s_fwd_error = 0;
-    s_rot_error = 0;
-    s_old_fwd_error = 0;
-    s_old_rot_error = 0;
+    m_fwd_error = 0;
+    m_rot_error = 0;
+    m_previous_fwd_error = 0;
+    m_previous_rot_error = 0;
   }
 
-  void setup_motors() {
+  void stop_motors() {
+    set_left_motor_volts(0);
+    set_right_motor_volts(0);
+  }
+
+  void setup() {
     pinMode(MOTOR_LEFT_DIR, OUTPUT);
     pinMode(MOTOR_RIGHT_DIR, OUTPUT);
     pinMode(MOTOR_LEFT_PWM, OUTPUT);
@@ -87,19 +80,19 @@ float g_right_motor_volts;
   }
 
   float position_controller() {
-    s_fwd_error += forward.increment() - encoders.robot_fwd_increment();
-    float diff = s_fwd_error - s_old_fwd_error;
-    s_old_fwd_error = s_fwd_error;
-    float output = FWD_KP * s_fwd_error + FWD_KD * diff;
+    m_fwd_error += forward.increment() - encoders.robot_fwd_increment();
+    float diff = m_fwd_error - m_previous_fwd_error;
+    m_previous_fwd_error = m_fwd_error;
+    float output = FWD_KP * m_fwd_error + FWD_KD * diff;
     return output;
   }
 
   float angle_controller(float steering_adjustment) {
-    s_rot_error += rotation.increment() - encoders.robot_rot_increment();
-    s_rot_error += steering_adjustment;
-    float diff = s_rot_error - s_old_rot_error;
-    s_old_rot_error = s_rot_error;
-    float output = ROT_KP * s_rot_error + ROT_KD * diff;
+    m_rot_error += rotation.increment() - encoders.robot_rot_increment();
+    m_rot_error += steering_adjustment;
+    float diff = m_rot_error - m_previous_rot_error;
+    m_previous_rot_error = m_rot_error;
+    float output = ROT_KP * m_rot_error + ROT_KD * diff;
     return output;
   }
 
@@ -110,14 +103,42 @@ float g_right_motor_volts;
     float right_output = 0;
     left_output = pos_output - rot_output;
     right_output = pos_output + rot_output;
-    if (s_controllers_output_enabled) {
+    if (m_controller_output_enabled) {
       set_right_motor_volts(right_output);
       set_left_motor_volts(left_output);
     }
   }
-  /**
-   * Direct register access could be used here for enhanced performance
-   */
+
+  float get_left_motor_volts() {
+    float volts = 0;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      volts = m_left_motor_volts;
+    }
+    return volts;
+  }
+
+  float get_right_motor_volts() {
+    float volts = 0;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      volts = m_right_motor_volts;
+    }
+    return volts;
+  }
+
+  void set_left_motor_volts(float volts) {
+    volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
+    m_left_motor_volts = volts;
+    int motorPWM = (int)(volts * sensors.get_battery_scale());
+    set_left_motor_pwm(motorPWM);
+  }
+
+  void set_right_motor_volts(float volts) {
+    volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
+    m_right_motor_volts = volts;
+    int motorPWM = (int)(volts * sensors.get_battery_scale());
+    set_right_motor_pwm(motorPWM);
+  }
+
   void set_left_motor_pwm(int pwm) {
     pwm = MOTOR_LEFT_POLARITY * constrain(pwm, -255, 255);
     if (pwm < 0) {
@@ -140,21 +161,7 @@ float g_right_motor_volts;
     }
   }
 
-  void set_left_motor_volts(float volts) {
-    volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
-    g_left_motor_volts = volts;
-    int motorPWM = (int)(volts * sensors.get_battery_scale());
-    set_left_motor_pwm(motorPWM);
-  }
-
-  void set_right_motor_volts(float volts) {
-    volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
-    g_right_motor_volts = volts;
-    int motorPWM = (int)(volts * sensors.get_battery_scale());
-    set_right_motor_pwm(motorPWM);
-  }
-
-void set_motor_pwm_frequency(int frequency = PWM_31250_HZ){
+  void set_motor_pwm_frequency(int frequency = PWM_31250_HZ) {
     switch (frequency) {
       case PWM_31250_HZ:
         // Divide by 1. frequency = 31.25 kHz;
@@ -175,10 +182,15 @@ void set_motor_pwm_frequency(int frequency = PWM_31250_HZ){
     }
   }
 
-  void stop_motors() {
-    set_left_motor_volts(0);
-    set_right_motor_volts(0);
-  }
+private:
+  bool m_controller_output_enabled;
+  float m_previous_fwd_error;
+  float m_previous_rot_error;
+  float m_fwd_error;
+  float m_rot_error;
+  // these are maintained only for logging
+  float m_left_motor_volts;
+  float m_right_motor_volts;
 };
 
 extern Motors motors;
