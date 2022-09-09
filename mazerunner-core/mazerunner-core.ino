@@ -56,16 +56,27 @@ Reporter reporter;
 
 void setup() {
   Serial.begin(BAUDRATE);
+  sensors.setup_adc();
   systick.begin();
   pinMode(USER_IO_6, OUTPUT);
   pinMode(EMITTER_A, OUTPUT);
   pinMode(EMITTER_B, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
+  motors.setup();
   encoders.setup();
-  motors.setup_motors();
-  encoders.setup_encoders();
-  sensors.setup_adc();
-  Serial.println();
+  Serial.print('-');
+  if (sensors.button_pressed()) {
+    maze.initialise_maze();
+    for (int i = 0; i < 4; i++) {
+      digitalWrite(LED_BUILTIN, 1);
+      delay(50);
+      digitalWrite(LED_BUILTIN, 0);
+      delay(50);
+    }
+    Serial.println(F("Maze cleared"));
+    sensors.wait_for_button_release();
+  }
+
   sensors.disable();
   Serial.println(F("RDY"));
 }
