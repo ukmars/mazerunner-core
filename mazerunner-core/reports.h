@@ -129,7 +129,7 @@ public:
       Serial.print(' ');
       Serial.print(sensors.get_cross_track_error());
       Serial.print(' ');
-      Serial.print(sensors.steering_feedback());
+      Serial.print(sensors.get_steering_feedback());
       Serial.println();
     }
 #else

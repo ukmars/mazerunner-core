@@ -38,7 +38,7 @@
 #include "digitalWriteFast.h"
 #include "encoders.h"
 #include "profile.h"
-#include "sensors.h"
+// #include "sensors.h"
 
 enum { PWM_488_HZ,
        PWM_3906_HZ,
@@ -46,22 +46,22 @@ enum { PWM_488_HZ,
 
 class Motors {
 public:
-  void enable_motor_controllers() {
+  void enable_controllers() {
     m_controller_output_enabled = true;
   }
 
-  void disable_motor_controllers() {
+  void disable_controllers() {
     m_controller_output_enabled = false;
   }
 
-  void reset_motor_controllers() {
+  void reset_controllers() {
     m_fwd_error = 0;
     m_rot_error = 0;
     m_previous_fwd_error = 0;
     m_previous_rot_error = 0;
   }
 
-  void stop_motors() {
+  void stop() {
     set_left_motor_volts(0);
     set_right_motor_volts(0);
   }
@@ -75,8 +75,8 @@ public:
     digitalWriteFast(MOTOR_LEFT_DIR, 0);
     digitalWriteFast(MOTOR_RIGHT_PWM, 0);
     digitalWriteFast(MOTOR_RIGHT_DIR, 0);
-    set_motor_pwm_frequency();
-    stop_motors();
+    set_pwm_frequency();
+    stop();
   }
 
   float position_controller() {
@@ -96,7 +96,7 @@ public:
     return output;
   }
 
-  void update_motor_controllers(float steering_adjustment) {
+  void update_controllers(float steering_adjustment) {
     float pos_output = position_controller();
     float rot_output = angle_controller(steering_adjustment);
     float left_output = 0;
@@ -107,6 +107,10 @@ public:
       set_right_motor_volts(right_output);
       set_left_motor_volts(left_output);
     }
+  }
+
+  void set_battery_compensation(float comp) {
+    m_battery_compensation = comp;
   }
 
   float get_left_motor_volts() {
@@ -128,14 +132,14 @@ public:
   void set_left_motor_volts(float volts) {
     volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
     m_left_motor_volts = volts;
-    int motorPWM = (int)(volts * sensors.get_battery_scale());
+    int motorPWM = (int)(volts * m_battery_compensation);
     set_left_motor_pwm(motorPWM);
   }
 
   void set_right_motor_volts(float volts) {
     volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
     m_right_motor_volts = volts;
-    int motorPWM = (int)(volts * sensors.get_battery_scale());
+    int motorPWM = (int)(volts * m_battery_compensation);
     set_right_motor_pwm(motorPWM);
   }
 
@@ -161,7 +165,7 @@ public:
     }
   }
 
-  void set_motor_pwm_frequency(int frequency = PWM_31250_HZ) {
+  void set_pwm_frequency(int frequency = PWM_31250_HZ) {
     switch (frequency) {
       case PWM_31250_HZ:
         // Divide by 1. frequency = 31.25 kHz;
@@ -188,6 +192,7 @@ private:
   float m_previous_rot_error;
   float m_fwd_error;
   float m_rot_error;
+  float m_battery_compensation = 1.0f;
   // these are maintained only for logging
   float m_left_motor_volts;
   float m_right_motor_volts;

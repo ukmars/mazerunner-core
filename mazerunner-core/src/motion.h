@@ -46,13 +46,14 @@ public:
    * @brief Reset profiles, counters and controllers. Motors off. Steering off.
    */
   void reset_drive_system() {
-    motors.stop_motors();
-    motors.disable_motor_controllers();
+    motors.stop();
+    motors.disable_controllers();
     sensors.set_steering_mode(STEERING_OFF);
     encoders.reset();
-    motors.reset_motor_controllers();
     forward.reset();
     rotation.reset();
+    motors.reset_controllers();
+    motors.enable_controllers();
   }
 
   //***************************************************************************//

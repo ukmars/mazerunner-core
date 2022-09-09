@@ -352,7 +352,6 @@ public:
     delay(1000);
     sensors.enable();
     motion.reset_drive_system();
-    motors.enable_motor_controllers();
     forward.start(BACK_WALL_TO_CENTER, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
@@ -440,7 +439,6 @@ public:
     delay(1000);
     sensors.enable();
     motion.reset_drive_system();
-    motors.enable_motor_controllers();
     if (not handStart) {
       // back up to the wall behind
       forward.start(-60, 120, 0, 1000);
@@ -620,7 +618,7 @@ public:
     search_to(maze.maze_goal());
     handStart = false;
     search_to(START);
-    motors.stop_motors();
+    motors.stop();
     return 0;
   }
 
@@ -641,7 +639,6 @@ public:
   void user_log_front_sensor() {
     sensors.enable();
     motion.reset_drive_system();
-    motors.enable_motor_controllers();
     reporter.report_front_sensor_track_header();
     forward.start(-200, 100, 0, 500);
     while (not forward.is_finished()) {
@@ -674,7 +671,6 @@ public:
     sensors.enable();
     delay(100);
     motion.reset_drive_system();
-    motors.enable_motor_controllers();
     sensors.set_steering_mode(STEERING_OFF);
     reporter.report_sensor_track_header();
     rotation.start(360, 180, 0, 1800);
@@ -717,7 +713,6 @@ public:
     sensors.enable();
     delay(100);
     motion.reset_drive_system();
-    motors.enable_motor_controllers();
     sensors.set_steering_mode(STEERING_OFF);
     Serial.println(F("Edge positions:"));
     forward.start(FULL_CELL - 30.0, 100, 0, 1000);
@@ -769,7 +764,6 @@ public:
     // the other turn parameters
     uint8_t side = sensors.wait_for_user_start();
     motion.reset_drive_system();
-    motors.enable_motor_controllers();
     sensors.set_steering_mode(STEERING_OFF);
     // move to the boundary with the next cell
     float distance = BACK_WALL_TO_CENTER + HALF_CELL;

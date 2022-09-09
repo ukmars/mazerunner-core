@@ -86,7 +86,8 @@ public:
     forward.update();
     rotation.update();
     sensors.update();
-    motors.update_motor_controllers(sensors.steering_feedback());
+    motors.set_battery_compensation(sensors.get_battery_comp());
+    motors.update_controllers(sensors.get_steering_feedback());
     sensors.start_sensor_cycle();
     // NOTE: no code should follow this line;
   }

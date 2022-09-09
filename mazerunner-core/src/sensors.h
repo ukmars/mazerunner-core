@@ -79,12 +79,9 @@ public:
   /*** steering variables ***/
   uint8_t g_steering_mode = STEER_NORMAL;
 
-  float steering_feedback() {
-    return m_steering_feedback;
-  }
-
+  float get_steering_feedback() { return m_steering_feedback; }
   float get_cross_track_error() { return m_cross_track_error; };
-  float get_battery_scale() { return m_battery_compensation; };
+  float get_battery_comp() { return m_battery_compensation; };
 
   /**
    *  The default for the Arduino is to give a slow ADC clock for maximum
