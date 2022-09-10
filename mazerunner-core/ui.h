@@ -115,7 +115,7 @@ public:
       case 'S':
         sensors.enable();
         delay(10);
-        reporter.report_wall_sensors();
+        reporter.show_wall_sensors();
         sensors.disable();
         break;
       default:

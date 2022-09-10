@@ -90,7 +90,7 @@ public:
     sensors.wait_for_user_start(); // cover front sensor with hand to start
     switch (cmd) {
       case 1:
-        reporter.report_sensor_calibration();
+        show_sensor_calibration();
         break;
       case 2:
         search_maze();
@@ -133,6 +133,18 @@ public:
     }
   }
 
+  void show_sensor_calibration() {
+    reporter.wall_sensor_header();
+    sensors.enable();
+    while (not sensors.button_pressed()) {
+      reporter.show_wall_sensors();
+    }
+    sensors.wait_for_button_release();
+    Serial.println();
+    delay(200);
+    sensors.disable();
+  }
+
   //***************************************************************************//
   /**
    * Used to bring the mouse to a halt, centred in a cell.
@@ -149,13 +161,13 @@ public:
     sensors.set_steering_mode(STEERING_OFF);
     forward.start(remaining, forward.speed(), 0, forward.acceleration());
     while (not forward.is_finished()) {
-      if (sensors.g_front_sum > (FRONT_REFERENCE - 150)) {
+      if (sensors.get_front_sum() > (FRONT_REFERENCE - 150)) {
         break;
       }
       delay(2);
     }
     if (sensors.see_front_wall) {
-      while (sensors.g_front_sum < FRONT_REFERENCE) {
+      while (sensors.get_front_sum() < FRONT_REFERENCE) {
         forward.start(10, 50, 0, 1000);
         delay(2);
       }
@@ -212,7 +224,7 @@ public:
 
     float turn_point = FULL_CELL + turn_params[turn_id].run_in;
     while (forward.position() < turn_point) {
-      if (sensors.g_front_sum > trigger) {
+      if (sensors.get_front_sum() > trigger) {
         forward.set_state(CS_FINISHED);
         triggered = true;
         break;
@@ -253,7 +265,7 @@ public:
     float remaining = (FULL_CELL + HALF_CELL) - forward.position();
     forward.start(remaining, forward.speed(), 30, forward.acceleration());
     if (has_wall) {
-      while (sensors.g_front_sum < FRONT_REFERENCE) {
+      while (sensors.get_front_sum() < FRONT_REFERENCE) {
         delay(2);
       }
     } else {
@@ -278,7 +290,7 @@ public:
     float remaining = (FULL_CELL + HALF_CELL) - forward.position();
     forward.start(remaining, forward.speed(), 30, forward.acceleration());
     if (has_wall) {
-      while (sensors.g_front_sum < 850) {
+      while (sensors.get_front_sum() < 850) {
         delay(2);
       }
     } else {
@@ -307,7 +319,7 @@ public:
     print_hex_2(location);
     Serial.print(' ');
     Serial.print(dirLetters[heading]);
-    print_justified(sensors.g_front_sum, 4);
+    print_justified(sensors.get_front_sum(), 4);
     Serial.print('@');
     print_justified((int)forward.position(), 4);
     Serial.print(' ');
@@ -614,10 +626,10 @@ public:
   void user_log_front_sensor() {
     sensors.enable();
     motion.reset_drive_system();
-    reporter.report_front_sensor_track_header();
+    reporter.front_sensor_track_header();
     forward.start(-200, 100, 0, 500);
     while (not forward.is_finished()) {
-      reporter.report_front_sensor_track();
+      reporter.front_sensor_track();
     }
     motion.reset_drive_system();
     sensors.disable();
@@ -650,7 +662,8 @@ public:
     reporter.report_sensor_track_header();
     rotation.start(360, 180, 0, 1800);
     while (not rotation.is_finished()) {
-      reporter.report_sensor_track(true);
+      // reporter.report_sensor_track(true);
+      reporter.show_wall_sensors();
     }
     motion.reset_drive_system();
     sensors.disable();

@@ -153,6 +153,14 @@ public:
     m_battery_compensation = comp;
   }
 
+  int get_fwd_millivolts() {
+    return 1000 * (get_right_motor_volts() + get_left_motor_volts());
+  }
+
+  int get_rot_millivolts() {
+    return 1000 * (get_right_motor_volts() - get_left_motor_volts());
+  }
+
   float get_left_motor_volts() {
     float volts = 0;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {

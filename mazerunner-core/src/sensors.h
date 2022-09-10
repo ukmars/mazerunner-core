@@ -74,11 +74,14 @@ public:
   volatile bool see_left_wall;
   volatile bool see_right_wall;
 
-  volatile int g_front_sum;
+  volatile int m_front_sum;
+  volatile int m_front_diff;
 
   /*** steering variables ***/
   uint8_t g_steering_mode = STEER_NORMAL;
 
+  int get_front_sum() { return int(m_front_sum); };
+  int get_front_diff() { return int(m_front_diff); };
   float get_steering_feedback() { return m_steering_feedback; }
   float get_cross_track_error() { return m_cross_track_error; };
   float get_battery_comp() { return m_battery_compensation; };
@@ -218,8 +221,9 @@ public:
     // set the wall detection flags
     see_left_wall = lss.value > LEFT_THRESHOLD;
     see_right_wall = rss.value > RIGHT_THRESHOLD;
-    g_front_sum = lfs.value + rfs.value;
-    see_front_wall = g_front_sum > FRONT_THRESHOLD;
+    m_front_sum = lfs.value + rfs.value;
+    m_front_diff = lfs.value - rfs.value;
+    see_front_wall = m_front_sum > FRONT_THRESHOLD;
 
     // calculate the alignment errors - too far left is negative
     int error = 0;
@@ -241,7 +245,7 @@ public:
 
     // the side sensors are not reliable close to a wall ahead.
     // TODO: The magic number 100 may need adjusting
-    if (g_front_sum > 100) {
+    if (m_front_sum > 100) {
       error = 0;
     }
     m_cross_track_error = error;
