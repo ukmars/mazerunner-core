@@ -33,8 +33,7 @@
 #ifndef PROFILE_H
 #define PROFILE_H
 
-#include "..//config.h"
-#include "encoders.h"
+#include "../config.h"
 #include <Arduino.h>
 #include <util/atomic.h>
 //***************************************************************************//
@@ -58,13 +57,6 @@ public:
       m_speed = 0;
       m_target_speed = 0;
       m_state = CS_IDLE;
-    }
-  }
-
-  // not used?
-  void clear_counters() {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      m_position = 0;
     }
   }
 
@@ -168,7 +160,7 @@ public:
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { m_position = position; }
   }
 
-  // update is called from within systick and shoul dbe safe from interrupts
+  // update is called from within systick and should be safe from interrupts
   void update() {
     if (m_state == CS_IDLE) {
       return;
@@ -179,7 +171,7 @@ public:
       if (remaining < get_braking_distance()) {
         m_state = CS_BRAKING;
         if (m_final_speed == 0) {
-          m_target_speed = m_sign * 5.0f;
+          m_target_speed = m_sign * 5.0f; // magic number to make sure we reach zero
         } else {
           m_target_speed = m_final_speed;
         };
