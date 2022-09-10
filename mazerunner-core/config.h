@@ -36,10 +36,24 @@
 #include <Arduino.h>
 
 /***
- * The config.h file defines the actual robot variant which will be the target for the build.
- *
- * Start with the pinouts for the robot. These the
- * Pin definitions for the UKMARSBOT V1.x mainboard
+ * The config.h file determines the actual robot variant that 
+ * will be the target for the build. 
+ * 
+ * This files lets you pick a specific robot that has its unique
+ * configuration stored in that file. In this way, you can write
+ * generic code that will work with a variety of different actual
+ * robots. there are a number of example robot files in the project.
+ * You should pick one that is closest to your setup, copy it and
+ * then amend the details in that copy. Finally, add or modify
+ * the selection settings below to use your new robot configuration.
+ * 
+ */
+
+
+ /***
+ * Start with the pinouts for the robot. These are the pin 
+ * definitions for the UKMARSBOT V1.x mainboard and should be 
+ * suitable for a number of derivatives.
  */
 
 const int SERIAL_TX = 0;
@@ -64,13 +78,15 @@ const int SENSOR5 = A5;
 const int FUNCTION_PIN = A6;
 const int BATTERY_VOLTS = A7;
 
+/*************************************************************************/
 /***
- *  Structure definitions used in the software. Declared here for lack of a better place
- * Robot specific instances are in the robot config file
+ * Structure definitions used in the software. Declared here for lack of a 
+ * better place.
+ * Robot specific instances and values are in the robot config file.
  */
 struct TurnParameters {
   int speed;
-  int run_in;  // (mm)
+  int run_in;  // mm
   int run_out; // mm
   int angle;   // deg
   int omega;   // deg/s
@@ -78,6 +94,7 @@ struct TurnParameters {
   int trigger; // sensor value
 };
 
+/*************************************************************************/
 /***
  * It is possible that you might want to run the robot in a number of
  * different mazes with different calibration values. The config file
@@ -88,6 +105,7 @@ struct TurnParameters {
 #define EVENT_HOME 1
 #define EVENT_UK 2
 #define EVENT_PORTUGAL 3
+
 // choose the one you will be using
 #define EVENT EVENT_UK
 
@@ -117,8 +135,8 @@ struct TurnParameters {
 #endif
 
 /*************************************************************************/
+/*************************************************************************/
 
-//***************************************************************************//
 /***
  * these are the defaults for some system-wide settings regardless of the robot
  * or environment. It would be best not to mess with these without good reason.
@@ -137,6 +155,16 @@ const float FULL_CELL = 180.0f;
 const float HALF_CELL = FULL_CELL / 2.0f;
 
 //***************************************************************************//
+/***
+ * Use the physical constants from the robot config file to pre-calculate
+ * some essential scaling factors. In that robot specific config file you 
+ * must provide:
+ *      - ROTATION_BIAS
+ *      - WHEEL_DIAMETER
+ *      - ENCODER_PULSES
+ *      - GEAR_RATIO
+ *      - MOUSE_RADIUS
+ */
 const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
 const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
 const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
@@ -145,7 +173,13 @@ const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 /***
  * This piece of magic lets you define a variable, such as the maze, that can
  * survive a processor reset. The downside is that you MUST take care to
- * properly initialise it when necesary
+ * properly initialise it when necesary. If you just turn on the robot for
+ * example, the maze will have random data in it. 
+ * 
+ * CLEAR THE MAZE BEFORE EVERY CONTEST
+ * 
+ * The mazerunner code clears the maze if the user button is held down during
+ * a reset.
  */
 #define PERSISTENT __attribute__((section(".noinit")))
 
