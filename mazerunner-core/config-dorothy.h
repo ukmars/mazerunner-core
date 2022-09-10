@@ -63,18 +63,12 @@ const float BIAS_FF = 0.121;
 
 //***** PERFORMANCE CONSTANTS************************************************//
 // search and run speeds in mm/s and mm
-const int DEFAULT_TURN_SPEED = 300;
-const int DEFAULT_SEARCH_SPEED = 400;
-const int DEFAULT_MAX_SPEED = 800;
-const int DEFAULT_SEARCH_ACCEL = 2000;
-
-// TODO explain these
+const int SEARCH_SPEED = 400;
 const int SEARCH_ACCELERATION = 3000;
-const int SPEEDMAX_EXPLORE = 400;
-const int SPEEDMAX_STRAIGHT = 800;
-const int SPEEDMAX_SMOOTH_TURN = 500;
-const int OMEGA_MAX_SPIN_TURN = 360;
+const int SEARCH_TURN_SPEED = 300;
+const int OMEGA_SPIN_TURN = 360;
 const int ALPHA_SPIN_TURN = 3600;
+
 //***************************************************************************//
 
 //***** SENSOR CALIBRATION **************************************************//
@@ -152,10 +146,10 @@ const float right_edge_pos = 93.0f;
 
 // These take no storage - the compiler uses the values directly
 const TurnParameters turn_params[4] = {
-    {DEFAULT_TURN_SPEED, 25, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
-    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90ER
-    {DEFAULT_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
-    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
+    {SEARCH_TURN_SPEED, 25, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
+    {SEARCH_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90ER
+    {SEARCH_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
+    {SEARCH_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
 };
 
 //***************************************************************************//

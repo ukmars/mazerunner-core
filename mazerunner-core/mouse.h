@@ -170,15 +170,15 @@ public:
   void turn_IP180() {
     static int direction = 1;
     direction *= -1; // alternate direction each time it is called
-    motion.spin_turn(direction * 180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+    motion.spin_turn(direction * 180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
   void turn_IP90R() {
-    motion.spin_turn(-90, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+    motion.spin_turn(-90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
   void turn_IP90L() {
-    motion.spin_turn(90, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+    motion.spin_turn(90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
   //***************************************************************************//
@@ -200,7 +200,7 @@ public:
   void turn_smooth(int turn_id) {
     bool triggered = false;
     sensors.set_steering_mode(STEERING_OFF);
-    forward.set_target_speed(DEFAULT_TURN_SPEED);
+    forward.set_target_speed(SEARCH_TURN_SPEED);
 
     float trigger = turn_params[turn_id].trigger;
     if (sensors.see_left_wall) {
@@ -227,7 +227,7 @@ public:
     while (not rotation.is_finished()) {
       delay(2);
     }
-    forward.start(turn_params[turn_id].run_out, forward.speed(), SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
+    forward.start(turn_params[turn_id].run_out, forward.speed(), SEARCH_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -263,8 +263,8 @@ public:
     }
     // Be sure robot has come to a halt.
     forward.stop();
-    motion.spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
-    forward.start(HALF_CELL - 10.0, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
+    motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
+    forward.start(HALF_CELL - 10.0, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -289,7 +289,7 @@ public:
     log_status('x');
     // Be sure robot has come to a halt.
     forward.stop();
-    motion.spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+    motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
   //***************************************************************************//
@@ -332,7 +332,7 @@ public:
     delay(1000);
     sensors.enable();
     motion.reset_drive_system();
-    forward.start(BACK_WALL_TO_CENTER, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
+    forward.start(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -426,7 +426,7 @@ public:
         delay(2);
       }
     }
-    forward.start(BACK_WALL_TO_CENTER, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
+    forward.start(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -773,7 +773,7 @@ public:
     sensors.set_steering_mode(STEERING_OFF);
     // move to the boundary with the next cell
     float distance = BACK_WALL_TO_CENTER + HALF_CELL;
-    forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
+    forward.start(distance, SEARCH_TURN_SPEED, SEARCH_TURN_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -790,7 +790,7 @@ public:
     int sensor_right = sensors.rss.value;
     // move two cells. The resting position of the mouse have the
     // same offset as the turn ending
-    forward.start(2 * FULL_CELL, DEFAULT_TURN_SPEED, 0, SEARCH_ACCELERATION);
+    forward.start(2 * FULL_CELL, SEARCH_TURN_SPEED, 0, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
