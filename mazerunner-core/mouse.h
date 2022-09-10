@@ -43,14 +43,6 @@
 #include "src/sensors.h"
 #include "src/utils.h"
 
-#define SEARCH_ACCELERATION 3000
-#define SPEEDMAX_EXPLORE 400
-#define SPEEDMAX_STRAIGHT 800
-#define SPEEDMAX_SMOOTH_TURN 500
-
-#define OMEGA_MAX_SPIN_TURN 360
-#define ALPHA_SPIN_TURN 3600
-
 enum {
   FRESH_START,
   SEARCHING,
