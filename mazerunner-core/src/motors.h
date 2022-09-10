@@ -46,6 +46,9 @@ enum { PWM_488_HZ,
 
 class Motors {
 public:
+  /***
+   *
+   */
   void enable_controllers() {
     m_controller_output_enabled = true;
   }
@@ -96,6 +99,33 @@ public:
     return output;
   }
 
+  /** calculate the voltage to be applied to the motor for a given speed
+   *  the drive train is not symmetric and there is significant stiction.
+   *  If used with PID, a simpler, single value will be sufficient.
+   *
+   *  Multiply by (1/x) is generally more efficient than just divide by x
+   */
+
+  float leftFeedForward(float speed) {
+    static float oldSpeed = 0;
+    float leftFF = speed * SPEED_FF + BIAS_FF;
+    float acc = (speed - oldSpeed) * LOOP_FREQUENCY;
+    oldSpeed = speed;
+    float accFF = ACC_FF * acc;
+    leftFF += accFF;
+    return leftFF;
+  }
+
+  float rightFeedForward(float speed) {
+    static float oldSpeed = 0;
+    float rightFF = speed * SPEED_FF + BIAS_FF;
+    float acc = (speed - oldSpeed) * LOOP_FREQUENCY;
+    oldSpeed = speed;
+    float accFF = ACC_FF * acc;
+    rightFF += accFF;
+    return rightFF;
+  }
+
   void update_controllers(float steering_adjustment) {
     float pos_output = position_controller();
     float rot_output = angle_controller(steering_adjustment);
@@ -103,6 +133,16 @@ public:
     float right_output = 0;
     left_output = pos_output - rot_output;
     right_output = pos_output + rot_output;
+
+    float tangent_speed = rotation.speed() * MOUSE_RADIUS * (1 / 57.29);
+    float left_speed = forward.speed() - tangent_speed;
+    float right_speed = forward.speed() + tangent_speed;
+    float left_ff = leftFeedForward(left_speed);
+    float right_ff = rightFeedForward(right_speed);
+    if (m_feedforward_enabled) {
+      left_output += left_ff;
+      right_output += right_ff;
+    }
     if (m_controller_output_enabled) {
       set_right_motor_volts(right_output);
       set_left_motor_volts(left_output);
@@ -188,6 +228,7 @@ public:
 
 private:
   bool m_controller_output_enabled;
+  bool m_feedforward_enabled = true;
   float m_previous_fwd_error;
   float m_previous_rot_error;
   float m_fwd_error;

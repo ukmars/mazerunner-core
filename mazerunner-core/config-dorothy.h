@@ -32,6 +32,26 @@ const float STEERING_KP = 0.25;
 const float STEERING_KD = 0.00;
 const float STEERING_ADJUST_LIMIT = 10.0; // deg/s
 
+// Motor Feedforward
+/***
+ * Speed Feedforward is used to add a drive voltage proportional to the motor speed
+ * The units are Volts per mm/s and the value will be different for each
+ * robot where the motor + gearbox + wheel diamter + robot weight are different
+ * You can experimentally determine a suitable value by turning off the controller
+ * and then commanding a set voltage to the motors. The same voltage is applied to
+ * each motor. Have the robot report its speed regularly or have it measure
+ * its steady state speed after a period of acceleration.
+ * Do this for several applied voltages from 0.5 Volts to 5 Volts in steps of 0.5V
+ * Plot a chart of steady state speed against voltage. The slope of that graph is
+ * the speed feedforward, SPEED_FF.
+ * Note that the line will not pass through the origin because there will be
+ * some minimum voltage needed just to ovecome friction and get the wheels to turn at all.
+ * That minimum voltage is the BIAS_FF.
+ */
+const float ACC_FF = 0.000392;
+const float SPEED_FF = 0.00357;
+const float BIAS_FF = 0.121;
+
 // encoder polarity is either 1 or -1 and is used to account for reversal of the encoder phases
 #define ENCODER_LEFT_POLARITY (-1)
 #define ENCODER_RIGHT_POLARITY (1)
