@@ -65,6 +65,20 @@ const int FUNCTION_PIN = A6;
 const int BATTERY_VOLTS = A7;
 
 /***
+ *  Structure definitions used in the software. Declared here for lack of a better place
+ * Robot specific instances are in the robot config file
+ */
+struct TurnParameters {
+  int speed;
+  int run_in;  // (mm)
+  int run_out; // mm
+  int angle;   // deg
+  int omega;   // deg/s
+  int alpha;   // deg/s/s
+  int trigger; // sensor value
+};
+
+/***
  * It is possible that you might want to run the robot in a number of
  * different mazes with different calibration values. The config file
  * can have different sensor defaults for each of these environments

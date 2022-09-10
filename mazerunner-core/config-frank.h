@@ -153,6 +153,13 @@ const int FRONT_REFERENCE = 850; // reading when mouse centered with wall ahead
 const float left_edge_pos = 90.0f;
 const float right_edge_pos = 93.0f;
 
+const TurnParameters turn_params[4] = {
+    {DEFAULT_TURN_SPEED, 25, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
+    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90ER
+    {DEFAULT_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
+    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
+};
+
 //***************************************************************************//
 //***************************************************************************//
 // Some physical constants that are likely to be board -specific
