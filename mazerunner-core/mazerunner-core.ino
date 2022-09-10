@@ -29,6 +29,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "cli.h"
 #include "config.h"
 #include "maze.h"
 #include "mouse.h"
@@ -38,7 +39,6 @@
 #include "src/motors.h"
 #include "src/sensors.h"
 #include "src/systick.h"
-#include "ui.h"
 #include <Arduino.h>
 
 // Global objects
@@ -51,7 +51,7 @@ Profile forward;
 Profile rotation;
 Maze maze PERSISTENT;
 Mouse mouse;
-UI ui;
+CommandLineInterface cli;
 Reporter reporter;
 
 void setup() {
@@ -82,8 +82,8 @@ void setup() {
 }
 
 void loop() {
-  if (ui.read_line() > 0) {
-    ui.interpret_line();
+  if (cli.read_serial() > 0) {
+    cli.interpret_line();
   }
   if (sensors.button_pressed()) {
     sensors.wait_for_button_release();

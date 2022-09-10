@@ -1,5 +1,5 @@
 /*
- * File: ui.h
+ * File: cli.h
  * Project: mazerunner
  * File Created: Sunday, 28th March 2021 2:44:57 pm
  * Author: Peter Harrison
@@ -30,14 +30,13 @@
  * SOFTWARE.
  */
 
-#ifndef UI_H_
-#define UI_H_
+#ifndef CLI_H_
+#define CLI_H_
 
 #include "config.h"
 #include "maze.h"
 #include "mouse.h"
 #include "reports.h"
-#include "src/digitalWriteFast.h"
 #include "src/sensors.h"
 #include "src/utils.h"
 #include <Arduino.h>
@@ -46,9 +45,84 @@
 // #define MAX_DIGITS 8
 const int INPUT_BUFFER_SIZE = 32;
 
-class UI {
+class CommandLineInterface {
 
 public:
+  /***
+   * Read characters from the serial port into the buffer.
+   * return 1 if there is a complete line avaialble
+   * return 0 if not.
+   *
+   * Input is echoed back through the serial port and can be
+   * edited by the user using the backspace key. Accepted
+   * characters are converted to upper case for convenience.
+   *
+   * Lines are terminated with a LINEFEED character which is
+   * echoed but not placed in the buffer.
+   *
+   * All printiable characters are placed in a buffer with a
+   * maximum length of just 32 characters. You could make this
+   * longer but there should be little practical need.
+   *
+   * All other characters are ignored.
+   *
+   */
+  const char BACKSPACE = 0x08;
+  int read_serial() {
+    while (Serial.available()) {
+      char c = Serial.read();
+      if (c == '\n') {
+        Serial.println();
+        return 1;
+      } else if (c == BACKSPACE) {
+        if (m_index > 0) {
+          m_buffer[m_index] = 0;
+          m_index--;
+          Serial.print(c); // backspace only moves the cursor
+          Serial.print(' ');
+          Serial.print(c);
+        }
+      } else if (isPrintable(c)) {
+        c = toupper(c);
+        Serial.print(c);
+        if (m_index < INPUT_BUFFER_SIZE - 1) {
+          m_buffer[m_index++] = c;
+          m_buffer[m_index] = 0;
+        }
+      } else {
+        // drop the character silently
+      }
+    }
+    return 0;
+  }
+
+  /***
+   * Input lines are parsed into a number of space-separated
+   * tokens which are stored in an argument structure, Args.
+   *
+   * This structure has an integer count of the number of tokens
+   * and an array of the token values as strings.
+   *
+   * After tokenising, the arguments are examined and processed.
+   *
+   * Single character commands are handled separately for simplicity.
+   *
+   * Commands that consist of more than one token have their own
+   * handler which executes a function that is passed a reference to
+   * the list of tokens as an argument.
+   *
+   * Once a command line has been dealt with, the input buffer is
+   * cleared, that means that new characters that arrive while a
+   * function is executing will be lost. A side effect of that
+   * is that commands cannot be aborted over the serial link.
+   *
+   * NOTES:
+   *    - serial input is dealt with by polling so you must
+   *      frequently check for new input in the main program loop.
+   *    - tokenising uses the input buffer so no extra storage space
+   *      is used.
+   *
+   */
   void interpret_line() {
     Args args = get_tokens();
     switch (args.argc) {
@@ -65,6 +139,44 @@ public:
     }
     clear_input();
     prompt();
+  }
+
+  /***
+   * Tokenising is a process where the input buffer is examined
+   * for separators that divide one string from another. Here
+   * the separator is a space character, a comma or an '=' sign.
+   * consecutive separators are treated as one.
+   *
+   * The start of each separate string is recorded in an array
+   * in the Args structure and a null character is placed at its
+   * end. In this way, the original string gets to look like a
+   * sequence of shorter strings - the tokens. The argv array
+   * is a list of where each starts and you can think if it as
+   * aan array of strings. The argc element keeps count of how
+   * many tokens were found.
+   *
+   * If you wanted to list all the tokens after processing, you
+   * would just use the code:
+   *
+   *      for (int i = 0; i < args.argc; i++) {
+   *        Serial.println(args.argv[i]);
+   *      }
+   *
+   */
+  Args get_tokens() {
+    Args args = {0};
+    char *line = m_buffer;
+    char *token;
+    for (token = strtok(line, " ,="); token != NULL; token = strtok(NULL, " ,=")) {
+      args.argv[args.argc] = token;
+      args.argc++;
+      if (args.argc == MAX_ARGC)
+        break;
+    }
+    for (int i = 0; i < args.argc; i++) {
+      Serial.println(args.argv[i]);
+    }
+    return args;
   }
 
   /***
@@ -128,66 +240,17 @@ public:
     m_buffer[m_index] = 0;
   }
 
-  /***
-   * Read characters from the serial port into the buffer.
-   * return 1 if there is a complete line avaialble
-   * return 0 if not
-   *
-   */
-  int read_line() {
-    while (Serial.available()) {
-      char c = Serial.read();
-      // TODO : add single character priority commands like Abort
-      if (c == '\n') {
-        Serial.println();
-        return 1;
-      } else if (c == 8) {
-        if (m_index > 0) {
-          m_buffer[m_index] = 0;
-          m_index--;
-          Serial.print(c);
-          Serial.print(' ');
-          Serial.print(c);
-        }
-      } else if (isPrintable(c)) {
-        c = toupper(c);
-        Serial.print(c);
-        if (m_index < INPUT_BUFFER_SIZE - 1) {
-          m_buffer[m_index++] = c;
-          m_buffer[m_index] = 0;
-        }
-      } else {
-        // drop the character silently
-      }
-    }
-    return 0;
-  }
-
-  Args get_tokens() {
-    Args args = {0};
-    char *line = m_buffer;
-    char *token;
-    // special case for the single character settings commands
-    if (m_buffer[0] == '$') {
-      args.argv[args.argc] = (char *)"$";
-      args.argc++;
-      line++;
-    }
-    for (token = strtok(line, " ,="); token != NULL; token = strtok(NULL, " ,=")) {
-      args.argv[args.argc] = token;
-      args.argc++;
-      if (args.argc == MAX_ARGC)
-        break;
-    }
-    return args;
-  }
-
   void prompt() {
     Serial.print('\n');
     Serial.print('>');
     Serial.print(' ');
   }
 
+  /***
+   * You may add a help text here but remember to keep it in
+   * sync with what the robot acually does.
+   *
+   */
   void help() {
     Serial.println(F("W   : display maze walls"));
     Serial.println(F("X   : reset maze"));
@@ -217,6 +280,6 @@ private:
   uint8_t m_index = 0;
 };
 
-extern UI ui;
+extern CommandLineInterface cli;
 
 #endif /* UI_H_ */
