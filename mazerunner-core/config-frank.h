@@ -6,9 +6,6 @@ const int SENSOR_COUNT = 4;
 const float MAX_MOTOR_VOLTS = 6.0;
 
 //***************************************************************************//
-#define LOGGING_ON 1
-#define LOGGING_OFF 0
-#define DEBUG_LOGGING LOGGING_ON
 
 // time between logged lined when reporting is enabled (milliseconds)
 const int REPORTING_INTERVAL = 10;
