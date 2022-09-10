@@ -36,9 +36,9 @@
 #include <Arduino.h>
 
 /***
- * The config.h file determines the actual robot variant that 
- * will be the target for the build. 
- * 
+ * The config.h file determines the actual robot variant that
+ * will be the target for the build.
+ *
  * This files lets you pick a specific robot that has its unique
  * configuration stored in that file. In this way, you can write
  * generic code that will work with a variety of different actual
@@ -46,13 +46,12 @@
  * You should pick one that is closest to your setup, copy it and
  * then amend the details in that copy. Finally, add or modify
  * the selection settings below to use your new robot configuration.
- * 
+ *
  */
 
-
- /***
- * Start with the pinouts for the robot. These are the pin 
- * definitions for the UKMARSBOT V1.x mainboard and should be 
+/***
+ * Start with the pinouts for the robot. These are the pin
+ * definitions for the UKMARSBOT V1.x mainboard and should be
  * suitable for a number of derivatives.
  */
 
@@ -80,7 +79,7 @@ const int BATTERY_VOLTS = A7;
 
 /*************************************************************************/
 /***
- * Structure definitions used in the software. Declared here for lack of a 
+ * Structure definitions used in the software. Declared here for lack of a
  * better place.
  * Robot specific instances and values are in the robot config file.
  */
@@ -157,7 +156,7 @@ const float HALF_CELL = FULL_CELL / 2.0f;
 //***************************************************************************//
 /***
  * Use the physical constants from the robot config file to pre-calculate
- * some essential scaling factors. In that robot specific config file you 
+ * some essential scaling factors. In that robot specific config file you
  * must provide:
  *      - ROTATION_BIAS
  *      - WHEEL_DIAMETER
@@ -174,10 +173,10 @@ const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
  * This piece of magic lets you define a variable, such as the maze, that can
  * survive a processor reset. The downside is that you MUST take care to
  * properly initialise it when necesary. If you just turn on the robot for
- * example, the maze will have random data in it. 
- * 
+ * example, the maze will have random data in it.
+ *
  * CLEAR THE MAZE BEFORE EVERY CONTEST
- * 
+ *
  * The mazerunner code clears the maze if the user button is held down during
  * a reset.
  */

@@ -133,18 +133,6 @@ public:
     }
   }
 
-  void show_sensor_calibration() {
-    reporter.wall_sensor_header();
-    sensors.enable();
-    while (not sensors.button_pressed()) {
-      reporter.show_wall_sensors();
-    }
-    sensors.wait_for_button_release();
-    Serial.println();
-    delay(200);
-    sensors.disable();
-  }
-
   //***************************************************************************//
   /**
    * Used to bring the mouse to a halt, centred in a cell.
@@ -328,6 +316,11 @@ public:
     Serial.print(' ');
   }
 
+  /***
+   * A simple wall follower that knows where it is
+   * It will follow the left wall until it reaches the supplied taget
+   * cell.
+   */
   void follow_to(unsigned char target) {
     Serial.println(F("Follow TO"));
     handStart = true;
@@ -609,6 +602,12 @@ public:
     return 0;
   }
 
+  //***************************************************************************//
+  //************  BELOW HERE ARE VARIOUS TEST FUNCTIONS ***********************//
+  //********** THEY ARE NOT ESSENTIALL TO THE BUSINESS OF *********************//
+  //******** SOLVING THE MAZE BUT THEY MAY HELP WITH SETUP ********************//
+  //***************************************************************************//
+
   /***
    * just sit in a loop, flashing lights waiting for the button to be pressed
    */
@@ -623,6 +622,13 @@ public:
     digitalWriteFast(LED_BUILTIN, 0);
   }
 
+  /***
+   * You may want to log the front sensor readings as a function of distance
+   * from the wall. This function does that. Place the robot hard up against
+   * a wall ahead and run the command. You will get a table of values for
+   * the sensors as a function of distance.
+   *
+   */
   void user_log_front_sensor() {
     sensors.enable();
     motion.reset_drive_system();
@@ -670,7 +676,6 @@ public:
     delay(100);
   }
 
-  //***************************************************************************//
   /**
    * Edge detection test displays the position at which an edge is found when
    * the robot is travelling down a straight.
@@ -747,6 +752,19 @@ public:
     delay(100);
   }
 
+  /***
+   * A basic function to let you test the configuration of the SS90Ex turns.
+   *
+   * These are the turns used during the search of the maze and need to be
+   * accurate and repeatable.
+   *
+   * You may need to spend some time with this function to get the turns
+   * just right.
+   *
+   * NOTE: that the turn parameters are stored in the robot config file
+   * NOTE: that the left and right turns are likely to be different.
+   *
+   */
   void test_SS90E() {
     // note that changes to the speeds are likely to affect
     // the other turn parameters
@@ -781,6 +799,26 @@ public:
     print_justified(sensor_left, 5);
     print_justified(sensor_right, 5);
     motion.reset_drive_system();
+  }
+
+  /***
+   * loop until the user button is pressed while
+   * pumping out sensor readings. The first four numbers are
+   * the raw readings, the next four are normalised then there
+   * are two values for the sum and difference of the front sensors
+   *
+   * The advanced user might use this a s a start for auto calibration
+   */
+  void show_sensor_calibration() {
+    reporter.wall_sensor_header();
+    sensors.enable();
+    while (not sensors.button_pressed()) {
+      reporter.show_wall_sensors();
+    }
+    sensors.wait_for_button_release();
+    Serial.println();
+    delay(200);
+    sensors.disable();
   }
 };
 
