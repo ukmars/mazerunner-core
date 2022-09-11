@@ -82,7 +82,7 @@ public:
 
   int get_front_sum() { return int(m_front_sum); };
   int get_front_diff() { return int(m_front_diff); };
-  float get_steering_feedback() { return m_steering_feedback; }
+  float get_steering_feedback() { return m_steering_adjustment; }
   float get_cross_track_error() { return m_cross_track_error; };
   float get_battery_comp() { return m_battery_compensation; };
 
@@ -152,13 +152,13 @@ public:
     // TODO: are these limits appropriate, or even needed?
     adjustment = constrain(adjustment, -STEERING_ADJUST_LIMIT, STEERING_ADJUST_LIMIT);
     last_steering_error = m_cross_track_error;
-    m_steering_feedback = adjustment;
+    m_steering_adjustment = adjustment;
     return adjustment;
   }
 
   void set_steering_mode(uint8_t mode) {
     last_steering_error = m_cross_track_error;
-    m_steering_feedback = 0;
+    m_steering_adjustment = 0;
     g_steering_mode = mode;
   }
 
@@ -178,13 +178,12 @@ public:
     m_battery_volts = BATTERY_MULTIPLIER * m_battery_adc;
     m_battery_compensation = 255.0 / m_battery_volts;
   }
-  /*********************************** Wall tracking **************************/
-
+  
   /*********************************** Wall tracking **************************/
   // calculate the alignment errors - too far left is negative
 
   /***
-   * Note: Runs in the systick interrupt. DO NOT call this directly.
+   * Note: Runs from the systick interrupt. DO NOT call this directly.
    * @brief update the global wall sensor values.
    * @return robot cross-track-error. Too far left is negative.
    */
@@ -193,7 +192,7 @@ public:
     if (not m_enabled) {
       // NOTE: No values will be updated although the ADC is working
       m_cross_track_error = 0;
-      m_steering_feedback = 0;
+      m_steering_adjustment = 0;
       return;
     }
 
@@ -476,7 +475,7 @@ private:
   volatile float m_battery_volts;
   volatile float m_battery_compensation;
   volatile float m_cross_track_error;
-  volatile float m_steering_feedback;
+  volatile float m_steering_adjustment;
 };
 
 #endif
