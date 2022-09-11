@@ -34,8 +34,10 @@
 #define SYSTICK_H
 
 #include "../config.h"
+#include "adc.h"
 #include "motors.h"
 #include "sensors.h"
+#include "switches.h"
 class Systick {
 public:
   // don't let this start firing up before we are ready.
@@ -86,9 +88,10 @@ public:
     forward.update();
     rotation.update();
     sensors.update();
+    switches.update();
     motors.set_battery_compensation(sensors.get_battery_comp());
     motors.update_controllers(sensors.get_steering_feedback());
-    sensors.start_sensor_cycle();
+    adc.start_sensor_cycle();
     // NOTE: no code should follow this line;
   }
 };

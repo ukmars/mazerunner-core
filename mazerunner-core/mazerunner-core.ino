@@ -34,15 +34,19 @@
 #include "maze.h"
 #include "mouse.h"
 #include "reports.h"
+#include "src/adc.h"
 #include "src/encoders.h"
 #include "src/motion.h"
 #include "src/motors.h"
 #include "src/sensors.h"
+#include "src/switches.h"
 #include "src/systick.h"
 #include <Arduino.h>
 
 // Global objects
 Systick systick;
+AnalogueConverter adc(EMITTER_A, EMITTER_B);
+Switches switches(SWITCHES_CHANNEL);
 Encoders encoders;
 Sensors sensors;
 Motion motion;
@@ -56,7 +60,7 @@ Reporter reporter;
 
 void setup() {
   Serial.begin(BAUDRATE);
-  sensors.setup_adc();
+  adc.init();
   systick.begin();
   pinMode(USER_IO_6, OUTPUT);
   pinMode(EMITTER_A, OUTPUT);
@@ -65,7 +69,7 @@ void setup() {
   motors.setup();
   encoders.setup();
   Serial.print('-');
-  if (sensors.button_pressed()) {
+  if (switches.button_pressed()) {
     maze.initialise_maze();
     for (int i = 0; i < 4; i++) {
       digitalWrite(LED_BUILTIN, 1);
@@ -74,7 +78,7 @@ void setup() {
       delay(50);
     }
     Serial.println(F("Maze cleared"));
-    sensors.wait_for_button_release();
+    switches.wait_for_button_release();
   }
 
   sensors.disable();
@@ -85,9 +89,9 @@ void loop() {
   if (cli.read_serial() > 0) {
     cli.interpret_line();
   }
-  if (sensors.button_pressed()) {
-    sensors.wait_for_button_release();
-    mouse.execute_cmd(sensors.get_switches(), Args{0});
+  if (switches.button_pressed()) {
+    switches.wait_for_button_release();
+    mouse.execute_cmd(switches.read(), Args{0});
   }
 }
 
@@ -115,5 +119,5 @@ ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
 }
 
 ISR(ADC_vect) {
-  sensors.update_channel();
+  adc.update_channel();
 }

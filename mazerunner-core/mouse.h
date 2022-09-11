@@ -41,6 +41,7 @@
 #include "src/motors.h"
 #include "src/profile.h"
 #include "src/sensors.h"
+#include "src/switches.h"
 #include "src/utils.h"
 
 enum {
@@ -341,7 +342,7 @@ public:
     motion.wait_until_position(FULL_CELL - 10);
     // at the start of this loop we are always at the sensing point
     while (location != target) {
-      if (sensors.button_pressed()) {
+      if (switches.button_pressed()) {
         break;
       }
       Serial.println();
@@ -435,7 +436,7 @@ public:
     motion.wait_until_position(FULL_CELL - 10);
     // TODO. the robot needs to start each iteration at the sensing point
     while (location != target) {
-      if (sensors.button_pressed()) {
+      if (switches.button_pressed()) {
         break;
       }
       Serial.println();
@@ -612,13 +613,13 @@ public:
    * just sit in a loop, flashing lights waiting for the button to be pressed
    */
   void panic() {
-    while (!sensors.button_pressed()) {
+    while (!switches.button_pressed()) {
       digitalWriteFast(LED_BUILTIN, 1);
       delay(100);
       digitalWriteFast(LED_BUILTIN, 0);
       delay(100);
     }
-    sensors.wait_for_button_release();
+    switches.wait_for_button_release();
     digitalWriteFast(LED_BUILTIN, 0);
   }
 
@@ -812,10 +813,10 @@ public:
   void show_sensor_calibration() {
     reporter.wall_sensor_header();
     sensors.enable();
-    while (not sensors.button_pressed()) {
+    while (not switches.button_pressed()) {
       reporter.show_wall_sensors();
     }
-    sensors.wait_for_button_release();
+    switches.wait_for_button_release();
     Serial.println();
     delay(200);
     sensors.disable();
