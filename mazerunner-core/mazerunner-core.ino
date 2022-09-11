@@ -91,7 +91,7 @@ void loop() {
   }
   if (switches.button_pressed()) {
     switches.wait_for_button_release();
-    mouse.execute_cmd(switches.read(), Args{0});
+    mouse.execute_cmd(switches.read());
   }
 }
 

@@ -85,6 +85,11 @@ public:
   }
 
   void execute_cmd(int cmd, const Args &args) {
+    execute_cmd(cmd);
+  }
+
+
+  void execute_cmd(int cmd) {
     if (cmd == 0) {
       return;
     }
