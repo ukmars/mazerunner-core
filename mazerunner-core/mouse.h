@@ -84,12 +84,11 @@ public:
     heading = NORTH;
   }
 
-  void execute_cmd(int cmd, const Args &args) {
-    execute_cmd(cmd);
+  void execute_cmd(int cmd) {
+    execute_cmd(cmd, Args{0});
   }
 
-
-  void execute_cmd(int cmd) {
+  void execute_cmd(int cmd, const Args &args) {
     if (cmd == 0) {
       return;
     }
