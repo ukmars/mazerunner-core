@@ -106,26 +106,6 @@ public:
     bitSet(ADCSRA, ADPS0);
   }
 
-  /**
-   * The adc_thresholds may need adjusting for non-standard resistors.
-   *
-   * @brief  Convert the switch ADC reading into a switch reading.
-   * @return integer in range 0..16 or -1 if there is an error
-   */
-  int get_switches() {
-    const int adc_thesholds[] = {660, 647, 630, 614, 590, 570, 545, 522, 461, 429, 385, 343, 271, 212, 128, 44, 0};
-
-    if (m_switches_adc > 800) {
-      return 16;
-    }
-    for (int i = 0; i < 16; i++) {
-      if (m_switches_adc > (adc_thesholds[i] + adc_thesholds[i + 1]) / 2) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
   //***************************************************************************//
 
   /**
@@ -178,7 +158,7 @@ public:
     m_battery_volts = BATTERY_MULTIPLIER * m_battery_adc;
     m_battery_compensation = 255.0 / m_battery_volts;
   }
-  
+
   /*********************************** Wall tracking **************************/
   // calculate the alignment errors - too far left is negative
 
@@ -254,27 +234,6 @@ public:
   //***************************************************************************//
 
   uint8_t sensor_phase = 0;
-  inline bool button_pressed() {
-    return get_switches() == 16;
-  }
-
-  void wait_for_button_press() {
-    while (not(button_pressed())) {
-      delay(10);
-    };
-  }
-
-  void wait_for_button_release() {
-    while (button_pressed()) {
-      delay(10);
-    };
-  }
-
-  void wait_for_button_click() {
-    wait_for_button_press();
-    wait_for_button_release();
-    delay(250);
-  }
 
   bool occluded_left() {
     return lfs.raw > 100 && sensors.rfs.raw < 100;
@@ -389,46 +348,44 @@ public:
   void update_channel() {
     switch (sensor_phase) {
       case 0:
-        // always start conversions as soon as  possible so they get a
-        // full 50us to convert
-        start_conversion(BATTERY_VOLTS);
-        break;
-      case 1:
-        m_battery_adc = get_adc_result();
-        start_conversion(FUNCTION_PIN);
-        break;
-      case 2:
-        m_switches_adc = get_adc_result();
         start_conversion(A0);
         break;
-      case 3:
+      case 1:
         m_adc_reading[0] = get_adc_result();
-        start_conversion(A1);
+        start_conversion(1);
         break;
-      case 4:
+      case 2:
         m_adc_reading[1] = get_adc_result();
         start_conversion(A2);
         break;
-      case 5:
+      case 3:
         m_adc_reading[2] = get_adc_result();
         start_conversion(A3);
         break;
-      case 6:
+      case 4:
         m_adc_reading[3] = get_adc_result();
         start_conversion(A4);
         break;
-      case 7:
+      case 5:
         m_adc_reading[4] = get_adc_result();
         start_conversion(A5);
         break;
-      case 8:
+      case 6:
         m_adc_reading[5] = get_adc_result();
+        start_conversion(A6);
+        break;
+      case 7:
+        m_adc_reading[6] = get_adc_result();
+        start_conversion(A7);
+        break;
+      case 8:
+        m_adc_reading[7] = get_adc_result();
         if (m_enabled) {
           // got all the dark ones so light them up
           digitalWriteFast(EMITTER_A, 1);
           digitalWriteFast(EMITTER_B, 1);
         }
-        start_conversion(A7); // dummy read of the battery to provide delay
+        start_conversion(A7); // dummy adc conversion to create a delay
         // wait at least one cycle for the detectors to respond
         break;
       case 9:
@@ -458,6 +415,8 @@ public:
         m_adc_reading[5] = get_adc_result() - m_adc_reading[5];
         digitalWriteFast(EMITTER_A, 0);
         digitalWriteFast(EMITTER_B, 0);
+        m_battery_adc = m_adc_reading[BATTERY_CHANNEL];
+        m_switches_adc = m_adc_reading[SWITCHES_CHANNEL];
         bitClear(ADCSRA, ADIE); // turn off the interrupt
         break;
       default:
@@ -466,10 +425,52 @@ public:
     sensor_phase++;
   }
 
+  /**
+   * The adc_thresholds may need adjusting for non-standard resistors.
+   *
+   * @brief  Convert the switch ADC reading into a switch reading.
+   * @return integer in range 0..16 or -1 if there is an error
+   */
+  int get_switches() {
+    const int adc_thesholds[] = {660, 647, 630, 614, 590, 570, 545, 522, 461, 429, 385, 343, 271, 212, 128, 44, 0};
+
+    if (m_switches_adc > 800) {
+      return 16;
+    }
+    for (int i = 0; i < 16; i++) {
+      if (m_switches_adc > (adc_thesholds[i] + adc_thesholds[i + 1]) / 2) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  inline bool button_pressed() {
+    return get_switches() == 16;
+  }
+
+  void wait_for_button_press() {
+    while (not(button_pressed())) {
+      delay(10);
+    };
+  }
+
+  void wait_for_button_release() {
+    while (button_pressed()) {
+      delay(10);
+    };
+  }
+
+  void wait_for_button_click() {
+    wait_for_button_press();
+    wait_for_button_release();
+    delay(250);
+  }
+
 private:
   float last_steering_error = 0;
   volatile bool m_enabled = false;
-  volatile int m_adc_reading[6];
+  volatile int m_adc_reading[8];
   volatile int m_battery_adc;
   volatile int m_switches_adc;
   volatile float m_battery_volts;

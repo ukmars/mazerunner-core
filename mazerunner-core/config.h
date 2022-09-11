@@ -76,6 +76,8 @@ const int SENSOR4 = A4;
 const int SENSOR5 = A5;
 const int FUNCTION_PIN = A6;
 const int BATTERY_VOLTS = A7;
+const int SWITCHES_CHANNEL = 6;
+const int BATTERY_CHANNEL = 7;
 
 /*************************************************************************/
 /***
