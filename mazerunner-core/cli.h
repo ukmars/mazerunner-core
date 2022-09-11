@@ -173,9 +173,9 @@ public:
       if (args.argc == MAX_ARGC)
         break;
     }
-    for (int i = 0; i < args.argc; i++) {
-      Serial.println(args.argv[i]);
-    }
+    // for (int i = 0; i < args.argc; i++) {
+    //   Serial.println(args.argv[i]);
+    // }
     return args;
   }
 
