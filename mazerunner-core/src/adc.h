@@ -10,8 +10,7 @@
 class AnalogueConverter {
 
 public:
-  AnalogueConverter() = default;
-  explicit AnalogueConverter(uint8_t emitter_a) : m_emitter_a(emitter_a){};
+  explicit AnalogueConverter(uint8_t emitter_a) : m_emitter_a(emitter_a), m_emitter_b(emitter_a){};
   AnalogueConverter(uint8_t emitter_a, uint8_t emitter_b) : m_emitter_a(emitter_b), m_emitter_b(emitter_b){};
   void set_emitter_a(uint8_t pin) {
     m_emitter_a = pin;
@@ -217,6 +216,7 @@ public:
   }
 
 private:
+  AnalogueConverter() = default;
   uint8_t m_sensor_phase = 0;
   bool m_emitters_enabled = false;
   uint8_t m_emitter_a = 255;
