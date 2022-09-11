@@ -63,18 +63,12 @@ const float BIAS_FF = 0.121;
 
 //***** PERFORMANCE CONSTANTS************************************************//
 // search and run speeds in mm/s and mm
-const int DEFAULT_TURN_SPEED = 300;
-const int DEFAULT_SEARCH_SPEED = 400;
-const int DEFAULT_MAX_SPEED = 800;
-const int DEFAULT_SEARCH_ACCEL = 2000;
-
-// TODO explain these
+const int SEARCH_SPEED = 400;
 const int SEARCH_ACCELERATION = 3000;
-const int SPEEDMAX_EXPLORE = 400;
-const int SPEEDMAX_STRAIGHT = 800;
-const int SPEEDMAX_SMOOTH_TURN = 500;
-const int OMEGA_MAX_SPIN_TURN = 360;
+const int SEARCH_TURN_SPEED = 300;
+const int OMEGA_SPIN_TURN = 360;
 const int ALPHA_SPIN_TURN = 3600;
+
 //***************************************************************************//
 
 //***** SENSOR CALIBRATION **************************************************//
@@ -85,6 +79,7 @@ const float SENSING_POSITION = 170.0;
 // if you have the basic sensor board enter the same value for both front constants
 #if EVENT == EVENT_HOME
 // RAW values for the front sensor when the robot is backed up to a wall
+// with another wall ahead
 const int FRONT_LEFT_CALIBRATION = 97;
 const int FRONT_RIGHT_CALIBRATION = 48;
 // RAW values for the side sensors when the robot is centred in a cell
@@ -93,7 +88,8 @@ const int LEFT_CALIBRATION = 87;
 const int RIGHT_CALIBRATION = 80;
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
-// when the robot is 20mm past the threshold.
+// when the robot is 20mm past the cell boundary. That is, the distance
+// from the front of the mouse to the wall ahead is 92mm
 const int TURN_THRESHOLD_SS90E = 115;
 const int EXTRA_WALL_ADJUST = 6;
 
@@ -151,11 +147,12 @@ const float left_edge_pos = 90.0f;
 const float right_edge_pos = 93.0f;
 
 // These take no storage - the compiler uses the values directly
+// speed, runin, runout, angle, omega, alpha, threshold
 const TurnParameters turn_params[4] = {
-    {DEFAULT_TURN_SPEED, 25, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
-    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90ER
-    {DEFAULT_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
-    {DEFAULT_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
+    {SEARCH_TURN_SPEED, 25, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
+    {SEARCH_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90ER
+    {SEARCH_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
+    {SEARCH_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90R
 };
 
 //***************************************************************************//

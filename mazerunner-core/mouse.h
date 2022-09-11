@@ -41,6 +41,7 @@
 #include "src/motors.h"
 #include "src/profile.h"
 #include "src/sensors.h"
+#include "src/switches.h"
 #include "src/utils.h"
 
 enum {
@@ -133,18 +134,6 @@ public:
     }
   }
 
-  void show_sensor_calibration() {
-    reporter.wall_sensor_header();
-    sensors.enable();
-    while (not sensors.button_pressed()) {
-      reporter.show_wall_sensors();
-    }
-    sensors.wait_for_button_release();
-    Serial.println();
-    delay(200);
-    sensors.disable();
-  }
-
   //***************************************************************************//
   /**
    * Used to bring the mouse to a halt, centred in a cell.
@@ -182,15 +171,15 @@ public:
   void turn_IP180() {
     static int direction = 1;
     direction *= -1; // alternate direction each time it is called
-    motion.spin_turn(direction * 180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+    motion.spin_turn(direction * 180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
   void turn_IP90R() {
-    motion.spin_turn(-90, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+    motion.spin_turn(-90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
   void turn_IP90L() {
-    motion.spin_turn(90, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+    motion.spin_turn(90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
   //***************************************************************************//
@@ -212,7 +201,7 @@ public:
   void turn_smooth(int turn_id) {
     bool triggered = false;
     sensors.set_steering_mode(STEERING_OFF);
-    forward.set_target_speed(DEFAULT_TURN_SPEED);
+    forward.set_target_speed(SEARCH_TURN_SPEED);
 
     float trigger = turn_params[turn_id].trigger;
     if (sensors.see_left_wall) {
@@ -239,7 +228,7 @@ public:
     while (not rotation.is_finished()) {
       delay(2);
     }
-    forward.start(turn_params[turn_id].run_out, forward.speed(), SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
+    forward.start(turn_params[turn_id].run_out, forward.speed(), SEARCH_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -275,8 +264,8 @@ public:
     }
     // Be sure robot has come to a halt.
     forward.stop();
-    motion.spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
-    forward.start(HALF_CELL - 10.0, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
+    motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
+    forward.start(HALF_CELL - 10.0, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -301,7 +290,7 @@ public:
     log_status('x');
     // Be sure robot has come to a halt.
     forward.stop();
-    motion.spin_turn(-180, OMEGA_MAX_SPIN_TURN, ALPHA_SPIN_TURN);
+    motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
   //***************************************************************************//
@@ -328,6 +317,11 @@ public:
     Serial.print(' ');
   }
 
+  /***
+   * A simple wall follower that knows where it is
+   * It will follow the left wall until it reaches the supplied taget
+   * cell.
+   */
   void follow_to(unsigned char target) {
     Serial.println(F("Follow TO"));
     handStart = true;
@@ -339,7 +333,7 @@ public:
     delay(1000);
     sensors.enable();
     motion.reset_drive_system();
-    forward.start(BACK_WALL_TO_CENTER, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
+    forward.start(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -348,7 +342,7 @@ public:
     motion.wait_until_position(FULL_CELL - 10);
     // at the start of this loop we are always at the sensing point
     while (location != target) {
-      if (sensors.button_pressed()) {
+      if (switches.button_pressed()) {
         break;
       }
       Serial.println();
@@ -433,7 +427,7 @@ public:
         delay(2);
       }
     }
-    forward.start(BACK_WALL_TO_CENTER, SPEEDMAX_EXPLORE, SPEEDMAX_EXPLORE, SEARCH_ACCELERATION);
+    forward.start(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -442,7 +436,7 @@ public:
     motion.wait_until_position(FULL_CELL - 10);
     // TODO. the robot needs to start each iteration at the sensing point
     while (location != target) {
-      if (sensors.button_pressed()) {
+      if (switches.button_pressed()) {
         break;
       }
       Serial.println();
@@ -609,20 +603,33 @@ public:
     return 0;
   }
 
+  //***************************************************************************//
+  //************  BELOW HERE ARE VARIOUS TEST FUNCTIONS ***********************//
+  //********** THEY ARE NOT ESSENTIALL TO THE BUSINESS OF *********************//
+  //******** SOLVING THE MAZE BUT THEY MAY HELP WITH SETUP ********************//
+  //***************************************************************************//
+
   /***
    * just sit in a loop, flashing lights waiting for the button to be pressed
    */
   void panic() {
-    while (!sensors.button_pressed()) {
+    while (!switches.button_pressed()) {
       digitalWriteFast(LED_BUILTIN, 1);
       delay(100);
       digitalWriteFast(LED_BUILTIN, 0);
       delay(100);
     }
-    sensors.wait_for_button_release();
+    switches.wait_for_button_release();
     digitalWriteFast(LED_BUILTIN, 0);
   }
 
+  /***
+   * You may want to log the front sensor readings as a function of distance
+   * from the wall. This function does that. Place the robot hard up against
+   * a wall ahead and run the command. You will get a table of values for
+   * the sensors as a function of distance.
+   *
+   */
   void user_log_front_sensor() {
     sensors.enable();
     motion.reset_drive_system();
@@ -670,7 +677,6 @@ public:
     delay(100);
   }
 
-  //***************************************************************************//
   /**
    * Edge detection test displays the position at which an edge is found when
    * the robot is travelling down a straight.
@@ -747,6 +753,19 @@ public:
     delay(100);
   }
 
+  /***
+   * A basic function to let you test the configuration of the SS90Ex turns.
+   *
+   * These are the turns used during the search of the maze and need to be
+   * accurate and repeatable.
+   *
+   * You may need to spend some time with this function to get the turns
+   * just right.
+   *
+   * NOTE: that the turn parameters are stored in the robot config file
+   * NOTE: that the left and right turns are likely to be different.
+   *
+   */
   void test_SS90E() {
     // note that changes to the speeds are likely to affect
     // the other turn parameters
@@ -755,7 +774,7 @@ public:
     sensors.set_steering_mode(STEERING_OFF);
     // move to the boundary with the next cell
     float distance = BACK_WALL_TO_CENTER + HALF_CELL;
-    forward.start(distance, DEFAULT_TURN_SPEED, DEFAULT_TURN_SPEED, SEARCH_ACCELERATION);
+    forward.start(distance, SEARCH_TURN_SPEED, SEARCH_TURN_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -772,7 +791,7 @@ public:
     int sensor_right = sensors.rss.value;
     // move two cells. The resting position of the mouse have the
     // same offset as the turn ending
-    forward.start(2 * FULL_CELL, DEFAULT_TURN_SPEED, 0, SEARCH_ACCELERATION);
+    forward.start(2 * FULL_CELL, SEARCH_TURN_SPEED, 0, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -781,6 +800,26 @@ public:
     print_justified(sensor_left, 5);
     print_justified(sensor_right, 5);
     motion.reset_drive_system();
+  }
+
+  /***
+   * loop until the user button is pressed while
+   * pumping out sensor readings. The first four numbers are
+   * the raw readings, the next four are normalised then there
+   * are two values for the sum and difference of the front sensors
+   *
+   * The advanced user might use this a s a start for auto calibration
+   */
+  void show_sensor_calibration() {
+    reporter.wall_sensor_header();
+    sensors.enable();
+    while (not switches.button_pressed()) {
+      reporter.show_wall_sensors();
+    }
+    switches.wait_for_button_release();
+    Serial.println();
+    delay(200);
+    sensors.disable();
   }
 };
 
