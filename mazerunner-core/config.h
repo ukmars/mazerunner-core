@@ -173,7 +173,7 @@ const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 /***
  * This piece of magic lets you define a variable, such as the maze, that can
  * survive a processor reset. The downside is that you MUST take care to
- * properly initialise it when necesary. If you just turn on the robot for
+ * properly initialise it when necessary. If you just turn on the robot for
  * example, the maze will have random data in it. 
  * 
  * CLEAR THE MAZE BEFORE EVERY CONTEST
