@@ -131,7 +131,7 @@ public:
   }
 
   void disable() {
-    adc.enable_emitters();
+    adc.disable_emitters();
     m_enabled = false;
   }
 
