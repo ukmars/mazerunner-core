@@ -231,7 +231,6 @@ public:
   }
 
 private:
-  AnalogueConverter() = default;
   uint8_t m_sensor_phase = 0;
   bool m_emitters_enabled = false;
   uint8_t m_emitter_a = 255;
