@@ -60,7 +60,7 @@ public:
   }
 
   void emitter_on(uint8_t pin) {
-    if (pin == 255) {
+    if (pin == 255 || not m_emitters_enabled) {
       return;
     }
     digitalWriteFast(pin, 1);
@@ -97,12 +97,8 @@ public:
 
   const uint8_t ADC_REF = DEFAULT;
 
-  void start_conversion(uint8_t pin) {
-    if (pin >= 14)
-      pin -= 14; // allow for channel or pin numbers
-                 // set the analog reference (high two bits of ADMUX) and select the
-                 // channel (low 4 bits).  Result is right-adjusted
-    ADMUX = (ADC_REF << 6) | (pin & 0x07);
+  void start_conversion(uint8_t channel) {
+    ADMUX = (ADC_REF << 6) | (channel & 0x0F);
     // start the conversion
     sbi(ADCSRA, ADSC);
   }
@@ -128,33 +124,41 @@ public:
    * and a conversion started. After each ADC conversion the interrupt gets
    * generated and this ISR is called. The eight channels are read in turn with
    * the sensor emitter(s) off.
-   * At the end of that sequence, the emiter(s) get turned on and a dummy ADC
+   *
+   * At the end of that sequence, the emitter(s) get turned on and a dummy ADC
    * conversion is started to provide a delay while the sensors respond.
    * After that, all channels are read again to get the lit values.
+   *
+   * The lit section handles the sensor channels in two groups so that several
+   * channels can be illuminated by one emitters while the others use a different
+   * emitter. This is a little clunky but essential to avoid crosstalk between the
+   * forward- and side-looking sensor types
+   *
    * After all the channels have been read twice, the ADC interrupt is disabbled
    * and the sensors are idle until triggered again.
    *
-   * The ADC service runs all th etime even with the sensors 'disabled'. In this
+   * The ADC service runs all the time even with the sensors 'disabled'. In this
    * software, 'enabled' only means that the emitters are turned on in the second
    * phase. Without that, you might expect the sensor readings to be zero.
    *
    * Timing tests indicate that the sensor ISR consumes no more that 5% of the
    * available system bandwidth.
    *
-   * There are actually 16 available channels and channel 8 is the internal
-   * temperature sensor. Channel 15 is Gnd. If appropriate, a read of channel
+   * There are actually 16 available channels on the ATMEGA328p and channel 8 is
+   * the internal temperature sensor. Channel 15 is Gnd. If appropriate, a read of channel
    * 15 can be used to zero the ADC sample and hold capacitor.
    *
    * NOTE: All the channels are read even though only 5 are used for the maze
    * robot. This gives worst-case timing so there are no surprises if more
    * sensors are added.
+   *
    * If different types of sensor are used or the I2C is needed, there
    * will need to be changes here.
    */
   void update_channel() {
     switch (m_sensor_phase) {
       case 0:
-        start_conversion(A0);
+        start_conversion(0);
         break;
       case 1:
         m_adc_reading[0] = get_adc_result();
@@ -162,65 +166,71 @@ public:
         break;
       case 2:
         m_adc_reading[1] = get_adc_result();
-        start_conversion(A2);
+        start_conversion(2);
         break;
       case 3:
         m_adc_reading[2] = get_adc_result();
-        start_conversion(A3);
+        start_conversion(3);
         break;
       case 4:
         m_adc_reading[3] = get_adc_result();
-        start_conversion(A4);
+        start_conversion(4);
         break;
       case 5:
         m_adc_reading[4] = get_adc_result();
-        start_conversion(A5);
+        start_conversion(5);
         break;
       case 6:
         m_adc_reading[5] = get_adc_result();
-        start_conversion(A6);
+        start_conversion(6);
         break;
       case 7:
         m_adc_reading[6] = get_adc_result();
-        start_conversion(A7);
+        start_conversion(7);
         break;
       case 8:
         m_adc_reading[7] = get_adc_result();
-        if (m_emitters_enabled) {
-          digitalWriteFast(m_emitter_a, 1);
-          digitalWriteFast(m_emitter_b, 1);
-        }
-        start_conversion(A7); // dummy adc conversion to create a delay
+        // Now all the 'dark' readings have been taken and it is time to
+        // get the 'lit' results. These are in two groups. Start with Group A.
+        // These are the side sensors for the advanced wall sensor. The basic wall
+        // sensor board has all channels in group A
+        emitter_on(m_emitter_a);
+        start_conversion(15); // dummy adc conversion to create a delay
         // wait at least one cycle for the detectors to respond
         break;
       case 9:
-        start_conversion(A0);
+        start_conversion(0);
         break;
       case 10:
         m_adc_reading[0] = get_adc_result() - m_adc_reading[0];
-        start_conversion(A1);
+        start_conversion(3);
         break;
       case 11:
-        m_adc_reading[1] = get_adc_result() - m_adc_reading[1];
-        start_conversion(A2);
-        break;
+        m_adc_reading[3] = get_adc_result() - m_adc_reading[3];
+        // Now group B. These are the front sensors for the advanced board
+        // Since the Basic board only one group, the same emittter will be lit
+        emitter_off(m_emitter_a);
+        emitter_on(m_emitter_b);
+        start_conversion(15); // dummy adc conversion to create a delay
+        // wait at least one cycle for the detectors to respond
       case 12:
-        m_adc_reading[2] = get_adc_result() - m_adc_reading[2];
-        start_conversion(A3);
+        start_conversion(1);
         break;
       case 13:
-        m_adc_reading[3] = get_adc_result() - m_adc_reading[3];
-        start_conversion(A4);
+        m_adc_reading[1] = get_adc_result() - m_adc_reading[1];
+        start_conversion(2);
         break;
       case 14:
+        m_adc_reading[2] = get_adc_result() - m_adc_reading[2];
+        start_conversion(4);
+        break;
+      case 15:
         m_adc_reading[4] = get_adc_result() - m_adc_reading[4];
         start_conversion(A5);
         break;
-      case 15:
+      case 16:
         m_adc_reading[5] = get_adc_result() - m_adc_reading[5];
-        if (m_emitters_enabled) {
-          emitter_off(m_emitter_a);
-          emitter_off(m_emitter_b);
+        emitter_off(m_emitter_b);
         _NOP();
         end_sensor_cycle();
         break;
