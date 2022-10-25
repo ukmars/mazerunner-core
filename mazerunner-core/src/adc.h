@@ -10,8 +10,6 @@
 class AnalogueConverter {
 
 public:
-  // explicit AnalogueConverter(uint8_t emitter_a) : m_emitter_a(emitter_a), m_emitter_b(emitter_a){};
-  // AnalogueConverter(uint8_t emitter_a, uint8_t emitter_b) : m_emitter_a(emitter_b), m_emitter_b(emitter_b){};
   AnalogueConverter() = default;
 
   void begin(const int emitter_a) {
