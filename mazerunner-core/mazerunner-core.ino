@@ -45,7 +45,7 @@
 
 // Global objects
 Systick systick;
-AnalogueConverter adc(EMITTER_A, EMITTER_B);
+AnalogueConverter adc;
 Switches switches(SWITCHES_CHANNEL);
 Encoders encoders;
 Sensors sensors;
@@ -60,7 +60,7 @@ Reporter reporter;
 
 void setup() {
   Serial.begin(BAUDRATE);
-  adc.init();
+  adc.begin(EMITTER_A, EMITTER_B);
   systick.begin();
   pinMode(USER_IO_6, OUTPUT);
   pinMode(EMITTER_A, OUTPUT);

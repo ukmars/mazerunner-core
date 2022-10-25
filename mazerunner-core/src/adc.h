@@ -10,15 +10,47 @@
 class AnalogueConverter {
 
 public:
-  explicit AnalogueConverter(uint8_t emitter_a) : m_emitter_a(emitter_a), m_emitter_b(emitter_a){};
-  AnalogueConverter(uint8_t emitter_a, uint8_t emitter_b) : m_emitter_a(emitter_b), m_emitter_b(emitter_b){};
-  void set_emitter_a(uint8_t pin) {
-    m_emitter_a = pin;
-  };
+  // explicit AnalogueConverter(uint8_t emitter_a) : m_emitter_a(emitter_a), m_emitter_b(emitter_a){};
+  // AnalogueConverter(uint8_t emitter_a, uint8_t emitter_b) : m_emitter_a(emitter_b), m_emitter_b(emitter_b){};
+  AnalogueConverter() = default;
 
-  void set_emitter_b(uint8_t pin) {
-    m_emitter_b = pin;
-  };
+  void begin(const int emitter_a) {
+    begin(emitter_a, emitter_a);
+  }
+
+  void begin(const int emitter_a, const int emitter_b) {
+    m_emitter_a = emitter_a;
+    m_emitter_b = emitter_b;
+    disable_emitters();
+    init();
+  }
+
+  /**
+   *  The default for the Arduino is to give a slow ADC clock for maximum
+   *  SNR in the results. That typically means a prescale value of 128
+   *  for the 16MHz ATMEGA328P running at 16MHz. Conversions then take more
+   *  than 100us to complete. In this application, we want to be able to
+   *  perform about 16 conversions in around 500us. To do that the prescaler
+   *  is reduced to a value of 32. This gives an ADC clock speed of
+   *  500kHz and a single conversion in around 26us. SNR is still pretty good
+   *  at these speeds:
+   *  http://www.openmusiclabs.com/learning/digital/atmega-m_adc_reading/
+   *
+   */
+
+  void init() {
+    // Change the clock prescaler from 128 to 32 for a 500kHz clock
+    bitSet(ADCSRA, ADPS2);
+    bitClear(ADCSRA, ADPS1);
+    bitSet(ADCSRA, ADPS0);
+  }
+  // void set_emitter_a(uint8_t pin) {
+  //   m_emitter_a = pin;
+  // };
+
+  // void set_emitter_b(uint8_t pin) {
+  //   m_emitter_b = pin;
+  // };
 
   void enable_emitters() {
     m_emitters_enabled = true;
@@ -44,26 +76,6 @@ public:
   volatile int operator[](int i) const { return m_adc_reading[i]; }
   volatile int &operator[](int i) { return m_adc_reading[i]; }
   //***************************************************************************//
-
-  /**
-   *  The default for the Arduino is to give a slow ADC clock for maximum
-   *  SNR in the results. That typically means a prescale value of 128
-   *  for the 16MHz ATMEGA328P running at 16MHz. Conversions then take more
-   *  than 100us to complete. In this application, we want to be able to
-   *  perform about 16 conversions in around 500us. To do that the prescaler
-   *  is reduced to a value of 32. This gives an ADC clock speed of
-   *  500kHz and a single conversion in around 26us. SNR is still pretty good
-   *  at these speeds:
-   *  http://www.openmusiclabs.com/learning/digital/atmega-m_adc_reading/
-   *
-   * @brief change the ADC prescaler to give a suitable conversion rate.
-   */
-  void init() {
-    // Change the clock prescaler from 128 to 32 for a 500kHz clock
-    bitSet(ADCSRA, ADPS2);
-    bitClear(ADCSRA, ADPS1);
-    bitSet(ADCSRA, ADPS0);
-  }
 
   void start_sensor_cycle() {
     m_sensor_phase = 0;   // sync up the start of the sensor sequence
