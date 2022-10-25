@@ -63,8 +63,6 @@ void setup() {
   adc.begin(EMITTER_A, EMITTER_B);
   systick.begin();
   pinMode(USER_IO_6, OUTPUT);
-  pinMode(EMITTER_A, OUTPUT);
-  pinMode(EMITTER_B, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   motors.setup();
   encoders.setup();

@@ -21,6 +21,8 @@ public:
   void begin(const int emitter_a, const int emitter_b) {
     m_emitter_a = emitter_a;
     m_emitter_b = emitter_b;
+    pinMode(emitter_a, OUTPUT);
+    pinMode(emitter_b, OUTPUT);
     disable_emitters();
     init();
   }
