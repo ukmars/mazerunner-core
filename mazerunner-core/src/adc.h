@@ -83,6 +83,10 @@ public:
     start_conversion(0);  // begin a conversion to get things started
   }
 
+  void end_sensor_cycle() {
+    bitClear(ADCSRA, ADIE); // enable the ADC interrupt
+  }
+
   /***
    * NOTE: Manual analogue conversions
    * All eight available ADC channels are automatically converted
@@ -217,9 +221,8 @@ public:
         if (m_emitters_enabled) {
           emitter_off(m_emitter_a);
           emitter_off(m_emitter_b);
-        }
         _NOP();
-        bitClear(ADCSRA, ADIE); // turn off the interrupt
+        end_sensor_cycle();
         break;
       default:
         break;
