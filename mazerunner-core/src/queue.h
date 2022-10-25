@@ -23,8 +23,7 @@
  *
  ************************************************************************/
 
-#ifndef QUEUE_H
-#define QUEUE_H
+#pragma once
 
 /**
  * The Queue class is used to speed up flooding of the maze
@@ -81,5 +80,3 @@ private:
   // while this is probably correct, prevent use of the copy constructor
   Queue(const Queue<item_t> &rhs) {}
 };
-
-#endif // QUEUE_H
