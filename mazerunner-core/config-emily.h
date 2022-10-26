@@ -1,6 +1,11 @@
 #ifndef EMILY_H
 #define EMILY_H
 
+/***
+ * It looks like this is where we decide the target and include appropriate drivers?
+ */
+#include "src/adc_atmega328.h"
+
 const uint32_t BAUDRATE = 115200;
 const int SENSOR_COUNT = 4;
 const float MAX_MOTOR_VOLTS = 6.0;
@@ -226,10 +231,10 @@ const int LED_RIGHT = USER_IO_6;
 // if you have  basic sensor board with a single emitter pin,
 // put the same pin number for both entries
 // BASIC
-// const int EMITTER_A = USER_IO_12;
-// const int EMITTER_B = USER_IO_12;
+// const int EMITTER_FRONT = USER_IO_12;
+// const int EMITTER_DIAGONAL = USER_IO_12;
 // ADVANCED
-const int EMITTER_A = USER_IO_11;
-const int EMITTER_B = USER_IO_12;
+const int EMITTER_FRONT = USER_IO_11;
+const int EMITTER_DIAGONAL = USER_IO_12;
 
 #endif

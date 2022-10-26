@@ -91,7 +91,7 @@ public:
     switches.update();
     motors.set_battery_compensation(sensors.get_battery_comp());
     motors.update_controllers(sensors.get_steering_feedback());
-    adc.start_sensor_cycle();
+    adc.start_conversion_cycle();
     // NOTE: no code should follow this line;
   }
 };

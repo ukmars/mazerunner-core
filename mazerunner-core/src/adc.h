@@ -3,130 +3,137 @@
 
 #include "../config.h"
 #include "digitalWriteFast.h"
+#include "list.h"
 #include <Arduino.h>
 #include <util/atomic.h>
 #include <wiring_private.h>
 
-class AnalogueConverter {
-
+/***
+ * This is an interface class for an actual adc subsystem. It is a pure
+ * virtual class and cannot be instantiated. Instead, you must create
+ * a derived class with appropriate code for the target hardware.
+ *
+ * Currently there are 8 available channels and 2 groups.
+ *
+ * The channels currently refer to the hardware ADC channel numbers,
+ * starting at zero.
+ * TODO: A future development should allow the use of any subset of
+ * hardware channels.
+ *
+ * It is expected that all the channels will be read at least once in a
+ * conversion cycle. These are the 'dark' readings.
+ *
+ * This is done on the assumption that not all adc channels are associated
+ * with active sensors. For example, on the basic UKMARSBOT, one of the
+ * channels is used for the battery voltage measurement and another is
+ * used for the analogue switches. Using this technique, the battery monitor
+ * and switches just need to grab a reading for the adc converter. If
+ * your platform has a different arrangement it should not be affected
+ * by this ADC code.
+ *
+ * After the first read each group will be read again with its associated
+ * emitter pin set high. The result for that channel will then be the
+ * difference between 'lit' reading and the previous 'dark' reading.
+ *
+ * Pin numbers are in the range 0..255 and are not necessarily mapped
+ * to specific hardware pins. That depends on the target hardware. For
+ * An arduino target, pins 0..13 have their usual meaning. Pins 14..23
+ * are the pins associated with the Arduino A0..A7 pins.
+ *
+ * A pin number of 255 is treated as a null value and will be ignored
+ * for all operations.
+ *
+ * Any, or all, of the channels can be added to one (or both) of the
+ * groups. At present the groups are hard-coded in sequence in the
+ * hardware implementation.
+ *
+ * Before the converter is used, you should assign emitter pin numbers to
+ * each group. If there is no pin number assigned, the channels in group
+ * will still be read a second time and so are likely to return a value of
+ * zero. TODO: this needs to be fixed
+ *
+ * Next, each group should have one or more channel numbers allocated to it.
+ * These are the channels that will get a second read with the associated
+ * emitter lit.
+ *
+ * Once the emitters and groups have been assigned, call the begin() method
+ * to configure the underlying hardware ADC and allow conversion cycle to begin.
+ *
+ * It is assumed that the conversion cycle happens under interrupt control and
+ * is triggered at the end of the systick function by calling the
+ * start_conversion_cycle() method.
+ *
+ * If you have a suitably fast ADC or some other hardware that gathers the
+ * sensor readings then the start_conversion_cycle() method should be used to
+ * perform the complete cycle in one call.
+ *
+ * NOTE: Manual analogue conversions:
+ * All ADC channels are automatically converted by the sensor interrupt.
+ * Attempting to performa a manual ADC conversion will disrupt that
+ * process so avoid doing that if you value your sanity.
+ *
+ * The use of virtual functions comes at some small cost. The VTABLE
+ * takes up at least another 8 bytes and there is an overhead in the
+ * function call. If this is a problem consider the use of CRTP techniques.
+ */
+class IAnalogueConverter {
 public:
-  AnalogueConverter() = default;
+  enum {
+    MAX_GROUPS = 2,
+    MAX_CHANNELS = 8,
+  };
 
-  void begin(const int emitter_a) {
-    begin(emitter_a, emitter_a);
+  IAnalogueConverter() {
+    for (int i = 0; i < MAX_GROUPS; i++) {
+      m_emitter_pin[i] = 255; // pin 255 is a null, or invalid pin
+    }
   }
 
-  void begin(const int emitter_a, const int emitter_b) {
-    m_emitter_a = emitter_a;
-    m_emitter_b = emitter_b;
-    pinMode(emitter_a, OUTPUT);
-    pinMode(emitter_b, OUTPUT);
-    disable_emitters();
-    init();
-  }
+  void set_emitter_for_group(uint8_t pin, uint8_t group) {
+    if (group >= MAX_GROUPS) {
+      return;
+    }
+    m_emitter_pin[group] = pin;
+  };
 
-  /**
-   *  The default for the Arduino is to give a slow ADC clock for maximum
-   *  SNR in the results. That typically means a prescale value of 128
-   *  for the 16MHz ATMEGA328P running at 16MHz. Conversions then take more
-   *  than 100us to complete. In this application, we want to be able to
-   *  perform about 16 conversions in around 500us. To do that the prescaler
-   *  is reduced to a value of 32. This gives an ADC clock speed of
-   *  500kHz and a single conversion in around 26us. SNR is still pretty good
-   *  at these speeds:
-   *  http://www.openmusiclabs.com/learning/digital/atmega-m_adc_reading/
-   *
-   */
-
-  void init() {
-    // Change the clock prescaler from 128 to 32 for a 500kHz clock
-    bitSet(ADCSRA, ADPS2);
-    bitClear(ADCSRA, ADPS1);
-    bitSet(ADCSRA, ADPS0);
-  }
-  // void set_emitter_a(uint8_t pin) {
-  //   m_emitter_a = pin;
-  // };
-
-  // void set_emitter_b(uint8_t pin) {
-  //   m_emitter_b = pin;
-  // };
+  void add_channel_to_group(uint8_t channel, uint8_t group) {
+    if (channel >= MAX_CHANNELS) {
+      return;
+    }
+    if (group >= MAX_GROUPS) {
+      return;
+    }
+    m_group[group].add(channel);
+  };
 
   void enable_emitters() {
     m_emitters_enabled = true;
   }
+
   void disable_emitters() {
     m_emitters_enabled = false;
   }
 
-  void emitter_on(uint8_t pin) {
-    if (pin == 255 || not m_emitters_enabled) {
-      return;
-    }
-    digitalWriteFast(pin, 1);
-  }
-
-  void emitter_off(uint8_t pin) {
-    if (pin == 255) {
-      return;
-    }
-    digitalWriteFast(pin, 0);
-  }
-
+  // for convenience allow access in an array-like manner
   volatile int operator[](int i) const { return m_adc_reading[i]; }
+
   volatile int &operator[](int i) { return m_adc_reading[i]; }
-  //***************************************************************************//
 
-  void start_sensor_cycle() {
-    m_sensor_phase = 0;   // sync up the start of the sensor sequence
-    bitSet(ADCSRA, ADIE); // enable the ADC interrupt
-    start_conversion(0);  // begin a conversion to get things started
-  }
+  virtual void begin() = 0;
 
-  void end_sensor_cycle() {
-    bitClear(ADCSRA, ADIE); // enable the ADC interrupt
-  }
+  virtual void start_conversion_cycle() = 0;
 
-  /***
-   * NOTE: Manual analogue conversions
-   * All eight available ADC channels are automatically converted
-   * by the sensor interrupt. Attempting to performa a manual ADC
-   * conversion with the Arduino AnalogueIn() function will disrupt
-   * that process so avoid doing that.
-   */
+protected:
+  volatile int m_adc_reading[MAX_CHANNELS];
 
-  const uint8_t ADC_REF = DEFAULT;
+  uint8_t m_emitter_pin[MAX_GROUPS];
 
-  void start_conversion(uint8_t channel) {
-    ADMUX = (ADC_REF << 6) | (channel & 0x0F);
-    // start the conversion
-    sbi(ADCSRA, ADSC);
-  }
+  List<uint8_t, MAX_CHANNELS> m_group[MAX_GROUPS];
 
-  int get_adc_result() {
-    // ADSC is cleared when the conversion finishes
-    // while (bit_is_set(ADCSRA, ADSC));
+  uint8_t m_channel_index;
+  uint8_t m_group_index;
 
-    // we have to read ADCL first; doing so locks both ADCL
-    // and ADCH until ADCH is read.  reading ADCL second would
-    // cause the results of each conversion to be discarded,
-    // as ADCL and ADCH would be locked when it completed.
-    uint8_t low = ADCL;
-    uint8_t high = ADCH;
-
-    // combine the two bytes
-    return (high << 8) | low;
-  }
-
-  friend void adc_isr(AnalogueConverter a);
-
-private:
-  uint8_t m_sensor_phase = 0;
   bool m_emitters_enabled = false;
-  uint8_t m_emitter_a = 255;
-  uint8_t m_emitter_b = 255;
-  volatile int m_adc_reading[8];
 };
 
-extern AnalogueConverter adc;
 #endif
