@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Project: mazerunner-core                                                   * 
+ * File:    adc.h                                                             * 
+ * File Created: Wednesday, 26th October 2022 10:51:51 pm                     * 
+ * Author: Peter Harrison                                                     * 
+ * -----                                                                      * 
+ * Last Modified: Wednesday, 26th October 2022 11:54:12 pm                    * 
+ * -----                                                                      * 
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
+ * -----                                                                      * 
+ * Licence:                                                                   * 
+ *     Use of this source code is governed by an MIT-style                    * 
+ *     license that can be found in the LICENSE file or at                    * 
+ *     https://opensource.org/licenses/MIT.                                   * 
+ ******************************************************************************/
+
 #ifndef ADC_H
 #define ADC_H
 

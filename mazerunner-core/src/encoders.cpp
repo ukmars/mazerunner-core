@@ -1,3 +1,20 @@
+/******************************************************************************
+ * Project: mazerunner-core                                                   * 
+ * File:    encoders.cpp                                                      * 
+ * File Created: Tuesday, 25th October 2022 10:58:35 am                       * 
+ * Author: Peter Harrison                                                     * 
+ * -----                                                                      * 
+ * Last Modified: Wednesday, 26th October 2022 11:54:00 pm                    * 
+ * -----                                                                      * 
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
+ * -----                                                                      * 
+ * Licence:                                                                   * 
+ *     Use of this source code is governed by an MIT-style                    * 
+ *     license that can be found in the LICENSE file or at                    * 
+ *     https://opensource.org/licenses/MIT.                                   * 
+ ******************************************************************************/
+
+
 #include "encoders.h"
 
 /**

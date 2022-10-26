@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Project: mazerunner-core                                                   * 
+ * File:    adc_atmega328.cpp                                                 * 
+ * File Created: Wednesday, 26th October 2022 12:11:36 am                     * 
+ * Author: Peter Harrison                                                     * 
+ * -----                                                                      * 
+ * Last Modified: Wednesday, 26th October 2022 11:54:32 pm                    * 
+ * -----                                                                      * 
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
+ * -----                                                                      * 
+ * Licence:                                                                   * 
+ *     Use of this source code is governed by an MIT-style                    * 
+ *     license that can be found in the LICENSE file or at                    * 
+ *     https://opensource.org/licenses/MIT.                                   * 
+ ******************************************************************************/
+
 #include "adc_atmega328.h"
 
 /** @brief Sample all the sensor channels with and without the emitter on

@@ -1,3 +1,20 @@
+/******************************************************************************
+ * Project: mazerunner-core                                                   * 
+ * File:    config-frank.h                                                    * 
+ * File Created: Wednesday, 26th October 2022 10:15:50 pm                     * 
+ * Author: Peter Harrison                                                     * 
+ * -----                                                                      * 
+ * Last Modified: Wednesday, 26th October 2022 11:50:59 pm                    * 
+ * -----                                                                      * 
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
+ * -----                                                                      * 
+ * Licence:                                                                   * 
+ *     Use of this source code is governed by an MIT-style                    * 
+ *     license that can be found in the LICENSE file or at                    * 
+ *     https://opensource.org/licenses/MIT.                                   * 
+ ******************************************************************************/
+
+
 #ifndef FRANK_H
 #define FRANK_H
 
