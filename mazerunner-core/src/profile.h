@@ -4,7 +4,7 @@
  * File Created: Friday, 9th September 2022 2:00:47 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:52:58 pm                    *
+ * Last Modified: Thursday, 27th October 2022 11:08:10 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -19,7 +19,7 @@
 
 #include "../config.h"
 #include <Arduino.h>
-#include <util/atomic.h>
+#include <src/atomic.h>
 //***************************************************************************//
 class Profile;
 

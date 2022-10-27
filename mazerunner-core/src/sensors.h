@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 12:11:36 am                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:52:39 pm                    *
+ * Last Modified: Thursday, 27th October 2022 11:08:21 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -21,7 +21,7 @@
 #include "adc.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
-#include <util/atomic.h>
+#include <src/atomic.h>
 #include <wiring_private.h>
 
 enum {
