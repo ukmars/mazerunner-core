@@ -1,19 +1,18 @@
 /******************************************************************************
- * Project: mazerunner-core                                                   * 
- * File:    encoders.h                                                        * 
- * File Created: Tuesday, 25th October 2022 9:53:01 am                        * 
- * Author: Peter Harrison                                                     * 
- * -----                                                                      * 
- * Last Modified: Wednesday, 26th October 2022 11:53:48 pm                    * 
- * -----                                                                      * 
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
- * -----                                                                      * 
- * Licence:                                                                   * 
- *     Use of this source code is governed by an MIT-style                    * 
- *     license that can be found in the LICENSE file or at                    * 
- *     https://opensource.org/licenses/MIT.                                   * 
+ * Project: mazerunner-core                                                   *
+ * File:    encoders.h                                                        *
+ * File Created: Tuesday, 25th October 2022 9:53:01 am                        *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Wednesday, 26th October 2022 11:53:48 pm                    *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
-
 
 #ifndef ENCODERS_H
 #define ENCODERS_H

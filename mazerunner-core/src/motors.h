@@ -1,19 +1,18 @@
 /******************************************************************************
- * Project: mazerunner-core                                                   * 
- * File:    motors.h                                                          * 
- * File Created: Saturday, 10th September 2022 4:55:17 pm                     * 
- * Author: Peter Harrison                                                     * 
- * -----                                                                      * 
- * Last Modified: Wednesday, 26th October 2022 11:53:16 pm                    * 
- * -----                                                                      * 
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
- * -----                                                                      * 
- * Licence:                                                                   * 
- *     Use of this source code is governed by an MIT-style                    * 
- *     license that can be found in the LICENSE file or at                    * 
- *     https://opensource.org/licenses/MIT.                                   * 
+ * Project: mazerunner-core                                                   *
+ * File:    motors.h                                                          *
+ * File Created: Saturday, 10th September 2022 4:55:17 pm                     *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Wednesday, 26th October 2022 11:53:16 pm                    *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
-
 
 #ifndef MOTORS_H
 #define MOTORS_H

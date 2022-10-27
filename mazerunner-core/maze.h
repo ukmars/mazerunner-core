@@ -1,17 +1,17 @@
 /******************************************************************************
- * Project: mazerunner-core                                                   * 
- * File:    maze.h                                                            * 
- * File Created: Wednesday, 12th October 2022 9:47:23 pm                      * 
- * Author: Peter Harrison                                                     * 
- * -----                                                                      * 
- * Last Modified: Wednesday, 26th October 2022 11:50:38 pm                    * 
- * -----                                                                      * 
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
- * -----                                                                      * 
- * Licence:                                                                   * 
- *     Use of this source code is governed by an MIT-style                    * 
- *     license that can be found in the LICENSE file or at                    * 
- *     https://opensource.org/licenses/MIT.                                   * 
+ * Project: mazerunner-core                                                   *
+ * File:    maze.h                                                            *
+ * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Wednesday, 26th October 2022 11:50:38 pm                    *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
 
 #ifndef MAZE_H

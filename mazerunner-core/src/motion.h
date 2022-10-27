@@ -1,19 +1,18 @@
 /******************************************************************************
- * Project: mazerunner-core                                                   * 
- * File:    motion.h                                                          * 
- * File Created: Saturday, 10th September 2022 11:18:32 am                    * 
- * Author: Peter Harrison                                                     * 
- * -----                                                                      * 
- * Last Modified: Wednesday, 26th October 2022 11:53:29 pm                    * 
- * -----                                                                      * 
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
- * -----                                                                      * 
- * Licence:                                                                   * 
- *     Use of this source code is governed by an MIT-style                    * 
- *     license that can be found in the LICENSE file or at                    * 
- *     https://opensource.org/licenses/MIT.                                   * 
+ * Project: mazerunner-core                                                   *
+ * File:    motion.h                                                          *
+ * File Created: Saturday, 10th September 2022 11:18:32 am                    *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Thursday, 27th October 2022 11:20:05 am                     *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
-
 
 #ifndef MOTION_H
 #define MOTION_H

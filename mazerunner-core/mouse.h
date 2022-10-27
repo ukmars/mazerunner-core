@@ -1,17 +1,17 @@
 /******************************************************************************
- * Project: mazerunner-core                                                   * 
- * File:    mouse.h                                                           * 
- * File Created: Saturday, 10th September 2022 11:24:12 pm                    * 
- * Author: Peter Harrison                                                     * 
- * -----                                                                      * 
- * Last Modified: Wednesday, 26th October 2022 11:50:14 pm                    * 
- * -----                                                                      * 
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
- * -----                                                                      * 
- * Licence:                                                                   * 
- *     Use of this source code is governed by an MIT-style                    * 
- *     license that can be found in the LICENSE file or at                    * 
- *     https://opensource.org/licenses/MIT.                                   * 
+ * Project: mazerunner-core                                                   *
+ * File:    mouse.h                                                           *
+ * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Wednesday, 26th October 2022 11:50:14 pm                    *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
 
 #ifndef MOUSE_H

@@ -1,19 +1,18 @@
 /******************************************************************************
- * Project: mazerunner-core                                                   * 
- * File:    profile.h                                                         * 
- * File Created: Friday, 9th September 2022 2:00:47 pm                        * 
- * Author: Peter Harrison                                                     * 
- * -----                                                                      * 
- * Last Modified: Wednesday, 26th October 2022 11:52:58 pm                    * 
- * -----                                                                      * 
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
- * -----                                                                      * 
- * Licence:                                                                   * 
- *     Use of this source code is governed by an MIT-style                    * 
- *     license that can be found in the LICENSE file or at                    * 
- *     https://opensource.org/licenses/MIT.                                   * 
+ * Project: mazerunner-core                                                   *
+ * File:    profile.h                                                         *
+ * File Created: Friday, 9th September 2022 2:00:47 pm                        *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Wednesday, 26th October 2022 11:52:58 pm                    *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
-
 
 #ifndef PROFILE_H
 #define PROFILE_H
