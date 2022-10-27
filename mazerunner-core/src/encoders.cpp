@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 10:58:35 am                       * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Wednesday, 26th October 2022 11:54:00 pm                    * 
+ * Last Modified: Thursday, 27th October 2022 10:43:06 pm                     * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -22,6 +22,7 @@
  * the encoder interrupts is less than 3% of the available bandwidth.
  */
 
+#if defined(ARDUINO_ARCH_AVR)
 // INT0 will respond to the XOR-ed pulse train from the left encoder
 // runs in constant time of around 3us per interrupt.
 // would be faster with direct port access
@@ -35,3 +36,5 @@ ISR(INT0_vect) {
 ISR(INT1_vect) {
   encoders.right_input_change();
 }
+
+#endif

@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 4:55:17 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:53:16 pm                    *
+ * Last Modified: Thursday, 27th October 2022 10:32:51 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -198,6 +198,7 @@ public:
   }
 
   void set_pwm_frequency(int frequency = PWM_31250_HZ) {
+#if defined(ARDUINO_ARCH_AVR)
     switch (frequency) {
       case PWM_31250_HZ:
         // Divide by 1. frequency = 31.25 kHz;
@@ -216,6 +217,7 @@ public:
         bitSet(TCCR1B, CS10);
         break;
     }
+#endif
   }
 
 private:

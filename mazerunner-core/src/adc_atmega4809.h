@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 6:36:03 pm                      * 
+ * Last Modified: Thursday, 27th October 2022 10:29:36 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -21,7 +21,6 @@
 #include <Arduino.h>
 #include <wiring_private.h>
 
-#ifdef ARDUINO_ARCH_MEGAAVR
 class adc_atmega4809 : public IAnalogueConverter {
 
 public:
@@ -79,7 +78,7 @@ public:
     if (not m_configured) {
       return;
     }
-    m_phase = 0;          // sync up the start of the sensor sequence
+    m_phase = 0; // sync up the start of the sensor sequence
     // bitSet(ADCSRA, ADIE); // enable the ADC interrupt
     start_conversion(15); // begin a dummy conversion to get things started
   }
@@ -116,4 +115,3 @@ private:
 };
 
 extern adc_atmega4809 adc;
-#endif

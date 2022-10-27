@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 12:11:36 am                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:52:10 pm                    *
+ * Last Modified: Thursday, 27th October 2022 10:35:16 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -27,6 +27,7 @@ public:
   // don't let this start firing up before we are ready.
   // call the begin method explicitly.
   void begin() {
+#if defined(ARDUINO_ARCH_AVR)
     bitClear(TCCR2A, WGM20);
     bitSet(TCCR2A, WGM21);
     bitClear(TCCR2B, WGM22);
@@ -36,6 +37,7 @@ public:
     bitSet(TCCR2B, CS20);
     OCR2A = 249; // (16000000/128/500)-1 => 500Hz
     bitSet(TIMSK2, OCIE2A);
+#endif
     delay(10); // make sure it runs for a few cycles before we continue
   }
   /***

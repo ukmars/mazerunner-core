@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 9:53:01 am                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:53:48 pm                    *
+ * Last Modified: Thursday, 27th October 2022 10:32:51 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -71,6 +71,7 @@ extern Encoders encoders;
 class Encoders {
 public:
   void setup() {
+#if defined(ARDUINO_ARCH_AVR)
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       // left
       pinMode(ENCODER_LEFT_CLK, INPUT);
@@ -88,6 +89,7 @@ public:
       bitSet(EICRA, ISC10);
       bitSet(EIMSK, INT1);
     }
+#endif
     reset();
   }
 
