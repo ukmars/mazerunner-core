@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 11:11:03 am                     *
+ * Last Modified: Thursday, 27th October 2022 1:25:37 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -17,12 +17,9 @@
 #ifndef ADC_H
 #define ADC_H
 
-#include "../config.h"
 #include "digitalWriteFast.h"
 #include "list.h"
 #include <Arduino.h>
-#include <util/atomic.h>
-#include <wiring_private.h>
 
 /***
  * This is an interface class for an actual adc subsystem. It is a pure
