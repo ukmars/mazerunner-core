@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:56:33 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 2:07:12 pm                      *
+ * Last Modified: Thursday, 27th October 2022 4:34:04 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -37,6 +37,13 @@
 #endif
 #ifdef ARDUINO_ARCH_AVR
 #warning this is an Arduino Nano or similar with the ATMega328P processor?
+#if defined(__AVR_ATmega328P__)
+#warning ATMEGA328P
+#endif
+#if defined(__AVR_ATmega328__)
+#warning ATMEGA328
+#endif
+
 #endif
 
 // Global objects
