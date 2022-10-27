@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:56:33 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 12:19:30 am                     *
+ * Last Modified: Thursday, 27th October 2022 2:07:12 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -28,6 +28,16 @@
 #include "src/switches.h"
 #include "src/systick.h"
 #include <Arduino.h>
+
+#ifdef ARDUINO_ARCH_MEGAAVR
+#warning this is an Arduino Nano Every ATMEGA4809?
+#endif
+#ifdef ARDUINO_ARCH_NRF52840
+#warning this is an Arduino Nano 33 something with the NRF52840 processor?
+#endif
+#ifdef ARDUINO_ARCH_AVR
+#warning this is an Arduino Nano or similar with the ATMega328P processor?
+#endif
 
 // Global objects
 Systick systick;
