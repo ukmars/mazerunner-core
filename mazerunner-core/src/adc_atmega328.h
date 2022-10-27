@@ -1,19 +1,18 @@
 /******************************************************************************
- * Project: mazerunner-core                                                   * 
- * File:    adc_atmega328.h                                                   * 
- * File Created: Wednesday, 26th October 2022 10:51:51 pm                     * 
- * Author: Peter Harrison                                                     * 
- * -----                                                                      * 
- * Last Modified: Wednesday, 26th October 2022 11:54:19 pm                    * 
- * -----                                                                      * 
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
- * -----                                                                      * 
- * Licence:                                                                   * 
- *     Use of this source code is governed by an MIT-style                    * 
- *     license that can be found in the LICENSE file or at                    * 
- *     https://opensource.org/licenses/MIT.                                   * 
+ * Project: mazerunner-core                                                   *
+ * File:    adc_atmega328.h                                                   *
+ * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Thursday, 27th October 2022 11:06:32 am                     *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
-
 
 #pragma once
 
@@ -84,7 +83,7 @@ public:
     start_conversion(15); // begin a dummy conversion to get things started
   }
 
-  void end_sensor_cycle() {
+  void end_conversion_cycle() {
     bitClear(ADCSRA, ADIE); // disable the ADC interrupt
   }
 
@@ -112,11 +111,7 @@ public:
     return ADC;
   }
 
-  friend void adc_isr(adc_atmega328 &a);
-
 private:
-  bool m_configured = false;
-  uint8_t m_phase = 0; // used in the isr
 };
 
 extern adc_atmega328 adc;

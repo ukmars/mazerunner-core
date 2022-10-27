@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:56:33 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 12:19:30 am                     * 
+ * Last Modified: Thursday, 27th October 2022 12:19:30 am                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -31,7 +31,7 @@
 
 // Global objects
 Systick systick;
-adc_atmega328 adc; //TODO: this needs to get defineed in a hardware file not here
+adc_atmega328 adc; // TODO: this needs to get defineed in a hardware file not here
 
 Switches switches(SWITCHES_CHANNEL);
 Encoders encoders;

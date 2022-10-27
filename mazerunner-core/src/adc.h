@@ -1,17 +1,17 @@
 /******************************************************************************
- * Project: mazerunner-core                                                   * 
- * File:    adc.h                                                             * 
- * File Created: Wednesday, 26th October 2022 10:51:51 pm                     * 
- * Author: Peter Harrison                                                     * 
- * -----                                                                      * 
- * Last Modified: Wednesday, 26th October 2022 11:54:12 pm                    * 
- * -----                                                                      * 
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
- * -----                                                                      * 
- * Licence:                                                                   * 
- *     Use of this source code is governed by an MIT-style                    * 
- *     license that can be found in the LICENSE file or at                    * 
- *     https://opensource.org/licenses/MIT.                                   * 
+ * Project: mazerunner-core                                                   *
+ * File:    adc.h                                                             *
+ * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Thursday, 27th October 2022 11:11:03 am                     * 
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
 
 #ifndef ADC_H
@@ -135,9 +135,17 @@ public:
 
   volatile int &operator[](int i) { return m_adc_reading[i]; }
 
+  // all of these MUST be defined in the derived hardware class
   virtual void begin() = 0;
-
   virtual void start_conversion_cycle() = 0;
+  virtual void end_conversion_cycle() = 0;
+  virtual void start_conversion(uint8_t channel) = 0;
+  virtual int get_adc_result() = 0;
+  virtual void emitter_on(uint8_t pin) = 0;
+  virtual void emitter_off(uint8_t pin) = 0;
+
+  // an external function called from the hardware end of conversion ISR
+  friend void adc_isr(IAnalogueConverter &a);
 
 protected:
   volatile int m_adc_reading[MAX_CHANNELS];
@@ -150,6 +158,8 @@ protected:
   uint8_t m_group_index;
 
   bool m_emitters_enabled = false;
+  bool m_configured = false;
+  uint8_t m_phase = 0; // used in the isr
 };
 
 #endif

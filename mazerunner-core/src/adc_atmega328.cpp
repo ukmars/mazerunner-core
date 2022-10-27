@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 12:11:36 am                     * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Wednesday, 26th October 2022 11:54:32 pm                    * 
+ * Last Modified: Thursday, 27th October 2022 11:06:47 am                     * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -53,9 +53,12 @@
  * If different types of sensor are used or the I2C is needed, there
  * will need to be changes here.
  */
-;
 
-void adc_isr(adc_atmega328 &adc) {
+#ifndef ARDUINO_ARCH_AVR
+#warning this is not an AVR
+#endif
+
+void adc_isr(IAnalogueConverter &adc) {
 
   switch (adc.m_phase) {
     case 0: { // initialisation
@@ -64,7 +67,7 @@ void adc_isr(adc_atmega328 &adc) {
       adc.m_phase = 1;
       adc.start_conversion(15);
     } break;
-    case 1: { // group 0 all channels
+    case 1: { // all channels get read 'dark' first
       adc.m_adc_reading[adc.m_channel_index] = adc.get_adc_result();
       adc.m_channel_index += 1;
       if (adc.m_channel_index >= adc.MAX_CHANNELS) {
@@ -74,7 +77,7 @@ void adc_isr(adc_atmega328 &adc) {
           adc.emitter_on(adc.m_emitter_pin[0]);
           adc.start_conversion(15); // dummy conversion to get to the next isr
         } else {
-          adc.end_sensor_cycle(); // finish the cycle
+          adc.end_conversion_cycle(); // finish the cycle
         }
         break;
       }
@@ -113,7 +116,7 @@ void adc_isr(adc_atmega328 &adc) {
       if (adc.m_channel_index >= adc.m_group[0].size()) {
         adc.m_channel_index = 0;
         adc.emitter_off(adc.m_emitter_pin[1]);
-        adc.end_sensor_cycle();
+        adc.end_conversion_cycle();
         break;
       }
       channel = adc.m_group[0][adc.m_channel_index];
