@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 10:23:01 pm                     *
+ * Last Modified: Friday, 28th October 2022 9:18:25 am                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -17,7 +17,6 @@
 #pragma once
 
 #include "adc.h"
-#include "adc_atmega328.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <wiring_private.h>
