@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 12:11:36 am                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 10:35:16 pm                     *
+ * Last Modified: Saturday, 29th October 2022 12:44:44 pm                     * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -37,6 +37,19 @@ public:
     bitSet(TCCR2B, CS20);
     OCR2A = 249; // (16000000/128/500)-1 => 500Hz
     bitSet(TIMSK2, OCIE2A);
+#elif defined(ARDUINO_ARCH_MEGAAVR)
+    TCB_t *_timer = &TCB2;
+    /* Default Periodic Interrupt Mode */
+    _timer->CCMP = 255;
+
+    /* Enable timer interrupt */
+    _timer->INTCTRL |= TCB_CAPT_bm;
+
+    /* Clock selection -> same as TCA (F_CPU/64 -- 250kHz) */
+    _timer->CTRLA = TCB_CLKSEL_CLKTCA_gc;
+
+    /* Enable & start */
+    _timer->CTRLA |= TCB_ENABLE_bm; /* Keep this last before enabling interrupts to ensure tracking as accurate as possible */
 #endif
     delay(10); // make sure it runs for a few cycles before we continue
   }
@@ -58,7 +71,7 @@ public:
    * With just a single profile active and moving, that increases to nearly 30%.
    * Two such active profiles increases it to about 35-40%.
    *
-   * The reason that two prifiles does not take up twice as much time is that
+   * The reason that two profiles does not take up twice as much time is that
    * an active profile has a processing overhead even if there is no motion.
    *
    * Most of the load is due to that overhead. While the profile generates actual
@@ -67,6 +80,7 @@ public:
    *
    */
   void update() {
+    digitalWriteFast(LED_BUILTIN, 1);
     // NOTE - the code here seems to get inlined and so the function is 2800 bytes!
     // TODO: make sure all variables are interrupt-safe if they are used outside IRQs
     // grab the encoder values first because they will continue to change
@@ -79,6 +93,7 @@ public:
     motors.update_controllers(sensors.get_steering_feedback());
     adc.start_conversion_cycle();
     // NOTE: no code should follow this line;
+    digitalWriteFast(LED_BUILTIN, 0);
   }
 };
 
