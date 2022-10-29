@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 4:55:17 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 2:04:31 pm                      *
+ * Last Modified: Saturday, 29th October 2022 2:35:00 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -228,22 +228,9 @@ public:
     }
 #elif defined(ARDUINO_ARCH_MEGAAVR)
     // TCA0 is used for analogWrite on pins 9 and 10
-    // TCA0 seems to have an input clock of 65536
-    switch (frequency) {
-      case PWM_31250_HZ:
-        // Divide by 2. frequency = 31.25 kHz;
-        TCA0.SINGLE.CTRLA = (TCA_SINGLE_CLKSEL_DIV2_gc) | (TCA_SINGLE_ENABLE_bm);
-        break;
-      case PWM_3906_HZ:
-        // Divide by 16. frequency = 3.906 kHz;
-        TCA0.SINGLE.CTRLA = (TCA_SINGLE_CLKSEL_DIV16_gc) | (TCA_SINGLE_ENABLE_bm);
-        break;
-      case PWM_977_HZ: // the default from Arduino
-      default:
-        // Divide by 64 . frequency = 488Hz;
-        TCA0.SINGLE.CTRLA = (TCA_SINGLE_CLKSEL_DIV64_gc) | (TCA_SINGLE_ENABLE_bm);
-        break;
-    }
+    // The clock for TCA0 is also used as the clock for TCBx
+    // so changing that screws up millis() and anythin else timed of TCBx
+    // so just ignore a frequency change request and leave it at 977Hz
 #endif
   }
 
