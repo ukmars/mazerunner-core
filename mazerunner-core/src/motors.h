@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 4:55:17 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 10:32:51 pm                     *
+ * Last Modified: Friday, 28th October 2022 11:45:50 pm                       *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -217,6 +217,10 @@ public:
         bitSet(TCCR1B, CS10);
         break;
     }
+#elif defined(ARDUINO_ARCH_MEGAAVR)
+    TCA_t *m_timer = &TCA0;
+// possibly set up TCA0 frame rate
+// then use analogWrite to actually set the PWM?
 #endif
   }
 
