@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 12:11:36 am                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 12:44:44 pm                     * 
+ * Last Modified: Saturday, 29th October 2022 3:07:10 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -38,18 +38,24 @@ public:
     OCR2A = 249; // (16000000/128/500)-1 => 500Hz
     bitSet(TIMSK2, OCIE2A);
 #elif defined(ARDUINO_ARCH_MEGAAVR)
-    TCB_t *_timer = &TCB2;
-    /* Default Periodic Interrupt Mode */
-    _timer->CCMP = 255;
+    /* stop the timer */
+    TCB2.CTRLA &= ~TCB_ENABLE_bm;
 
-    /* Enable timer interrupt */
-    _timer->INTCTRL |= TCB_CAPT_bm;
+    /* Clock selection is same as TCA (F_CPU/64 -- 250kHz) */
+    TCB2.CTRLA = TCB_CLKSEL_CLKTCA_gc;
 
-    /* Clock selection -> same as TCA (F_CPU/64 -- 250kHz) */
-    _timer->CTRLA = TCB_CLKSEL_CLKTCA_gc;
+    // set periodic interrupt Mode
+    TCB2.CTRLB = (TCB_CNTMODE_INT_gc);
+
+    // timer is clocked at 250000Hz = 4us per tick
+    // we want 2000us => 5000 ticks
+    TCB2.CCMP = 2000 / (1000000 / 250000) - 1;
 
     /* Enable & start */
-    _timer->CTRLA |= TCB_ENABLE_bm; /* Keep this last before enabling interrupts to ensure tracking as accurate as possible */
+    TCB2.CTRLA |= TCB_ENABLE_bm;
+
+    /* Enable timer interrupt */
+    TCB2.INTCTRL |= TCB_CAPT_bm;
 #endif
     delay(10); // make sure it runs for a few cycles before we continue
   }

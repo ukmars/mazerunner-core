@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 10:59:56 am                       * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Saturday, 29th October 2022 10:01:39 am                     * 
+ * Last Modified: Saturday, 29th October 2022 3:07:15 pm                      * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -26,5 +26,6 @@ uint8_t state = 0;
 ISR(TCB2_INT_vect, ISR_NOBLOCK){
   state = 1- state;
   digitalWriteFast(LED_BUILTIN,1);
+  // systick.update();
 }
 #endif
