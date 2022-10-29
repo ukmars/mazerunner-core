@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 8:18:43 pm                      *
+ * Last Modified: Saturday, 29th October 2022 11:37:50 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -94,7 +94,9 @@ public:
   }
 
   void start_conversion(uint8_t channel) {
-
+    // the 4809 maps internal channels differently
+    // 3,2,1,0,12,13,4,5
+    channel = digitalPinToAnalogInput(channel);
     // select the channel - fix to channels 0-7
     ADC0.MUXPOS = channel & 0x0F; //
     // start the conversion

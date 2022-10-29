@@ -4,7 +4,7 @@
  * File Created: Thursday, 27th October 2022 12:12:56 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 8:27:29 pm                      * 
+ * Last Modified: Saturday, 29th October 2022 11:25:56 pm                     * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -66,7 +66,7 @@ void adc_isr(IAnalogueConverter &adc) {
       adc.m_group_index = 0;
       adc.m_channel_index = 0;
       adc.m_phase = 1;
-      adc.start_conversion(15);
+      adc.start_conversion(0);
     } break;
     case 1: { // all channels get read 'dark' first
       adc.m_adc_reading[adc.m_channel_index] = adc.get_adc_result();
