@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 9:53:01 am                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 11:03:42 pm                     *
+ * Last Modified: Saturday, 29th October 2022 8:50:13 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -60,9 +60,9 @@
 
 */
 #include "../config.h"
+#include "atomic.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
-#include <src/atomic.h>
 #include <stdint.h>
 
 class Encoders;

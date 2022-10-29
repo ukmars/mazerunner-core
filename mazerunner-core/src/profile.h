@@ -4,7 +4,7 @@
  * File Created: Friday, 9th September 2022 2:00:47 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 11:08:10 pm                     *
+ * Last Modified: Saturday, 29th October 2022 8:50:34 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -18,8 +18,8 @@
 #define PROFILE_H
 
 #include "../config.h"
+#include "atomic.h"
 #include <Arduino.h>
-#include <src/atomic.h>
 //***************************************************************************//
 class Profile;
 
