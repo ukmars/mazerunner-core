@@ -1,28 +1,28 @@
 /******************************************************************************
- * Project: mazerunner-core                                                   * 
- * File:    adc.cpp                                                           * 
- * File Created: Thursday, 27th October 2022 12:12:56 pm                      * 
- * Author: Peter Harrison                                                     * 
- * -----                                                                      * 
- * Last Modified: Thursday, 27th October 2022 10:29:36 pm                     * 
- * -----                                                                      * 
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
- * -----                                                                      * 
- * Licence:                                                                   * 
- *     Use of this source code is governed by an MIT-style                    * 
- *     license that can be found in the LICENSE file or at                    * 
- *     https://opensource.org/licenses/MIT.                                   * 
+ * Project: mazerunner-core                                                   *
+ * File:    adc.cpp                                                           *
+ * File Created: Thursday, 27th October 2022 12:12:56 pm                      *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Saturday, 29th October 2022 8:27:29 pm                      * 
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
 #include "adc.h"
 
 /***
  * This function should be independent of the hardware but is called from the
  * hardware end-of-conversion ISR.
- * 
- * In the adc interface class, it is declared as a friend so that it can access 
+ *
+ * In the adc interface class, it is declared as a friend so that it can access
  * the methods and properties of the actual class instance
- * 
- * 
+ *
+ *
  * @brief Sample all the sensor channels with and without the emitter on
  *
  * At the end of the 500Hz systick interrupt, the ADC interrupt is enabled

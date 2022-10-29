@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Friday, 28th October 2022 4:17:29 pm                        *
+ * Last Modified: Saturday, 29th October 2022 8:18:43 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -54,14 +54,13 @@ public:
     ADC0.CTRLB = 0;                                   // No sample accumuation
     ADC0.CTRLC != ADC_SAMPCAP_bm;                     // reduced sampling capacitance See DS.29.5.3
     ADC0.CTRLC &= ~ADC_REFSEL_gm;                     // clear the reference selection
-    ADC0.CTRLC |= ~ADC_REFSEL_VDDREF_gc;              // use VDD for the reference
-    ADC0.CTRLC &= ADC_PRESC_gm;                       // Clear the prescaler bits
+    ADC0.CTRLC |= ADC_REFSEL_VDDREF_gc;               // use VDD for the reference
+    ADC0.CTRLC &= ~ADC_PRESC_gm;                      // Clear the prescaler bits
     ADC0.CTRLC |= ADC_PRESC_DIV32_gc;                 // Prescaler DIV 32 => 500kHz?
     ADC0.CTRLD = 0;                                   // no sample delays or variations
     ADC0.CTRLE = 0;                                   // No window comparator
     ADC0.SAMPCTRL = 0;                                // Do not extend the ADC sampling length
-    ADC0.INTCTRL |= ADC_RESRDY_bm;                    /* Enable interrupts Gobal interrupt enable must be on*/
-    // ADC0.EVCTRL |= ADC_STARTEI_bm; //NEED THIS?                   /* Enable event triggered conversion */
+    ADC0.INTCTRL |= ADC_RESRDY_bm;                    // Enable interrupts Gobal interrupt enable must be on
   }
 
   void emitter_on(uint8_t pin) {
