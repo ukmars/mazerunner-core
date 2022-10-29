@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 10:59:56 am                       * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Thursday, 27th October 2022 10:35:16 pm                     * 
+ * Last Modified: Saturday, 29th October 2022 10:01:39 am                     * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -20,5 +20,11 @@
 #if defined(ARDUINO_ARCH_AVR)
 ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
   systick.update();
+}
+#elif defined(ARDUINO_ARCH_MEGAAVR)
+uint8_t state = 0;
+ISR(TCB2_INT_vect, ISR_NOBLOCK){
+  state = 1- state;
+  digitalWriteFast(LED_BUILTIN,1);
 }
 #endif
