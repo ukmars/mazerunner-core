@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 10:29:36 pm                     *
+ * Last Modified: Friday, 28th October 2022 4:17:29 pm                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -50,12 +50,18 @@ public:
    *
    */
   void converter_init() {
-    // Change the clock prescaler from 128 to 32 for a 500kHz clock
-    // bitSet(ADCSRA, ADPS2);
-    // bitClear(ADCSRA, ADPS1);
-    // bitSet(ADCSRA, ADPS0);
-    // // Set the reference to AVcc and right adjust the result
-    // ADMUX = DEFAULT << 6;
+    ADC0.CTRLA = ADC_RESSEL_10BIT_gc | ADC_ENABLE_bm; // ADC 10 Bit Resolution, ADC enabled
+    ADC0.CTRLB = 0;                                   // No sample accumuation
+    ADC0.CTRLC != ADC_SAMPCAP_bm;                     // reduced sampling capacitance See DS.29.5.3
+    ADC0.CTRLC &= ~ADC_REFSEL_gm;                     // clear the reference selection
+    ADC0.CTRLC |= ~ADC_REFSEL_VDDREF_gc;              // use VDD for the reference
+    ADC0.CTRLC &= ADC_PRESC_gm;                       // Clear the prescaler bits
+    ADC0.CTRLC |= ADC_PRESC_DIV32_gc;                 // Prescaler DIV 32 => 500kHz?
+    ADC0.CTRLD = 0;                                   // no sample delays or variations
+    ADC0.CTRLE = 0;                                   // No window comparator
+    ADC0.SAMPCTRL = 0;                                // Do not extend the ADC sampling length
+    ADC0.INTCTRL |= ADC_RESRDY_bm;                    /* Enable interrupts Gobal interrupt enable must be on*/
+    // ADC0.EVCTRL |= ADC_STARTEI_bm; //NEED THIS?                   /* Enable event triggered conversion */
   }
 
   void emitter_on(uint8_t pin) {
@@ -69,6 +75,7 @@ public:
     if (pin == 255) {
       return;
     }
+
     digitalWriteFast(pin, 0);
   }
 
@@ -84,31 +91,23 @@ public:
   }
 
   void end_conversion_cycle() {
-    // bitClear(ADCSRA, ADIE); // disable the ADC interrupt
+    ADC0.INTCTRL &= ~ADC_RESRDY_bm; /* Disable interrupts */
   }
 
   void start_conversion(uint8_t channel) {
 
-    // select the channel
-    // ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);
+    // select the channel - fix to channels 0-7
+    ADC0.MUXPOS = channel & 0x0F; //
     // start the conversion
-    // sbi(ADCSRA, ADSC);
+    ADC0.INTCTRL = ADC_RESRDY_bm; // Enable ADC result ready interrupt TODO: should this be in init?
+    ADC0.INTFLAGS = 0xFF;         // Clear interrupt flags
+    ADC0.COMMAND = ADC_STCONV_bm; // start the conversion (cleared on completion)
   }
 
-  // ADSC is cleared when the conversion finishes and
-  // normally you might wait for the end of conversion
-  // while (bit_is_set(ADCSRA, ADSC));
-  // But - since the conversions are done through interrupts
-  // there should always be a result waiting when
-  // this function is called.
-  //
-  // You have to read ADCL first; doing so locks both ADCL
-  // and ADCH until ADCH is read.  Reading ADCL second would
-  // cause the results of each conversion to be discarded,
-  // as ADCL and ADCH would be locked when it completed.
-  // Fortunately, the compiler knows how to do that for you.
   int get_adc_result() {
-    // return ADC;
+    ADC0.INTFLAGS = ADC_RESRDY_bm;
+    // Check that compiler gets low byte then high byte
+    return ADC0.RES; // also clears the result ready interrupt flag.
   }
 
 private:
