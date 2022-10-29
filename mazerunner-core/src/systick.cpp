@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 10:59:56 am                       * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Saturday, 29th October 2022 3:07:15 pm                      * 
+ * Last Modified: Saturday, 29th October 2022 8:24:06 pm                      * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -22,10 +22,8 @@ ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
   systick.update();
 }
 #elif defined(ARDUINO_ARCH_MEGAAVR)
-uint8_t state = 0;
 ISR(TCB2_INT_vect, ISR_NOBLOCK){
-  state = 1- state;
-  digitalWriteFast(LED_BUILTIN,1);
-  // systick.update();
+  systick.update();
+  TCB2.INTFLAGS = TCB_CAPT_bm; // manually clear the interrupt
 }
 #endif

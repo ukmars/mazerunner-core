@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 12:11:36 am                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 3:07:10 pm                      *
+ * Last Modified: Saturday, 29th October 2022 8:25:17 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -38,24 +38,13 @@ public:
     OCR2A = 249; // (16000000/128/500)-1 => 500Hz
     bitSet(TIMSK2, OCIE2A);
 #elif defined(ARDUINO_ARCH_MEGAAVR)
-    /* stop the timer */
-    TCB2.CTRLA &= ~TCB_ENABLE_bm;
-
-    /* Clock selection is same as TCA (F_CPU/64 -- 250kHz) */
-    TCB2.CTRLA = TCB_CLKSEL_CLKTCA_gc;
-
-    // set periodic interrupt Mode
-    TCB2.CTRLB = (TCB_CNTMODE_INT_gc);
-
+    TCB2.CTRLA &= ~TCB_ENABLE_bm;      // stop the timer
+    TCB2.CTRLA = TCB_CLKSEL_CLKTCA_gc; // Clock selection is same as TCA (F_CPU/64 -- 250kHz)
+    TCB2.CTRLB = (TCB_CNTMODE_INT_gc); // set periodic interrupt Mode
     // timer is clocked at 250000Hz = 4us per tick
-    // we want 2000us => 5000 ticks
-    TCB2.CCMP = 2000 / (1000000 / 250000) - 1;
-
-    /* Enable & start */
-    TCB2.CTRLA |= TCB_ENABLE_bm;
-
-    /* Enable timer interrupt */
-    TCB2.INTCTRL |= TCB_CAPT_bm;
+    TCB2.CCMP = 2000 / (1000000 / 250000) - 1; // we want 2000us => 5000 ticks
+    TCB2.CTRLA |= TCB_ENABLE_bm;               // Enable & start
+    TCB2.INTCTRL |= TCB_CAPT_bm;               // Enable timer interrupt
 #endif
     delay(10); // make sure it runs for a few cycles before we continue
   }
@@ -86,7 +75,7 @@ public:
    *
    */
   void update() {
-    digitalWriteFast(LED_BUILTIN, 1);
+    // digitalWriteFast(LED_BUILTIN, 1);
     // NOTE - the code here seems to get inlined and so the function is 2800 bytes!
     // TODO: make sure all variables are interrupt-safe if they are used outside IRQs
     // grab the encoder values first because they will continue to change
@@ -99,7 +88,7 @@ public:
     motors.update_controllers(sensors.get_steering_feedback());
     adc.start_conversion_cycle();
     // NOTE: no code should follow this line;
-    digitalWriteFast(LED_BUILTIN, 0);
+    // digitalWriteFast(LED_BUILTIN, 0);
   }
 };
 
