@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 4:55:17 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Friday, 28th October 2022 11:45:50 pm                       *
+ * Last Modified: Saturday, 29th October 2022 12:54:40 pm                     * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -175,6 +175,14 @@ public:
     set_right_motor_pwm(motorPWM);
   }
 
+  /***
+   * PWM values are constrained to +/- 255 since the default for
+   * analogueWrite is 8 bits. The sign is only used to determine 
+   * the direction.
+   * 
+   * NOTE: it might be wise to check the resolution of the 
+   * analogueWrite function in other targtes
+   */
   void set_left_motor_pwm(int pwm) {
     pwm = MOTOR_LEFT_POLARITY * constrain(pwm, -255, 255);
     if (pwm < 0) {
