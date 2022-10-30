@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 10:58:35 am                       * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Thursday, 27th October 2022 10:43:06 pm                     * 
+ * Last Modified: Sunday, 30th October 2022 12:12:45 am                       * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -16,25 +16,21 @@
 
 
 #include "encoders.h"
-
 /**
  * Measurements indicate that even at 1500mm/s the total load due to
  * the encoder interrupts is less than 3% of the available bandwidth.
  */
 
-#if defined(ARDUINO_ARCH_AVR)
-// INT0 will respond to the XOR-ed pulse train from the left encoder
+// ISR will respond to the XOR-ed pulse train from the encoder
 // runs in constant time of around 3us per interrupt.
 // would be faster with direct port access
-ISR(INT0_vect) {
+
+// a bit of indirection for convenience
+void callback_left(){
   encoders.left_input_change();
 }
 
-// INT1 will respond to the XOR-ed pulse train from the right encoder
-// runs in constant time of around 3us per interrupt.
-// would be faster with direct port access
-ISR(INT1_vect) {
-  encoders.right_input_change();
+void callback_right(){
+encoders.right_input_change();
 }
 
-#endif
