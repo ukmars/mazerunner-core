@@ -4,7 +4,7 @@
  * File Created: Sunday, 11th September 2022 3:34:57 pm                       *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:48:13 pm                    *
+ * Last Modified: Sunday, 30th October 2022 4:21:26 pm                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -107,7 +107,7 @@ struct TurnParameters {
 #define ROBOT_EMILY 5
 #define ROBOT_FRANK 6
 
-#define ROBOT_NAME ROBOT_FRANK
+#define ROBOT_NAME ROBOT_EMILY
 
 #if ROBOT_NAME == ROBOT_DOROTHY
 #include "config-dorothy.h"
