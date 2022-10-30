@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 9:53:01 am                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 8:50:13 pm                      *
+ * Last Modified: Sunday, 30th October 2022 12:12:45 am                       *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -68,28 +68,18 @@
 class Encoders;
 
 extern Encoders encoders;
+
+void callback_left();
+void callback_right();
 class Encoders {
 public:
   void setup() {
-#if defined(ARDUINO_ARCH_AVR)
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      // left
-      pinMode(ENCODER_LEFT_CLK, INPUT);
-      pinMode(ENCODER_LEFT_B, INPUT);
-      // pin change interrupt
-      bitClear(EICRA, ISC01);
-      bitSet(EICRA, ISC00);
-      bitSet(EIMSK, INT0);
-
-      // right
-      pinMode(ENCODER_RIGHT_CLK, INPUT);
-      pinMode(ENCODER_RIGHT_B, INPUT);
-      // pin change interrupt
-      bitClear(EICRA, ISC11);
-      bitSet(EICRA, ISC10);
-      bitSet(EIMSK, INT1);
-    }
-#endif
+    pinMode(ENCODER_LEFT_CLK, INPUT);
+    pinMode(ENCODER_LEFT_B, INPUT);
+    pinMode(ENCODER_RIGHT_CLK, INPUT);
+    pinMode(ENCODER_RIGHT_B, INPUT);
+    attachInterrupt(ENCODER_LEFT_CLK, callback_left, CHANGE);
+    attachInterrupt(ENCODER_RIGHT_CLK, callback_right, CHANGE);
     reset();
   }
 
