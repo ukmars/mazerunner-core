@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 9:53:01 am                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Sunday, 30th October 2022 3:58:26 pm                        *
+ * Last Modified: Sunday, 30th October 2022 4:02:04 pm                        * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -93,7 +93,6 @@ public:
   }
 
   void left_input_change() {
-    digitalWriteFast(12, 1);
     static bool oldA = false;
     static bool oldB = false;
     bool newB = digitalReadFast(ENCODER_LEFT_B);
@@ -102,11 +101,9 @@ public:
     m_left_counter += delta;
     oldA = newA;
     oldB = newB;
-    digitalWriteFast(12, 0);
   }
 
   void right_input_change() {
-    digitalWriteFast(11, 1);
     static bool oldA = false;
     static bool oldB = false;
     bool newB = digitalReadFast(ENCODER_RIGHT_B);
@@ -115,7 +112,6 @@ public:
     m_right_counter += delta;
     oldA = newA;
     oldB = newB;
-    digitalWriteFast(10, 0);
   }
 
   void update() {
