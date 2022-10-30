@@ -1,252 +1,162 @@
+/******************************************************************************
+ * Project: mazerunner-core                                                   *
+ * File:    adc.h                                                             *
+ * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Saturday, 29th October 2022 11:37:50 pm                     *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
+ ******************************************************************************/
+
 #ifndef ADC_H
 #define ADC_H
 
-#include "../config.h"
 #include "digitalWriteFast.h"
+#include "list.h"
 #include <Arduino.h>
-#include <util/atomic.h>
-#include <wiring_private.h>
 
-class AnalogueConverter {
-
+/***
+ * This is an interface class for an actual adc subsystem. It is a pure
+ * virtual class and cannot be instantiated. Instead, you must create
+ * a derived class with appropriate code for the target hardware.
+ *
+ * Currently there are 8 available channels and 2 groups.
+ *
+ * The channels currently refer to the hardware ADC channel numbers,
+ * starting at zero.
+ * TODO: A future development should allow the use of any subset of
+ * hardware channels.
+ *
+ * It is expected that all the channels will be read at least once in a
+ * conversion cycle. These are the 'dark' readings.
+ *
+ * This is done on the assumption that not all adc channels are associated
+ * with active sensors. For example, on the basic UKMARSBOT, one of the
+ * channels is used for the battery voltage measurement and another is
+ * used for the analogue switches. Using this technique, the battery monitor
+ * and switches just need to grab a reading for the adc converter. If
+ * your platform has a different arrangement it should not be affected
+ * by this ADC code.
+ *
+ * After the first read each group will be read again with its associated
+ * emitter pin set high. The result for that channel will then be the
+ * difference between 'lit' reading and the previous 'dark' reading.
+ *
+ * Pin numbers are in the range 0..255 and are not necessarily mapped
+ * to specific hardware pins. That depends on the target hardware. For
+ * An arduino target, pins 0..13 have their usual meaning. Pins 14..23
+ * are the pins associated with the Arduino A0..A7 pins.
+ *
+ * A pin number of 255 is treated as a null value and will be ignored
+ * for all operations.
+ *
+ * Any, or all, of the channels can be added to one (or both) of the
+ * groups. At present the groups are hard-coded in sequence in the
+ * hardware implementation.
+ *
+ * Before the converter is used, you should assign emitter pin numbers to
+ * each group. If there is no pin number assigned, the channels in group
+ * will still be read a second time and so are likely to return a value of
+ * zero. TODO: this needs to be fixed
+ *
+ * Next, each group should have one or more channel numbers allocated to it.
+ * These are the channels that will get a second read with the associated
+ * emitter lit.
+ *
+ * Once the emitters and groups have been assigned, call the begin() method
+ * to configure the underlying hardware ADC and allow conversion cycle to begin.
+ *
+ * It is assumed that the conversion cycle happens under interrupt control and
+ * is triggered at the end of the systick function by calling the
+ * start_conversion_cycle() method.
+ *
+ * If you have a suitably fast ADC or some other hardware that gathers the
+ * sensor readings then the start_conversion_cycle() method should be used to
+ * perform the complete cycle in one call.
+ *
+ * NOTE: Manual analogue conversions:
+ * All ADC channels are automatically converted by the sensor interrupt.
+ * Attempting to performa a manual ADC conversion will disrupt that
+ * process so avoid doing that if you value your sanity.
+ *
+ * The use of virtual functions comes at some small cost. The VTABLE
+ * takes up at least another 8 bytes and there is an overhead in the
+ * function call. If this is a problem consider the use of CRTP techniques.
+ */
+class IAnalogueConverter {
 public:
-  AnalogueConverter() = default;
+  enum {
+    MAX_GROUPS = 2,
+    MAX_CHANNELS = 8,
+  };
 
-  void begin(const int emitter_a) {
-    begin(emitter_a, emitter_a);
+  IAnalogueConverter() {
+    for (int i = 0; i < MAX_GROUPS; i++) {
+      m_emitter_pin[i] = 255; // pin 255 is a null, or invalid pin
+    }
   }
 
-  void begin(const int emitter_a, const int emitter_b) {
-    m_emitter_a = emitter_a;
-    m_emitter_b = emitter_b;
-    pinMode(emitter_a, OUTPUT);
-    pinMode(emitter_b, OUTPUT);
-    disable_emitters();
-    init();
-  }
+  void set_emitter_for_group(uint8_t pin, uint8_t group) {
+    if (group >= MAX_GROUPS) {
+      return;
+    }
+    m_emitter_pin[group] = pin;
+  };
 
-  /**
-   *  The default for the Arduino is to give a slow ADC clock for maximum
-   *  SNR in the results. That typically means a prescale value of 128
-   *  for the 16MHz ATMEGA328P running at 16MHz. Conversions then take more
-   *  than 100us to complete. In this application, we want to be able to
-   *  perform about 16 conversions in around 500us. To do that the prescaler
-   *  is reduced to a value of 32. This gives an ADC clock speed of
-   *  500kHz and a single conversion in around 26us. SNR is still pretty good
-   *  at these speeds:
-   *  http://www.openmusiclabs.com/learning/digital/atmega-m_adc_reading/
-   *
-   */
-
-  void init() {
-    // Change the clock prescaler from 128 to 32 for a 500kHz clock
-    bitSet(ADCSRA, ADPS2);
-    bitClear(ADCSRA, ADPS1);
-    bitSet(ADCSRA, ADPS0);
-  }
-  // void set_emitter_a(uint8_t pin) {
-  //   m_emitter_a = pin;
-  // };
-
-  // void set_emitter_b(uint8_t pin) {
-  //   m_emitter_b = pin;
-  // };
+  void add_channel_to_group(uint8_t channel, uint8_t group) {
+    if (channel >= MAX_CHANNELS) {
+      return;
+    }
+    if (group >= MAX_GROUPS) {
+      return;
+    }
+    m_group[group].add(channel);
+  };
 
   void enable_emitters() {
     m_emitters_enabled = true;
   }
+
   void disable_emitters() {
     m_emitters_enabled = false;
   }
 
-  void emitter_on(uint8_t pin) {
-    if (pin == 255 || not m_emitters_enabled) {
-      return;
-    }
-    digitalWriteFast(pin, 1);
-  }
-
-  void emitter_off(uint8_t pin) {
-    if (pin == 255) {
-      return;
-    }
-    digitalWriteFast(pin, 0);
-  }
-
+  // for convenience allow access in an array-like manner
   volatile int operator[](int i) const { return m_adc_reading[i]; }
+
   volatile int &operator[](int i) { return m_adc_reading[i]; }
-  //***************************************************************************//
 
-  void start_sensor_cycle() {
-    m_sensor_phase = 0;   // sync up the start of the sensor sequence
-    bitSet(ADCSRA, ADIE); // enable the ADC interrupt
-    start_conversion(0);  // begin a conversion to get things started
-  }
+  // all of these MUST be defined in the derived hardware class
+  virtual void begin() = 0;
+  virtual void start_conversion_cycle() = 0;
+  virtual void end_conversion_cycle() = 0;
+  virtual void start_conversion(uint8_t channel) = 0;
+  virtual int get_adc_result() = 0;
+  virtual void emitter_on(uint8_t pin) = 0;
+  virtual void emitter_off(uint8_t pin) = 0;
 
-  void end_sensor_cycle() {
-    bitClear(ADCSRA, ADIE); // enable the ADC interrupt
-  }
+  // an external function called from the hardware end of conversion ISR
+  friend void adc_isr(IAnalogueConverter &a);
 
-  /***
-   * NOTE: Manual analogue conversions
-   * All eight available ADC channels are automatically converted
-   * by the sensor interrupt. Attempting to performa a manual ADC
-   * conversion with the Arduino AnalogueIn() function will disrupt
-   * that process so avoid doing that.
-   */
+protected:
+  volatile int m_adc_reading[MAX_CHANNELS];
 
-  const uint8_t ADC_REF = DEFAULT;
+  uint8_t m_emitter_pin[MAX_GROUPS];
 
-  void start_conversion(uint8_t channel) {
-    ADMUX = (ADC_REF << 6) | (channel & 0x0F);
-    // start the conversion
-    sbi(ADCSRA, ADSC);
-  }
+  List<uint8_t, MAX_CHANNELS> m_group[MAX_GROUPS];
 
-  int get_adc_result() {
-    // ADSC is cleared when the conversion finishes
-    // while (bit_is_set(ADCSRA, ADSC));
+  uint8_t m_channel_index;
+  uint8_t m_group_index;
 
-    // we have to read ADCL first; doing so locks both ADCL
-    // and ADCH until ADCH is read.  reading ADCL second would
-    // cause the results of each conversion to be discarded,
-    // as ADCL and ADCH would be locked when it completed.
-    uint8_t low = ADCL;
-    uint8_t high = ADCH;
-
-    // combine the two bytes
-    return (high << 8) | low;
-  }
-
-  /** @brief Sample all the sensor channels with and without the emitter on
-   *
-   * At the end of the 500Hz systick interrupt, the ADC interrupt is enabled
-   * and a conversion started. After each ADC conversion the interrupt gets
-   * generated and this ISR is called. The eight channels are read in turn with
-   * the sensor emitter(s) off.
-   *
-   * At the end of that sequence, the emitter(s) get turned on and a dummy ADC
-   * conversion is started to provide a delay while the sensors respond.
-   * After that, all channels are read again to get the lit values.
-   *
-   * The lit section handles the sensor channels in two groups so that several
-   * channels can be illuminated by one emitters while the others use a different
-   * emitter. This is a little clunky but essential to avoid crosstalk between the
-   * forward- and side-looking sensor types
-   *
-   * After all the channels have been read twice, the ADC interrupt is disabbled
-   * and the sensors are idle until triggered again.
-   *
-   * The ADC service runs all the time even with the sensors 'disabled'. In this
-   * software, 'enabled' only means that the emitters are turned on in the second
-   * phase. Without that, you might expect the sensor readings to be zero.
-   *
-   * Timing tests indicate that the sensor ISR consumes no more that 5% of the
-   * available system bandwidth.
-   *
-   * There are actually 16 available channels on the ATMEGA328p and channel 8 is
-   * the internal temperature sensor. Channel 15 is Gnd. If appropriate, a read of channel
-   * 15 can be used to zero the ADC sample and hold capacitor.
-   *
-   * NOTE: All the channels are read even though only 5 are used for the maze
-   * robot. This gives worst-case timing so there are no surprises if more
-   * sensors are added.
-   *
-   * If different types of sensor are used or the I2C is needed, there
-   * will need to be changes here.
-   */
-  void update_channel() {
-    switch (m_sensor_phase) {
-      case 0:
-        start_conversion(0);
-        break;
-      case 1:
-        m_adc_reading[0] = get_adc_result();
-        start_conversion(1);
-        break;
-      case 2:
-        m_adc_reading[1] = get_adc_result();
-        start_conversion(2);
-        break;
-      case 3:
-        m_adc_reading[2] = get_adc_result();
-        start_conversion(3);
-        break;
-      case 4:
-        m_adc_reading[3] = get_adc_result();
-        start_conversion(4);
-        break;
-      case 5:
-        m_adc_reading[4] = get_adc_result();
-        start_conversion(5);
-        break;
-      case 6:
-        m_adc_reading[5] = get_adc_result();
-        start_conversion(6);
-        break;
-      case 7:
-        m_adc_reading[6] = get_adc_result();
-        start_conversion(7);
-        break;
-      case 8:
-        m_adc_reading[7] = get_adc_result();
-        // Now all the 'dark' readings have been taken and it is time to
-        // get the 'lit' results. These are in two groups. Start with Group A.
-        // These are the side sensors for the advanced wall sensor. The basic wall
-        // sensor board has all channels in group A
-        emitter_on(m_emitter_a);
-        start_conversion(15); // dummy adc conversion to create a delay
-        // wait at least one cycle for the detectors to respond
-        break;
-      case 9:
-        start_conversion(0);
-        break;
-      case 10:
-        m_adc_reading[0] = get_adc_result() - m_adc_reading[0];
-        start_conversion(3);
-        break;
-      case 11:
-        m_adc_reading[3] = get_adc_result() - m_adc_reading[3];
-        // Now group B. These are the front sensors for the advanced board
-        // Since the Basic board only one group, the same emittter will be lit
-        emitter_off(m_emitter_a);
-        emitter_on(m_emitter_b);
-        start_conversion(15); // dummy adc conversion to create a delay
-        // wait at least one cycle for the detectors to respond
-      case 12:
-        start_conversion(1);
-        break;
-      case 13:
-        m_adc_reading[1] = get_adc_result() - m_adc_reading[1];
-        start_conversion(2);
-        break;
-      case 14:
-        m_adc_reading[2] = get_adc_result() - m_adc_reading[2];
-        start_conversion(4);
-        break;
-      case 15:
-        m_adc_reading[4] = get_adc_result() - m_adc_reading[4];
-        start_conversion(A5);
-        break;
-      case 16:
-        m_adc_reading[5] = get_adc_result() - m_adc_reading[5];
-        emitter_off(m_emitter_b);
-        _NOP();
-        end_sensor_cycle();
-        break;
-      default:
-        break;
-    }
-    m_sensor_phase++;
-  }
-
-private:
-  uint8_t m_sensor_phase = 0;
   bool m_emitters_enabled = false;
-  uint8_t m_emitter_a = 255;
-  uint8_t m_emitter_b = 255;
-  volatile int m_adc_reading[8];
+  bool m_configured = false;
+  uint8_t m_phase = 0; // used in the isr
 };
 
-extern AnalogueConverter adc;
 #endif

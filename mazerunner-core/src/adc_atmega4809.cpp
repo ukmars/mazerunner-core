@@ -1,10 +1,10 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   * 
- * File:    encoders.cpp                                                      * 
- * File Created: Tuesday, 25th October 2022 10:58:35 am                       * 
+ * File:    adc_atmega328.cpp                                                 * 
+ * File Created: Wednesday, 26th October 2022 12:11:36 am                     * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Thursday, 27th October 2022 10:43:06 pm                     * 
+ * Last Modified: Saturday, 29th October 2022 3:10:13 pm                      * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -15,26 +15,16 @@
  ******************************************************************************/
 
 
-#include "encoders.h"
 
-/**
- * Measurements indicate that even at 1500mm/s the total load due to
- * the encoder interrupts is less than 3% of the available bandwidth.
- */
 
-#if defined(ARDUINO_ARCH_AVR)
-// INT0 will respond to the XOR-ed pulse train from the left encoder
-// runs in constant time of around 3us per interrupt.
-// would be faster with direct port access
-ISR(INT0_vect) {
-  encoders.left_input_change();
-}
+#ifdef ARDUINO_ARCH_MEGAAVR
 
-// INT1 will respond to the XOR-ed pulse train from the right encoder
-// runs in constant time of around 3us per interrupt.
-// would be faster with direct port access
-ISR(INT1_vect) {
-  encoders.right_input_change();
+#include "adc_atmega4809.h"
+
+adc_atmega4809 adc; // TODO: this needs to get defined in a hardware file not here
+
+ISR(ADC0_RESRDY_vect) {
+  adc_isr(adc);
 }
 
 #endif

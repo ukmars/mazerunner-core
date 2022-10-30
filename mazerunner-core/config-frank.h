@@ -1,5 +1,33 @@
+/******************************************************************************
+ * Project: mazerunner-core                                                   *
+ * File:    config-frank.h                                                    *
+ * File Created: Wednesday, 26th October 2022 10:15:50 pm                     *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Thursday, 27th October 2022 11:07:51 pm                     *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
+ ******************************************************************************/
+
 #ifndef FRANK_H
 #define FRANK_H
+
+/***
+ * It looks like this is where we decide the target and include appropriate drivers?
+ */
+
+#if defined(ARDUINO_ARCH_MEGAAVR)
+#include "src/adc_atmega4809.h"
+#elif defined(ARDUINO_ARCH_AVR)
+#include "src/adc_atmega328.h"
+#elif defined(ARDUINO_ARCH_NRF52840)
+#warning need a nano33 ble header here
+#endif
 
 const uint32_t BAUDRATE = 115200;
 const int SENSOR_COUNT = 4;
@@ -226,10 +254,10 @@ const int LED_RIGHT = USER_IO_6;
 // if you have  basic sensor board with a single emitter pin,
 // put the same pin number for both entries
 // BASIC
-// const int EMITTER_A = USER_IO_12;
-// const int EMITTER_B = USER_IO_12;
+// const int EMITTER_FRONT = USER_IO_12;
+// const int EMITTER_DIAGONAL = USER_IO_12;
 // ADVANCED
-const int EMITTER_A = USER_IO_11;
-const int EMITTER_B = USER_IO_12;
+const int EMITTER_FRONT = USER_IO_11;
+const int EMITTER_DIAGONAL = USER_IO_12;
 
 #endif

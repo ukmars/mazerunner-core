@@ -1,11 +1,27 @@
+/******************************************************************************
+ * Project: mazerunner-core                                                   *
+ * File:    switches.h                                                        *
+ * File Created: Wednesday, 26th October 2022 12:11:36 am                     *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Saturday, 29th October 2022 8:51:13 pm                      *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
+ ******************************************************************************/
+
 #ifndef SWITCHES_H
 #define SWITCHES_H
 
 #include "../config.h"
 #include "adc.h"
+#include "atomic.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
-#include <util/atomic.h>
 #include <wiring_private.h>
 
 class Switches {

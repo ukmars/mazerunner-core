@@ -1,34 +1,18 @@
-/*
- * File: systick.h
- * Project: vw-control
- * File Created: Monday, 15th March 2021 10:33:57 am
- * Author: Peter Harrison
- * -----
- * Last Modified: Monday, 5th April 2021 12:04:20 am
- * Modified By: Peter Harrison
- * -----
- * MIT License
- *
- * Copyright (c) 2021 Peter Harrison
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+/******************************************************************************
+ * Project: mazerunner-core                                                   *
+ * File:    systick.h                                                         *
+ * File Created: Wednesday, 26th October 2022 12:11:36 am                     *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Saturday, 29th October 2022 8:25:17 pm                      *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
+ ******************************************************************************/
 
 #ifndef SYSTICK_H
 #define SYSTICK_H
@@ -43,6 +27,7 @@ public:
   // don't let this start firing up before we are ready.
   // call the begin method explicitly.
   void begin() {
+#if defined(ARDUINO_ARCH_AVR)
     bitClear(TCCR2A, WGM20);
     bitSet(TCCR2A, WGM21);
     bitClear(TCCR2B, WGM22);
@@ -52,6 +37,15 @@ public:
     bitSet(TCCR2B, CS20);
     OCR2A = 249; // (16000000/128/500)-1 => 500Hz
     bitSet(TIMSK2, OCIE2A);
+#elif defined(ARDUINO_ARCH_MEGAAVR)
+    TCB2.CTRLA &= ~TCB_ENABLE_bm;      // stop the timer
+    TCB2.CTRLA = TCB_CLKSEL_CLKTCA_gc; // Clock selection is same as TCA (F_CPU/64 -- 250kHz)
+    TCB2.CTRLB = (TCB_CNTMODE_INT_gc); // set periodic interrupt Mode
+    // timer is clocked at 250000Hz = 4us per tick
+    TCB2.CCMP = 2000 / (1000000 / 250000) - 1; // we want 2000us => 5000 ticks
+    TCB2.CTRLA |= TCB_ENABLE_bm;               // Enable & start
+    TCB2.INTCTRL |= TCB_CAPT_bm;               // Enable timer interrupt
+#endif
     delay(10); // make sure it runs for a few cycles before we continue
   }
   /***
@@ -72,7 +66,7 @@ public:
    * With just a single profile active and moving, that increases to nearly 30%.
    * Two such active profiles increases it to about 35-40%.
    *
-   * The reason that two prifiles does not take up twice as much time is that
+   * The reason that two profiles does not take up twice as much time is that
    * an active profile has a processing overhead even if there is no motion.
    *
    * Most of the load is due to that overhead. While the profile generates actual
@@ -81,6 +75,7 @@ public:
    *
    */
   void update() {
+    // digitalWriteFast(LED_BUILTIN, 1);
     // NOTE - the code here seems to get inlined and so the function is 2800 bytes!
     // TODO: make sure all variables are interrupt-safe if they are used outside IRQs
     // grab the encoder values first because they will continue to change
@@ -91,8 +86,9 @@ public:
     switches.update();
     motors.set_battery_compensation(sensors.get_battery_comp());
     motors.update_controllers(sensors.get_steering_feedback());
-    adc.start_sensor_cycle();
+    adc.start_conversion_cycle();
     // NOTE: no code should follow this line;
+    // digitalWriteFast(LED_BUILTIN, 0);
   }
 };
 

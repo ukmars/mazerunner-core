@@ -1,34 +1,18 @@
-/*
- * File: config.h
- * Project: mazerunner
- * File Created: Monday, 29th March 2021 11:04:59 pm
- * Author: Peter Harrison
- * -----
- * Last Modified: Thursday, 6th May 2021 9:17:32 am
- * Modified By: Peter Harrison
- * -----
- * MIT License
- *
- * Copyright (c) 2021 Peter Harrison
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+/******************************************************************************
+ * Project: mazerunner-core                                                   *
+ * File:    config.h                                                          *
+ * File Created: Sunday, 11th September 2022 3:34:57 pm                       *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Wednesday, 26th October 2022 11:48:13 pm                    *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
+ ******************************************************************************/
 
 #ifndef CONFIG_H
 #define CONFIG_H
@@ -123,7 +107,7 @@ struct TurnParameters {
 #define ROBOT_EMILY 5
 #define ROBOT_FRANK 6
 
-#define ROBOT_NAME ROBOT_EMILY
+#define ROBOT_NAME ROBOT_FRANK
 
 #if ROBOT_NAME == ROBOT_DOROTHY
 #include "config-dorothy.h"

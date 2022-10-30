@@ -1,34 +1,18 @@
-/*
- * File: motors.h
- * Project: vw-control
- * File Created: Monday, 29th March 2021 11:04:59 pm
- * Author: Peter Harrison
- * -----
- * Last Modified: Sunday, 4th April 2021 11:56:54 pm
- * Modified By: Peter Harrison
- * -----
- * MIT License
- *
- * Copyright (c) 2021 Peter Harrison
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+/******************************************************************************
+ * Project: mazerunner-core                                                   *
+ * File:    motors.h                                                          *
+ * File Created: Saturday, 10th September 2022 4:55:17 pm                     *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Saturday, 29th October 2022 2:35:00 pm                      *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
+ ******************************************************************************/
 
 #ifndef MOTORS_H
 #define MOTORS_H
@@ -41,6 +25,7 @@
 // #include "sensors.h"
 
 enum { PWM_488_HZ,
+       PWM_977_HZ,
        PWM_3906_HZ,
        PWM_31250_HZ };
 
@@ -191,6 +176,14 @@ public:
     set_right_motor_pwm(motorPWM);
   }
 
+  /***
+   * PWM values are constrained to +/- 255 since the default for
+   * analogueWrite is 8 bits. The sign is only used to determine
+   * the direction.
+   *
+   * NOTE: it might be wise to check the resolution of the
+   * analogueWrite function in other targtes
+   */
   void set_left_motor_pwm(int pwm) {
     pwm = MOTOR_LEFT_POLARITY * constrain(pwm, -255, 255);
     if (pwm < 0) {
@@ -214,6 +207,7 @@ public:
   }
 
   void set_pwm_frequency(int frequency = PWM_31250_HZ) {
+#if defined(ARDUINO_ARCH_AVR)
     switch (frequency) {
       case PWM_31250_HZ:
         // Divide by 1. frequency = 31.25 kHz;
@@ -232,6 +226,12 @@ public:
         bitSet(TCCR1B, CS10);
         break;
     }
+#elif defined(ARDUINO_ARCH_MEGAAVR)
+    // TCA0 is used for analogWrite on pins 9 and 10
+    // The clock for TCA0 is also used as the clock for TCBx
+    // so changing that screws up millis() and anythin else timed of TCBx
+    // so just ignore a frequency change request and leave it at 977Hz
+#endif
   }
 
 private:

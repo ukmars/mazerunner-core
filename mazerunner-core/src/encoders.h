@@ -1,34 +1,18 @@
-/*
- * File: encoders.h
- * Project: mazerunner
- * File Created: Saturday, 27th March 2021 3:43:33 pm
- * Author: Peter Harrison
- * -----
- * Last Modified: Monday, 5th April 2021 3:05:30 pm
- * Modified By: Peter Harrison
- * -----
- * MIT License
- *
- * Copyright (c) 2021 Peter Harrison
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+/******************************************************************************
+ * Project: mazerunner-core                                                   *
+ * File:    encoders.h                                                        *
+ * File Created: Tuesday, 25th October 2022 9:53:01 am                        *
+ * Author: Peter Harrison                                                     *
+ * -----                                                                      *
+ * Last Modified: Saturday, 29th October 2022 8:50:13 pm                      *
+ * -----                                                                      *
+ * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * -----                                                                      *
+ * Licence:                                                                   *
+ *     Use of this source code is governed by an MIT-style                    *
+ *     license that can be found in the LICENSE file or at                    *
+ *     https://opensource.org/licenses/MIT.                                   *
+ ******************************************************************************/
 
 #ifndef ENCODERS_H
 #define ENCODERS_H
@@ -76,10 +60,10 @@
 
 */
 #include "../config.h"
+#include "atomic.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <stdint.h>
-#include <util/atomic.h>
 
 class Encoders;
 
@@ -87,6 +71,7 @@ extern Encoders encoders;
 class Encoders {
 public:
   void setup() {
+#if defined(ARDUINO_ARCH_AVR)
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       // left
       pinMode(ENCODER_LEFT_CLK, INPUT);
@@ -104,6 +89,7 @@ public:
       bitSet(EICRA, ISC10);
       bitSet(EIMSK, INT1);
     }
+#endif
     reset();
   }
 

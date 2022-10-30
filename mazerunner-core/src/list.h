@@ -1,10 +1,10 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    queue.h                                                           *
- * File Created: Tuesday, 25th October 2022 9:25:57 am                        *
+ * File:    list.h                                                            *
+ * File Created: Wednesday, 26th October 2022 2:59:04 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:52:50 pm                    *
+ * Last Modified: Wednesday, 26th October 2022 11:48:44 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -17,57 +17,42 @@
 #pragma once
 
 /**
- * The Queue class is used to speed up flooding of the maze
+ * The List class is VERY basic! Minimal even.
  */
-template <class item_t>
-class Queue {
+template <class item_t, int num_items = 8>
+class List {
 public:
-  explicit Queue(int maxSize = 64) : MAX_ITEMS(maxSize) {
-    mData = new item_t[MAX_ITEMS + 1];
+  explicit List(int maxSize = num_items) : mTail(0) {
+    mData = new item_t[num_items];
     clear();
   }
 
-  ~Queue() {
+  ~List() {
     delete[] mData;
   };
 
   int size() {
-    return mItemCount;
+    return mTail;
   }
 
   void clear() {
-    mHead = 0;
     mTail = 0;
-    mItemCount = 0;
   }
 
   void add(item_t item) {
-    mData[mTail] = item;
-    ++mTail;
-    ++mItemCount;
-    if (mTail > MAX_ITEMS) {
-      mTail -= MAX_ITEMS;
+    if (mTail >= num_items) {
+      return;
     }
+    mData[mTail++] = item;
   }
-
-  item_t head() {
-    item_t result = mData[mHead];
-    ++mHead;
-    if (mHead > MAX_ITEMS) {
-      mHead -= MAX_ITEMS;
-    }
-    --mItemCount;
-    return result;
-  }
+  int operator[](int i) const { return mData[i]; }
 
 protected:
   item_t *mData;
-  const int MAX_ITEMS;
-  int mHead;
-  int mTail;
-  int mItemCount;
+  //    const int MAX_ITEMS;
+  uint8_t mTail;
 
 private:
   // while this is probably correct, prevent use of the copy constructor
-  Queue(const Queue<item_t> &rhs) {}
+  //    List(const List<item_t,num_items> &rhs) {}
 };
