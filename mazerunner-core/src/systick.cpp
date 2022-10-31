@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 10:59:56 am                       * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Saturday, 29th October 2022 8:24:06 pm                      * 
+ * Last Modified: Monday, 31st October 2022 12:44:41 pm                       * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -16,6 +16,7 @@
 
 
 #include "systick.h"
+#include "Arduino.h"
 
 #if defined(ARDUINO_ARCH_AVR)
 ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {

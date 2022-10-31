@@ -4,7 +4,7 @@
  * File Created: Friday, 9th September 2022 2:00:47 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:51:51 pm                    *
+ * Last Modified: Monday, 31st October 2022 12:32:39 pm                       *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -17,6 +17,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "Arduino.h"
 const int MAX_ARGC = 16;
 #define MAX_DIGITS 8
 
