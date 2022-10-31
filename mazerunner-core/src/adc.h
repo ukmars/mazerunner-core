@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 11:37:50 pm                     *
+ * Last Modified: Sunday, 30th October 2022 11:58:02 pm                       *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -151,7 +151,7 @@ protected:
 
   List<uint8_t, MAX_CHANNELS> m_group[MAX_GROUPS];
 
-  uint8_t m_channel_index;
+  uint8_t m_index;
   uint8_t m_group_index;
 
   bool m_emitters_enabled = false;
