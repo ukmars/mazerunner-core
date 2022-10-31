@@ -4,7 +4,7 @@
  * File Created: Sunday, 11th September 2022 10:54:41 am                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:51:24 pm                    *
+ * Last Modified: Monday, 31st October 2022 4:24:49 pm                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -20,7 +20,16 @@
 /***
  * It looks like this is where we decide the target and include appropriate drivers?
  */
+
+#if defined(ARDUINO_ARCH_MEGAAVR)
+#include "src/adc_atmega4809.h"
+#elif defined(ARDUINO_ARCH_AVR)
 #include "src/adc_atmega328.h"
+#elif defined(ARDUINO_ARCH_NRF52840)
+#warning need a nano33 ble header here
+#include "src/adc_null.h"
+#warning need a nano33 ble header here
+#endif
 
 const uint32_t BAUDRATE = 115200;
 const int SENSOR_COUNT = 4;
