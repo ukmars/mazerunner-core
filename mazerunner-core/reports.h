@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 2:18:37 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:49:54 pm                    *
+ * Last Modified: Sunday, 30th October 2022 10:19:00 pm                       *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -173,10 +173,12 @@ public:
     print_justified(sensors.lss.raw, 6);
     print_justified(sensors.rss.raw, 6);
     print_justified(sensors.rfs.raw, 6);
+    Serial.print(" | ");
     print_justified(sensors.lfs.value, 6);
     print_justified(sensors.lss.value, 6);
     print_justified(sensors.rss.value, 6);
     print_justified(sensors.rfs.value, 6);
+    Serial.print(" | ");
     print_justified(sensors.get_front_sum(), 6);
     print_justified(sensors.get_front_diff(), 6);
     Serial.println();
