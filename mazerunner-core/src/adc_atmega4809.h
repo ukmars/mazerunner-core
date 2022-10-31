@@ -1,10 +1,10 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    adc_atmega328.h                                                   *
+ * File:    adc_atmega4809.h                                                   *
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 11:37:50 pm                     *
+ * Last Modified: Monday, 31st October 2022 9:48:42 am                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -37,10 +37,12 @@ public:
     m_configured = true;
   }
 
+  //***************************************************************************//
+  // START OF HARDWARE DEPENDENCY
+
   /**
    *  The default for the Arduino is to give a slow ADC clock for maximum
-   *  SNR in the results. That typically means a prescale value of 128
-   *  for the 16MHz ATMEGA328P running at 16MHz. Conversions then take more
+   *  SNR in the results. Conversions then take more
    *  than 100us to complete. In this application, we want to be able to
    *  perform about 16 conversions in around 500us. To do that the prescaler
    *  is reduced to a value of 32. This gives an ADC clock speed of
@@ -62,31 +64,13 @@ public:
     ADC0.SAMPCTRL = 0;                                // Do not extend the ADC sampling length
     ADC0.INTCTRL |= ADC_RESRDY_bm;                    // Enable interrupts Gobal interrupt enable must be on
   }
-
-  void emitter_on(uint8_t pin) {
-    if (pin == 255 || not m_emitters_enabled) {
-      return;
-    }
-    digitalWriteFast(pin, 1);
-  }
-
-  void emitter_off(uint8_t pin) {
-    if (pin == 255) {
-      return;
-    }
-
-    digitalWriteFast(pin, 0);
-  }
-
-  //***************************************************************************//
-
   void start_conversion_cycle() {
     if (not m_configured) {
       return;
     }
-    m_phase = 0; // sync up the start of the sensor sequence
-    // bitSet(ADCSRA, ADIE); // enable the ADC interrupt
-    start_conversion(15); // begin a dummy conversion to get things started
+    ADC0.INTCTRL |= ADC_RESRDY_bm; /* Enable interrupts */
+    m_phase = 0;                   // sync up the start of the sensor sequence
+    start_conversion(15);          // begin a dummy conversion to get things started
   }
 
   void end_conversion_cycle() {
@@ -94,8 +78,7 @@ public:
   }
 
   void start_conversion(uint8_t channel) {
-    // the 4809 maps internal channels differently
-    // 3,2,1,0,12,13,4,5
+    // the 4809 maps internal channels differently    {3,2,1,0,12,13,4,5}
     channel = digitalPinToAnalogInput(channel);
     // select the channel - fix to channels 0-7
     ADC0.MUXPOS = channel & 0x0F; //
@@ -109,6 +92,22 @@ public:
     ADC0.INTFLAGS = ADC_RESRDY_bm;
     // Check that compiler gets low byte then high byte
     return ADC0.RES; // also clears the result ready interrupt flag.
+  }
+  // END OF HARDWARE DEPENDENCY
+  //***************************************************************************//
+
+  void emitter_on(uint8_t pin) {
+    if (pin == 255 || not m_emitters_enabled) {
+      return;
+    }
+    digitalWriteFast(pin, 1);
+  }
+
+  void emitter_off(uint8_t pin) {
+    if (pin == 255) {
+      return;
+    }
+    digitalWriteFast(pin, 0);
   }
 
 private:
