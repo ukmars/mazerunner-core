@@ -4,7 +4,7 @@
  * File Created: Monday, 31st October 2022 12:46:17 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 10:13:20 pm                       * 
+ * Last Modified: Monday, 31st October 2022 10:20:23 pm                       *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -17,12 +17,12 @@
 
 #include "Arduino.h"
 
-class NullSerial : public Stream {
+class SerialNull : public Stream {
 private:
 public:
   // public methods
-  NullSerial() {}
-  ~NullSerial() {}
+  SerialNull() {}
+  ~SerialNull() {}
 
   void begin(long speed) {
     (void)speed;

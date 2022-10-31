@@ -4,7 +4,7 @@
  * File Created: Monday, 31st October 2022 12:42:39 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 4:48:15 pm                        * 
+ * Last Modified: Monday, 31st October 2022 10:20:23 pm                       * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -74,7 +74,7 @@ HardwareSerial &console = Serial1;
  * Stream) that just logs messages to an SD card or flash device.
 */
 
-NullSerial nullConsole;
+SerialNull nullConsole;
 
 #ifdef USE_DEBUG
 Stream &debug = console;
