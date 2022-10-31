@@ -4,7 +4,7 @@
  * File Created: Thursday, 27th October 2022 12:12:56 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 12:07:42 am                       * 
+ * Last Modified: Monday, 31st October 2022 12:51:02 am                       * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -64,8 +64,6 @@
 void adc_isr(IAnalogueConverter &adc) {
     switch (adc.m_phase) {
         case 0: { // initialisation
-        _NOP();
-        _NOP();
             adc.m_group_index = 0;
             adc.m_index = 0;
             channel = adc.m_index;
