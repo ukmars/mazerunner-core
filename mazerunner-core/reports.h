@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 2:18:37 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Sunday, 30th October 2022 10:19:00 pm                       *
+ * Last Modified: Monday, 31st October 2022 4:32:06 pm                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -22,6 +22,7 @@
 #include "src/motors.h"
 #include "src/profile.h"
 #include "src/sensors.h"
+#include "src/serial.h"
 #include "src/utils.h"
 #include <Arduino.h>
 
@@ -34,7 +35,7 @@ class Reporter {
   uint32_t s_report_interval = REPORTING_INTERVAL;
 
 public:
-  // note that the Serial device has a 64 character buffer and, at 115200 baud
+  // note that the console device has a 64 character buffer and, at 115200 baud
   // 64 characters will take about 6ms to go out over the wire.
 
   /**
@@ -58,7 +59,7 @@ public:
    *
    */
   void report_profile_header() {
-    Serial.println(F("time robotPos robotAngle fwdPos  fwdSpeed rotpos rotSpeed fwdmVolts rotmVolts"));
+    console.println(F("time robotPos robotAngle fwdPos  fwdSpeed rotpos rotSpeed fwdmVolts rotmVolts"));
     s_start_time = millis();
     s_report_time = s_start_time;
   }
@@ -75,7 +76,7 @@ public:
       print_justified(int(rotation.speed()), 6);
       print_justified(motors.get_fwd_millivolts(), 6);
       print_justified(motors.get_rot_millivolts(), 6);
-      Serial.println();
+      console.println();
     }
   }
 
@@ -93,7 +94,7 @@ public:
    *
    */
   void report_sensor_track_header() {
-    Serial.println(F("time pos angle left right front error adjustment"));
+    console.println(F("time pos angle left right front error adjustment"));
     s_start_time = millis();
     s_report_time = s_start_time;
   }
@@ -115,11 +116,11 @@ public:
         print_justified(sensors.rss.value, 6);
         print_justified(sensors.rfs.value, 6);
       }
-      Serial.print(' ');
-      Serial.print(sensors.get_cross_track_error());
-      Serial.print(' ');
-      Serial.print(sensors.get_steering_feedback());
-      Serial.println();
+      console.print(' ');
+      console.print(sensors.get_cross_track_error());
+      console.print(' ');
+      console.print(sensors.get_steering_feedback());
+      console.println();
     }
   }
 
@@ -138,7 +139,7 @@ public:
    *
    */
   void front_sensor_track_header() {
-    Serial.println(F("dist front_sum front_diff"));
+    console.println(F("dist front_sum front_diff"));
   }
 
   void front_sensor_track() {
@@ -146,7 +147,7 @@ public:
       print_justified(int(encoders.robot_distance()), 7);
       print_justified(sensors.get_front_sum(), 7);
       print_justified(sensors.get_front_diff(), 7);
-      Serial.println();
+      console.println();
     }
   }
 
@@ -165,7 +166,7 @@ public:
    *
    */
   void wall_sensor_header() {
-    Serial.println(F("   lf_   ls_   rs_   rf_   lfs   lss   rss   rfs   sum  diff"));
+    console.println(F("   lf_   ls_   rs_   rf_   lfs   lss   rss   rfs   sum  diff"));
   }
 
   void show_wall_sensors() {
@@ -173,15 +174,15 @@ public:
     print_justified(sensors.lss.raw, 6);
     print_justified(sensors.rss.raw, 6);
     print_justified(sensors.rfs.raw, 6);
-    Serial.print(" | ");
+    console.print(" | ");
     print_justified(sensors.lfs.value, 6);
     print_justified(sensors.lss.value, 6);
     print_justified(sensors.rss.value, 6);
     print_justified(sensors.rfs.value, 6);
-    Serial.print(" | ");
+    console.print(" | ");
     print_justified(sensors.get_front_sum(), 6);
     print_justified(sensors.get_front_diff(), 6);
-    Serial.println();
+    console.println();
   }
 
   //***************************************************************************//

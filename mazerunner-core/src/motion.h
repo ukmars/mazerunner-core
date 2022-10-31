@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:18:32 am                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 27th October 2022 11:20:05 am                     *
+ * Last Modified: Monday, 31st October 2022 4:31:53 pm                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -20,6 +20,7 @@
 #include "motors.h"
 #include "profile.h"
 #include "sensors.h"
+#include "serial.h"
 #include <Arduino.h>
 class Motion {
 public:
@@ -112,7 +113,7 @@ public:
   void stop_at(float position) {
     float remaining = position - forward.position();
     forward.start(remaining, forward.speed(), 0, forward.acceleration());
-    Serial.print(F("STOP AT"));
+    console.print(F("STOP AT"));
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -133,7 +134,7 @@ public:
    */
   void stop_after(float distance) {
     forward.start(distance, forward.speed(), 0, forward.acceleration());
-    Serial.print(F("STOP AFTER"));
+    console.print(F("STOP AFTER"));
     while (not forward.is_finished()) {
       delay(2);
     }

@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:50:38 pm                    *
+ * Last Modified: Monday, 31st October 2022 4:32:17 pm                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -18,6 +18,7 @@
 #define MAZE_H
 
 #include "src/queue.h"
+#include "src/serial.h"
 #include "src/utils.h"
 #include <stdint.h>
 
@@ -313,109 +314,109 @@ public:
   void printNorthWalls(int row) {
     for (int col = 0; col < 16; col++) {
       unsigned char cell = row + 16 * col;
-      Serial.print('o');
+      console.print('o');
       if (is_wall(cell, NORTH)) {
-        Serial.print(("---"));
+        console.print(("---"));
       } else {
-        Serial.print(("   "));
+        console.print(("   "));
       }
     }
-    Serial.println('o');
+    console.println('o');
   }
 
   void printSouthWalls(int row) {
     for (int col = 0; col < 16; col++) {
       unsigned char cell = row + 16 * col;
-      Serial.print('o');
+      console.print('o');
       if (is_wall(cell, SOUTH)) {
-        Serial.print(("---"));
+        console.print(("---"));
       } else {
-        Serial.print(("   "));
+        console.print(("   "));
       }
     }
-    Serial.println('o');
+    console.println('o');
   }
 
   void print_plain() {
-    Serial.println();
+    console.println();
     for (int row = 15; row >= 0; row--) {
       printNorthWalls(row);
       for (int col = 0; col < 16; col++) {
         unsigned char cell = static_cast<unsigned char>(row + 16 * col);
         if (is_exit(cell, WEST)) {
-          Serial.print(("    "));
+          console.print(("    "));
         } else {
-          Serial.print(("|   "));
+          console.print(("|   "));
         }
       }
-      Serial.println('|');
+      console.println('|');
     }
     printSouthWalls(0);
-    Serial.println();
+    console.println();
     ;
   }
 
   void print_with_costs() {
-    Serial.println();
+    console.println();
     ;
     for (int row = 15; row >= 0; row--) {
       printNorthWalls(row);
       for (int col = 0; col < 16; col++) {
         unsigned char cell = static_cast<unsigned char>(row + 16 * col);
         if (is_exit(cell, WEST)) {
-          Serial.print(' ');
+          console.print(' ');
         } else {
-          Serial.print('|');
+          console.print('|');
         }
         print_justified(m_cost[cell], 3);
       }
-      Serial.println('|');
+      console.println('|');
     }
     printSouthWalls(0);
-    Serial.println();
+    console.println();
     ;
   }
 
   void print_with_directions() {
-    Serial.println();
+    console.println();
     flood_maze(maze_goal());
     for (int row = 15; row >= 0; row--) {
       printNorthWalls(row);
       for (int col = 0; col < 16; col++) {
         unsigned char cell = row + 16 * col;
         if (is_wall(cell, WEST)) {
-          Serial.print('|');
+          console.print('|');
         } else {
-          Serial.print(' ');
+          console.print(' ');
         }
         unsigned char direction = direction_to_smallest(cell, NORTH);
         if (cell == maze_goal()) {
           direction = 4;
         }
-        Serial.print(' ');
-        Serial.print(dirChars[direction]);
-        Serial.print(' ');
+        console.print(' ');
+        console.print(dirChars[direction]);
+        console.print(' ');
       }
-      Serial.println('|');
+      console.println('|');
     }
     printSouthWalls(0);
-    Serial.println();
+    console.println();
     ;
   }
 
   void print_maze_wall_data() {
-    Serial.println();
+    console.println();
     ;
     for (int row = 15; row >= 0; row--) {
       for (int col = 0; col < 16; col++) {
         int cell = row + 16 * col;
         print_hex_2(m_walls[cell]);
-        Serial.print(' ');
+        console.print(' ');
       }
-      Serial.println();
+      console.println();
       ;
     }
-    Serial.println();
+    console.println();
     ;
   }
 

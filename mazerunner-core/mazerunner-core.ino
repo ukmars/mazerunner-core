@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:56:33 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Sunday, 30th October 2022 4:19:44 pm                        *
+ * Last Modified: Monday, 31st October 2022 4:31:06 pm                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -25,6 +25,7 @@
 #include "src/motion.h"
 #include "src/motors.h"
 #include "src/sensors.h"
+#include "src/serial.h"
 #include "src/switches.h"
 #include "src/systick.h"
 #include <Arduino.h>
@@ -62,7 +63,8 @@ CommandLineInterface cli;
 Reporter reporter;
 
 void setup() {
-  Serial.begin(BAUDRATE);
+
+  console.begin(BAUDRATE);
   // group the front sensors
   adc.add_channel_to_group(0, 0);
   adc.add_channel_to_group(3, 0);
@@ -79,7 +81,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   motors.setup();
   encoders.setup();
-  Serial.print('-');
+  console.print('-');
   if (switches.button_pressed()) {
     maze.initialise_maze();
     for (int i = 0; i < 4; i++) {
@@ -88,12 +90,14 @@ void setup() {
       digitalWrite(LED_BUILTIN, 0);
       delay(50);
     }
-    Serial.println(F("Maze cleared"));
+    console.println(F("Maze cleared"));
     switches.wait_for_button_release();
   }
 
   sensors.disable();
-  Serial.println(F("RDY"));
+  // allow use of printf() calls direct to console
+  // redirectPrintf();
+  console.println(F("RDY"));
 }
 
 void loop() {

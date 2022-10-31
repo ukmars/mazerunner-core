@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 10:58:08 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:51:35 pm                    *
+ * Last Modified: Monday, 31st October 2022 4:29:38 pm                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -22,6 +22,7 @@
 #include "mouse.h"
 #include "reports.h"
 #include "src/sensors.h"
+#include "src/serial.h"
 #include "src/utils.h"
 #include <Arduino.h>
 #include <stdint.h>
@@ -53,22 +54,22 @@ public:
    */
   const char BACKSPACE = 0x08;
   int read_serial() {
-    while (Serial.available()) {
-      char c = Serial.read();
+    while (console.available()) {
+      char c = console.read();
       if (c == '\n') {
-        Serial.println();
+        console.println();
         return 1;
       } else if (c == BACKSPACE) {
         if (m_index > 0) {
           m_buffer[m_index] = 0;
           m_index--;
-          Serial.print(c); // backspace only moves the cursor
-          Serial.print(' ');
-          Serial.print(c);
+          console.print(c); // backspace only moves the cursor
+          console.print(' ');
+          console.print(c);
         }
       } else if (isPrintable(c)) {
         c = toupper(c);
-        Serial.print(c);
+        console.print(c);
         if (m_index < INPUT_BUFFER_SIZE - 1) {
           m_buffer[m_index++] = c;
           m_buffer[m_index] = 0;
@@ -143,7 +144,7 @@ public:
    * would just use the code:
    *
    *      for (int i = 0; i < args.argc; i++) {
-   *        Serial.println(args.argv[i]);
+   *        console.println(args.argv[i]);
    *      }
    *
    */
@@ -158,7 +159,7 @@ public:
         break;
     }
     // for (int i = 0; i < args.argc; i++) {
-    //   Serial.println(args.argv[i]);
+    //   console.println(args.argv[i]);
     // }
     return args;
   }
@@ -199,7 +200,7 @@ public:
         maze.print_plain();
         break;
       case 'X':
-        Serial.println(F("Reset Maze"));
+        console.println(F("Reset Maze"));
         maze.initialise_maze();
         break;
       case 'C':
@@ -225,9 +226,9 @@ public:
   }
 
   void prompt() {
-    Serial.print('\n');
-    Serial.print('>');
-    Serial.print(' ');
+    console.print('\n');
+    console.print('>');
+    console.print(' ');
   }
 
   /***
@@ -236,27 +237,27 @@ public:
    *
    */
   void help() {
-    Serial.println(F("W   : display maze walls"));
-    Serial.println(F("X   : reset maze"));
-    Serial.println(F("R   : display maze with directions"));
-    Serial.println(F("S   : show sensor readings"));
-    Serial.println(F("F n : Run user function n"));
-    Serial.println(F("       0 = ---"));
-    Serial.println(F("       1 = Sensor Calibration"));
-    Serial.println(F("       2 = Search to the goal and back"));
-    Serial.println(F("       3 = Follow a wall to the goal"));
-    Serial.println(F("       4 = "));
-    Serial.println(F("       5 = "));
-    Serial.println(F("       6 = "));
-    Serial.println(F("       7 = "));
-    Serial.println(F("       8 = "));
-    Serial.println(F("       9 = "));
-    Serial.println(F("      10 = "));
-    Serial.println(F("      11 = "));
-    Serial.println(F("      12 = "));
-    Serial.println(F("      13 = "));
-    Serial.println(F("      14 = "));
-    Serial.println(F("      15 = "));
+    console.println(F("W   : display maze walls"));
+    console.println(F("X   : reset maze"));
+    console.println(F("R   : display maze with directions"));
+    console.println(F("S   : show sensor readings"));
+    console.println(F("F n : Run user function n"));
+    console.println(F("       0 = ---"));
+    console.println(F("       1 = Sensor Calibration"));
+    console.println(F("       2 = Search to the goal and back"));
+    console.println(F("       3 = Follow a wall to the goal"));
+    console.println(F("       4 = "));
+    console.println(F("       5 = "));
+    console.println(F("       6 = "));
+    console.println(F("       7 = "));
+    console.println(F("       8 = "));
+    console.println(F("       9 = "));
+    console.println(F("      10 = "));
+    console.println(F("      11 = "));
+    console.println(F("      12 = "));
+    console.println(F("      13 = "));
+    console.println(F("      14 = "));
+    console.println(F("      15 = "));
   }
 
 private:

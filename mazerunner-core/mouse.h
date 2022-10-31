@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:50:14 pm                    *
+ * Last Modified: Monday, 31st October 2022 4:31:53 pm                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -25,6 +25,7 @@
 #include "src/motors.h"
 #include "src/profile.h"
 #include "src/sensors.h"
+#include "src/serial.h"
 #include "src/switches.h"
 #include "src/utils.h"
 
@@ -106,19 +107,19 @@ public:
 
   void print_walls() {
     if (sensors.see_left_wall) {
-      Serial.print('L');
+      console.print('L');
     } else {
-      Serial.print('-');
+      console.print('-');
     }
     if (sensors.see_front_wall) {
-      Serial.print('F');
+      console.print('F');
     } else {
-      Serial.print('-');
+      console.print('-');
     }
     if (sensors.see_right_wall) {
-      Serial.print('R');
+      console.print('R');
     } else {
-      Serial.print('-');
+      console.print('-');
     }
   }
 
@@ -290,19 +291,19 @@ public:
   }
 
   void log_status(char action) {
-    Serial.print('{');
-    Serial.print(action);
-    Serial.print(' ');
+    console.print('{');
+    console.print(action);
+    console.print(' ');
     print_hex_2(location);
-    Serial.print(' ');
-    Serial.print(dirLetters[heading]);
+    console.print(' ');
+    console.print(dirLetters[heading]);
     print_justified(sensors.get_front_sum(), 4);
-    Serial.print('@');
+    console.print('@');
     print_justified((int)forward.position(), 4);
-    Serial.print(' ');
+    console.print(' ');
     print_walls();
-    Serial.print('}');
-    Serial.print(' ');
+    console.print('}');
+    console.print(' ');
   }
 
   /***
@@ -311,7 +312,7 @@ public:
    * cell.
    */
   void follow_to(unsigned char target) {
-    Serial.println(F("Follow TO"));
+    console.println(F("Follow TO"));
     handStart = true;
     location = 0;
     heading = NORTH;
@@ -326,14 +327,14 @@ public:
       delay(2);
     }
     forward.set_position(HALF_CELL);
-    Serial.println(F("Off we go..."));
+    console.println(F("Off we go..."));
     motion.wait_until_position(FULL_CELL - 10);
     // at the start of this loop we are always at the sensing point
     while (location != target) {
       if (switches.button_pressed()) {
         break;
       }
-      Serial.println();
+      console.println();
       log_status('-');
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);
@@ -342,10 +343,10 @@ public:
       maze.flood_maze(maze.maze_goal());
       unsigned char newHeading = maze.direction_to_smallest(location, heading);
       unsigned char hdgChange = (newHeading - heading) & 0x3;
-      Serial.print(hdgChange);
-      Serial.write(' ');
-      Serial.write('|');
-      Serial.write(' ');
+      console.print(hdgChange);
+      console.write(' ');
+      console.write('|');
+      console.write(' ');
       log_status('.');
       if (location == target) {
         end_run();
@@ -368,8 +369,8 @@ public:
         log_status('x');
       }
     }
-    Serial.println();
-    Serial.println(F("Arrived!  "));
+    console.println();
+    console.println(F("Arrived!  "));
     for (int i = 0; i < 4; i++) {
       sensors.disable();
       delay(250);
@@ -420,14 +421,14 @@ public:
       delay(2);
     }
     forward.set_position(HALF_CELL);
-    Serial.println(F("Off we go..."));
+    console.println(F("Off we go..."));
     motion.wait_until_position(FULL_CELL - 10);
     // TODO. the robot needs to start each iteration at the sensing point
     while (location != target) {
       if (switches.button_pressed()) {
         break;
       }
-      Serial.println();
+      console.println();
       log_status('-');
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);
@@ -436,8 +437,8 @@ public:
       maze.flood_maze(target);
       unsigned char newHeading = maze.direction_to_smallest(location, heading);
       unsigned char hdgChange = (newHeading - heading) & 0x3;
-      Serial.print(hdg_letters[hdgChange]);
-      Serial.write(' ');
+      console.print(hdg_letters[hdgChange]);
+      console.write(' ');
       if (location == target) {
         end_run();
         heading = (heading + 2) & 0x03;
@@ -469,8 +470,8 @@ public:
       }
     }
     sensors.disable();
-    Serial.println();
-    Serial.println(F("Arrived!  "));
+    console.println();
+    console.println(F("Arrived!  "));
     for (int i = 0; i < 4; i++) {
       digitalWrite(LED_LEFT, 1);
       delay(250);
@@ -580,7 +581,7 @@ public:
    */
   int search_maze() {
     sensors.wait_for_user_start();
-    Serial.println(F("Search TO"));
+    console.println(F("Search TO"));
     handStart = true;
     location = START;
     heading = NORTH;
@@ -696,7 +697,7 @@ public:
     delay(100);
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
-    Serial.println(F("Edge positions:"));
+    console.println(F("Edge positions:"));
     forward.start(FULL_CELL - 30.0, 100, 0, 1000);
     while (not forward.is_finished()) {
       if (sensors.lss.value > left_max) {
@@ -721,20 +722,20 @@ public:
       }
       delay(5);
     }
-    Serial.print(F("Left: "));
+    console.print(F("Left: "));
     if (left_edge_found) {
-      Serial.print(BACK_WALL_TO_CENTER + left_edge_position);
+      console.print(BACK_WALL_TO_CENTER + left_edge_position);
     } else {
-      Serial.print('-');
+      console.print('-');
     }
 
-    Serial.print(F("  Right: "));
+    console.print(F("  Right: "));
     if (right_edge_found) {
-      Serial.print(BACK_WALL_TO_CENTER + right_edge_position);
+      console.print(BACK_WALL_TO_CENTER + right_edge_position);
     } else {
-      Serial.print('-');
+      console.print('-');
     }
-    Serial.println();
+    console.println();
 
     motion.reset_drive_system();
     sensors.disable();
@@ -805,7 +806,7 @@ public:
       reporter.show_wall_sensors();
     }
     switches.wait_for_button_release();
-    Serial.println();
+    console.println();
     delay(200);
     sensors.disable();
   }

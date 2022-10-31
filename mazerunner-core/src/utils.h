@@ -4,7 +4,7 @@
  * File Created: Friday, 9th September 2022 2:00:47 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 12:32:39 pm                       *
+ * Last Modified: Monday, 31st October 2022 4:32:38 pm                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -18,6 +18,7 @@
 #define UTILS_H
 
 #include "Arduino.h"
+#include "serial.h"
 const int MAX_ARGC = 16;
 #define MAX_DIGITS 8
 
@@ -29,9 +30,9 @@ struct Args {
 // simple formatting functions for printing maze costs
 inline void print_hex_2(unsigned char value) {
   if (value < 16) {
-    Serial.print('0');
+    console.print('0');
   }
-  Serial.print(value, HEX);
+  console.print(value, HEX);
 }
 
 inline void print_justified(int32_t value, int width) {
@@ -45,10 +46,10 @@ inline void print_justified(int32_t value, int width) {
     w--;
   }
   while (w > 0) {
-    Serial.write(' ');
+    console.write(' ');
     --w;
   }
-  Serial.print(value);
+  console.print(value);
 }
 
 inline void print_justified(int value, int width) {
