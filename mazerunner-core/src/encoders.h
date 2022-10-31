@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 9:53:01 am                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Sunday, 30th October 2022 4:02:04 pm                        *
+ * Last Modified: Monday, 31st October 2022 9:35:56 am                        *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -74,12 +74,16 @@ void callback_right();
 class Encoders {
 public:
   void setup() {
+#if defined(ARDUINO_ARCH_MEGAAVR) || defined(ARDUINO_ARCH_AVR)
     pinMode(ENCODER_LEFT_CLK, INPUT);
     pinMode(ENCODER_LEFT_B, INPUT);
     pinMode(ENCODER_RIGHT_CLK, INPUT);
     pinMode(ENCODER_RIGHT_B, INPUT);
     attachInterrupt(digitalPinToInterrupt(ENCODER_LEFT_CLK), callback_left, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENCODER_RIGHT_CLK), callback_right, CHANGE);
+#elif ARDUINO_ARCH_NRF52840
+#error Code for setup of encoders is needed
+#endif
     reset();
   }
 
