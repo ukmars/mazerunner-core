@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 10:37:22 am                      *
+ * Last Modified: Tuesday, 1st November 2022 11:32:24 am                      * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -128,8 +128,6 @@ public:
   }
 
   // for convenience allow access in an array-like manner
-  volatile int operator[](int i) const { return m_adc_reading[i]; }
-
   volatile int &operator[](int i) { return m_adc_reading[i]; }
 
   // all of these MUST be defined in the derived hardware class
