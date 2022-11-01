@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 9:50:43 am                        *
+ * Last Modified: Tuesday, 1st November 2022 11:14:12 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -26,7 +26,7 @@ class adc_atmega328 : public IAnalogueConverter {
 public:
   adc_atmega328() = default;
 
-  void begin() {
+  void begin() override {
     disable_emitters();
     for (int i = 0; i < MAX_GROUPS; i++) {
       if (m_emitter_pin[i] < 255) {
@@ -59,7 +59,7 @@ public:
     // Set the reference to AVcc and right adjust the result
     ADMUX = DEFAULT << 6;
   }
-  void start_conversion_cycle() {
+  void start_conversion_cycle() override {
     if (not m_configured) {
       return;
     }
@@ -68,31 +68,32 @@ public:
     start_conversion(15); // begin a dummy conversion to get things started
   }
 
-  void end_conversion_cycle() {
+  void end_conversion_cycle() override {
     bitClear(ADCSRA, ADIE); // disable the ADC interrupt
   }
 
-  void start_conversion(uint8_t channel) {
+  void start_conversion(uint8_t channel) override {
 
     // select the channel
     ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);
     // start the conversion
     sbi(ADCSRA, ADSC);
   }
-  int get_adc_result() {
+
+  int get_adc_result() override {
     return ADC;
   }
   // END OF HARDWARE DEPENDENCY
   //***************************************************************************//
 
-  void emitter_on(uint8_t pin) {
+  void emitter_on(uint8_t pin) override {
     if (pin == 255 || not m_emitters_enabled) {
       return;
     }
     digitalWriteFast(pin, 1);
   }
 
-  void emitter_off(uint8_t pin) {
+  void emitter_off(uint8_t pin) override {
     if (pin == 255) {
       return;
     }

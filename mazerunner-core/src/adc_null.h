@@ -4,7 +4,7 @@
  * File Created: Monday, 31st October 2022 1:03:23 pm                         *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 4:10:26 pm                        *
+ * Last Modified: Tuesday, 1st November 2022 11:16:04 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -28,7 +28,7 @@ class adc_null : public IAnalogueConverter {
 public:
   adc_null() = default;
 
-  void begin() {
+  void begin() override {
     disable_emitters();
     for (int i = 0; i < MAX_GROUPS; i++) {
       if (m_emitter_pin[i] < 255) {
@@ -56,7 +56,7 @@ public:
   void converter_init() {
   }
 
-  void start_conversion_cycle() {
+  void start_conversion_cycle() override {
     if (not m_configured) {
       return;
     }
@@ -65,33 +65,33 @@ public:
     // start_conversion(15); // begin a dummy conversion to get things started
   }
 
-  void end_conversion_cycle() {
+  void end_conversion_cycle() override {
     // disable the ADC interrupt
   }
 
-  void start_conversion(uint8_t channel) {
+  void start_conversion(uint8_t channel) override {
 
     // select the channel
     // start the conversion
   }
-  int get_adc_result() {
+  int get_adc_result() override {
     return 0;
   }
   // END OF HARDWARE DEPENDENCY
   //***************************************************************************//
 
-  void emitter_on(uint8_t pin) {
+  void emitter_on(uint8_t pin) override {
     if (pin == 255 || not m_emitters_enabled) {
       return;
     }
-    digitalWriteFast(pin, 1);
+    // digitalWriteFast(pin, 1);
   }
 
-  void emitter_off(uint8_t pin) {
+  void emitter_off(uint8_t pin) override {
     if (pin == 255) {
       return;
     }
-    digitalWriteFast(pin, 0);
+    // digitalWriteFast(pin, 0);
   }
 
 private:

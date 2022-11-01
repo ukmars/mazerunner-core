@@ -4,7 +4,7 @@
  * File Created: Monday, 31st October 2022 12:46:17 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 10:20:23 pm                       *
+ * Last Modified: Tuesday, 1st November 2022 11:18:31 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -36,7 +36,7 @@ public:
    * used for general input and output.
    * To re-enable serial communication, call Serial.begin().
    */
-  virtual void end() {}
+  void end() {}
 
   /***
    * Returns the next byte (character) of incoming serial data without
@@ -48,7 +48,7 @@ public:
    * RETURN: The first byte of incoming serial data available
    *         (or -1 if no data is available). Data type: int.
    */
-  virtual int peek() {
+  int peek() override {
     return -1;
   }
 
@@ -60,15 +60,16 @@ public:
    * RETURN: will return the number of bytes written, though reading that
    *         number is optional. Data type: size_t.
    */
-  virtual size_t write(unsigned char byte) {
+  size_t write(unsigned char byte) override {
     (void)byte;
     return 0;
   }
+
   size_t write(const char *str) {
     (void)str;
     return 0;
   }
-  size_t write(const uint8_t *buffer, size_t size) {
+  size_t write(const uint8_t *buffer, size_t size) override {
     (void)buffer;
     (void)size;
     return 0;
@@ -80,7 +81,7 @@ public:
    * RETURN: first byte of incoming data or -1 if none is available
    *         (EOF is probably defined as -1 in many implementations)
    */
-  virtual int read() {
+  int read() override {
     return -1;
   }
 
@@ -93,7 +94,7 @@ public:
    *
    * RETURN: the number of bytes in the buffer.
    */
-  virtual int available() {
+  int available() override {
     return 0;
   }
 
@@ -106,7 +107,7 @@ public:
    *
    * RETURN: nothing
    */
-  virtual void flush() {}
+  void flush() override {}
 
   // public only for easy access by interrupt handlers
   void handle_interrupt();
