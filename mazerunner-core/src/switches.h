@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 12:11:36 am                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 8:51:13 pm                      *
+ * Last Modified: Tuesday, 1st November 2022 10:42:08 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -76,7 +76,7 @@ public:
 
 private:
   uint8_t m_channel = 255;
-  int m_switches_adc;
+  int m_switches_adc = 0;
 };
 
 extern Switches switches;

@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 4:32:17 pm                        *
+ * Last Modified: Tuesday, 1st November 2022 10:35:58 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -422,8 +422,8 @@ public:
 
 private:
   uint8_t m_goal = 0x077;
-  uint8_t m_cost[256];
-  uint8_t m_walls[256];
+  uint8_t m_cost[256] = {0};
+  uint8_t m_walls[256] = {0};
 };
 
 extern Maze maze;

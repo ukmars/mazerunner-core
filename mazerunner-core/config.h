@@ -4,7 +4,7 @@
  * File Created: Sunday, 11th September 2022 3:34:57 pm                       *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Sunday, 30th October 2022 4:21:26 pm                        *
+ * Last Modified: Monday, 31st October 2022 10:26:16 pm                       *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -70,7 +70,7 @@ const int BATTERY_CHANNEL = 7;
  * Robot specific instances and values are in the robot config file.
  */
 struct TurnParameters {
-  int speed;
+  int speed;   // mm/s
   int run_in;  // mm
   int run_out; // mm
   int angle;   // deg

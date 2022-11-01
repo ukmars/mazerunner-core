@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 4:11:58 pm                        *
+ * Last Modified: Tuesday, 1st November 2022 10:37:22 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -145,14 +145,14 @@ public:
   friend void adc_isr(IAnalogueConverter &a);
 
 protected:
-  volatile int m_adc_reading[MAX_CHANNELS];
+  volatile int m_adc_reading[MAX_CHANNELS] = {0};
 
-  uint8_t m_emitter_pin[MAX_GROUPS];
+  uint8_t m_emitter_pin[MAX_GROUPS] = {0};
 
   List<uint8_t, MAX_CHANNELS> m_group[MAX_GROUPS];
 
-  uint8_t m_index;
-  uint8_t m_group_index;
+  uint8_t m_index = 0;
+  uint8_t m_group_index = 0;
 
   bool m_emitters_enabled = false;
   bool m_configured = false;

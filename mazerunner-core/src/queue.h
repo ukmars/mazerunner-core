@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 9:25:57 am                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:52:50 pm                    *
+ * Last Modified: Tuesday, 1st November 2022 10:42:20 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -61,11 +61,11 @@ public:
   }
 
 protected:
-  item_t *mData;
-  const int MAX_ITEMS;
-  int mHead;
-  int mTail;
-  int mItemCount;
+  item_t *mData = nullptr;
+  const int MAX_ITEMS = 10;
+  int mHead = 0;
+  int mTail = 0;
+  int mItemCount = 0;
 
 private:
   // while this is probably correct, prevent use of the copy constructor
