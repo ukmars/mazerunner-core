@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 10:40:06 am                      *
+ * Last Modified: Tuesday, 1st November 2022 10:30:36 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -203,7 +203,7 @@ public:
     float turn_point = FULL_CELL + turn_params[turn_id].run_in;
     while (forward.position() < turn_point) {
       if (sensors.get_front_sum() > trigger) {
-        forward.set_state(CS_FINISHED);
+        forward.set_state(PS_FINISHED);
         triggered = true;
         break;
       }

@@ -4,7 +4,7 @@
  * File Created: Friday, 9th September 2022 2:00:47 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 8:50:34 pm                      *
+ * Last Modified: Tuesday, 1st November 2022 10:30:36 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -27,10 +27,10 @@ extern Profile forward;
 extern Profile rotation;
 
 enum ProfileState : uint8_t {
-  CS_IDLE = 0,
-  CS_ACCELERATING = 1,
-  CS_BRAKING = 2,
-  CS_FINISHED = 3,
+  PS_IDLE = 0,
+  PS_ACCELERATING = 1,
+  PS_BRAKING = 2,
+  PS_FINISHED = 3,
 };
 
 class Profile {
@@ -40,11 +40,11 @@ public:
       m_position = 0;
       m_speed = 0;
       m_target_speed = 0;
-      m_state = CS_IDLE;
+      m_state = PS_IDLE;
     }
   }
 
-  bool is_finished() { return m_state == CS_FINISHED; }
+  bool is_finished() { return m_state == PS_FINISHED; }
 
   void start(float distance, float top_speed, float final_speed, float acceleration) {
     m_sign = (distance < 0) ? -1 : +1;
@@ -52,7 +52,7 @@ public:
       distance = -distance;
     }
     if (distance < 1.0) {
-      m_state = CS_FINISHED;
+      m_state = PS_FINISHED;
       return;
     }
     if (final_speed > top_speed) {
@@ -69,7 +69,7 @@ public:
     } else {
       m_one_over_acc = 1.0;
     }
-    m_state = CS_ACCELERATING;
+    m_state = PS_ACCELERATING;
   }
 
   void stop() {
@@ -82,7 +82,7 @@ public:
   void finish() {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       m_speed = m_target_speed;
-      m_state = CS_FINISHED;
+      m_state = PS_FINISHED;
     }
   }
 
@@ -146,14 +146,14 @@ public:
 
   // update is called from within systick and should be safe from interrupts
   void update() {
-    if (m_state == CS_IDLE) {
+    if (m_state == PS_IDLE) {
       return;
     }
     float delta_v = m_acceleration * LOOP_INTERVAL;
     float remaining = fabsf(m_final_position) - fabsf(m_position);
-    if (m_state == CS_ACCELERATING) {
+    if (m_state == PS_ACCELERATING) {
       if (remaining < get_braking_distance()) {
-        m_state = CS_BRAKING;
+        m_state = PS_BRAKING;
         if (m_final_speed == 0) {
           m_target_speed = m_sign * 5.0f; // magic number to make sure we reach zero
         } else {
@@ -176,14 +176,14 @@ public:
     }
     // increment the position
     m_position += m_speed * LOOP_INTERVAL;
-    if (m_state != CS_FINISHED && remaining < 0.125) {
-      m_state = CS_FINISHED;
+    if (m_state != PS_FINISHED && remaining < 0.125) {
+      m_state = PS_FINISHED;
       m_target_speed = m_final_speed;
     }
   }
 
 private:
-  volatile uint8_t m_state = CS_IDLE;
+  volatile uint8_t m_state = PS_IDLE;
   volatile float m_speed = 0;
   volatile float m_position = 0;
   int8_t m_sign = 1;
