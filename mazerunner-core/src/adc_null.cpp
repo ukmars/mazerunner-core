@@ -4,7 +4,7 @@
  * File Created: Monday, 31st October 2022 1:03:40 pm                         * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Tuesday, 1st November 2022 11:24:33 am                      * 
+ * Last Modified: Tuesday, 1st November 2022 11:29:52 am                      * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -18,6 +18,7 @@
 #include <Arduino.h>
 
 #if defined(ARDUINO_ARCH_NRF52840)
+#warning Needs a proper implementation of adc class
  adc_null adc; // TODO: this needs to get defineed in a hardware file not here
 #endif
 // ISR(ADC_vect) {
