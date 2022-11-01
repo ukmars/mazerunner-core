@@ -4,7 +4,7 @@
  * File Created: Monday, 31st October 2022 12:42:39 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 10:20:23 pm                       * 
+ * Last Modified: Tuesday, 1st November 2022 11:22:23 am                      * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -92,10 +92,12 @@ Stream &debug = nullConsole;
  * 
  * To use this facility add a call to redirectPrintf() early in the 
  * setup() function of your code.
+ * 
+ * TODO: this does not work with the NRF52 compiler. 
 */
 
 #define USE_PRINTF 1
-#ifdef USE_PRINTF
+#if defined(USE_PRINTF) && !defined(ARDUINO_ARCH_NRF52840) 
 // Function that printf and related will use to print
 int serial_putchar(char c, FILE *f) {
   if (c == '\n') {
