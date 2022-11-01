@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 12:11:36 am                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 29th October 2022 8:50:55 pm                      *
+ * Last Modified: Tuesday, 1st November 2022 10:59:36 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -208,10 +208,9 @@ public:
   uint8_t wait_for_user_start() {
     digitalWrite(LED_LEFT, 1);
     enable();
-    int count = 0;
     uint8_t choice = NO_START;
     while (choice == NO_START) {
-      count = 0;
+      int count = 0;
       while (occluded_left()) {
         count++;
         delay(20);
