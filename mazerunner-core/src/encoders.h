@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 9:53:01 am                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 9:35:56 am                        *
+ * Last Modified: Tuesday, 1st November 2022 11:22:52 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -82,7 +82,7 @@ public:
     attachInterrupt(digitalPinToInterrupt(ENCODER_LEFT_CLK), callback_left, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENCODER_RIGHT_CLK), callback_right, CHANGE);
 #elif ARDUINO_ARCH_NRF52840
-#error Code for setup of encoders is needed
+#warning Code for setup of encoders is needed
 #endif
     reset();
   }
