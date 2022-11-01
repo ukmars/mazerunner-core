@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 9:53:01 am                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 11:22:52 am                      *
+ * Last Modified: Tuesday, 1st November 2022 11:46:28 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -14,63 +14,24 @@
  *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
 
-#ifndef ENCODERS_H
-#define ENCODERS_H
+#pragma once
 
-/****************************************************************************/
-/*   ENCODERS                                                               */
-/****************************************************************************/
-
-/*
-   from ATMega328p datasheet section 12:
-   The ATMega328p can generate interrupt as a result of changes of state on two of its pins:
-
-   PD2 for INT0  - Arduino Digital Pin 2
-   PD3 for INT1  - Arduino Digital Pin 3
-
-   The INT0 and INT1 interrupts can be triggered by a falling or rising edge or a low level.
-   This is set up as indicated in the specification for the External Interrupt Control Register A –
-   EICRA.
-
-   The External Interrupt 0 is activated by the external pin INT0 if the SREG I-flag and the
-   corresponding interrupt mask are set. The level and edges on the external INT0 pin that activate
-   the interrupt are defined as
-
-   ISC01 ISC00  Description
-     0     0    Low Level of INT0 generates interrupt
-     0     1    Logical change of INT0 generates interrupt
-     1     0    Falling Edge of INT0 generates interrupt
-     1     1    Rising Edge of INT0 generates interrupt
-
-
-   The External Interrupt 1 is activated by the external pin INT1 if the SREG I-flag and the
-   corresponding interrupt mask are set. The level and edges on the external INT1 pin that activate
-   the interrupt are defined in Table 12-1
-
-   ISC11 ISC10  Description
-     0     0    Low Level of INT1 generates interrupt
-     0     1    Logical change of INT1 generates interrupt
-     1     0    Falling Edge of INT1 generates interrupt
-     1     1    Rising Edge of INT1 generates interrupt
-
-   To enable these interrupts, bits must be set in the external interrupt mask register EIMSK
-
-   EIMSK:INT0 (bit 0) enables the INT0 external interrupt
-   EIMSK:INT1 (bit 1) enables the INT1 external interrupt
-
-*/
 #include "../config.h"
 #include "atomic.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <stdint.h>
 
+// TODO: consider a single Encoder class and an Odometry class
+// that has two Encoder instances
+
 class Encoders;
 
-extern Encoders encoders;
+extern Encoders encoders; // declared in main file to keep it all together
 
 void callback_left();
 void callback_right();
+
 class Encoders {
 public:
   void setup() {
@@ -96,6 +57,14 @@ public:
     }
   }
 
+  /**
+   * For the ATmega328 and ATmega4809:
+   *   Measurements indicate that even at 1500mm/s the total load due to
+   *   the encoder interrupts is less than 3% of the available bandwidth.
+   *   The ISR will respond to the XOR-ed pulse train from the encoder
+   *   Runs in constant time of around 3us per interrupt.
+   *   Would be faster with direct port access
+   */
   void left_input_change() {
     static bool oldA = false;
     static bool oldB = false;
@@ -184,5 +153,3 @@ private:
   int m_left_counter;
   int m_right_counter;
 };
-
-#endif

@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 10:58:35 am                       * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Sunday, 30th October 2022 12:12:45 am                       * 
+ * Last Modified: Tuesday, 1st November 2022 11:46:25 pm                      * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -16,16 +16,9 @@
 
 
 #include "encoders.h"
-/**
- * Measurements indicate that even at 1500mm/s the total load due to
- * the encoder interrupts is less than 3% of the available bandwidth.
- */
 
-// ISR will respond to the XOR-ed pulse train from the encoder
-// runs in constant time of around 3us per interrupt.
-// would be faster with direct port access
-
-// a bit of indirection for convenience
+// a bit of indirection for convenience because the encoder instance is
+// unknown until the linker has done its thing
 void callback_left(){
   encoders.left_input_change();
 }
