@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 4:31:53 pm                        *
+ * Last Modified: Tuesday, 1st November 2022 10:40:06 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -29,7 +29,7 @@
 #include "src/switches.h"
 #include "src/utils.h"
 
-enum {
+enum MouseState {
   FRESH_START,
   SEARCHING,
   INPLACE_RUN,
@@ -39,7 +39,7 @@ enum {
 
 const char hdg_letters[] = "FRAL";
 const char dirLetters[] = "NESW";
-enum {
+enum TurnType {
   SS90EL = 0,
   SS90ER = 1,
   SS90L = 3,
@@ -53,10 +53,10 @@ class Mouse {
 public:
   unsigned char heading;
   unsigned char location;
-  bool leftWall;
-  bool frontWall;
-  bool rightWall;
-  bool handStart;
+  bool leftWall = false;
+  bool frontWall = false;
+  bool rightWall = false;
+  bool handStart = false;
 
   Mouse() {
     init();
