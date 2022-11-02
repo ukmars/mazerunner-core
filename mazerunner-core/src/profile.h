@@ -4,7 +4,7 @@
  * File Created: Friday, 9th September 2022 2:00:47 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 10:30:36 pm                      *
+ * Last Modified: Wednesday, 2nd November 2022 11:18:29 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -83,6 +83,12 @@ public:
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       m_speed = m_target_speed;
       m_state = PS_FINISHED;
+    }
+  }
+
+  void wait_until_finished() {
+    while (m_state != PS_FINISHED) {
+      delay(2);
     }
   }
 

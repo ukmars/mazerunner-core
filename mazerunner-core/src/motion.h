@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:18:32 am                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 4:31:53 pm                        *
+ * Last Modified: Wednesday, 2nd November 2022 11:18:29 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -77,9 +77,7 @@ public:
     // get ready to turn
     rotation.reset();
     rotation.start(angle, omega, 0, alpha);
-    while (not rotation.is_finished()) {
-      delay(2);
-    }
+    rotation.wait_until_finished();
   }
 
   /**
@@ -114,9 +112,7 @@ public:
     float remaining = position - forward.position();
     forward.start(remaining, forward.speed(), 0, forward.acceleration());
     console.print(F("STOP AT"));
-    while (not forward.is_finished()) {
-      delay(2);
-    }
+    forward.wait_until_finished();
   }
 
   /**
@@ -135,9 +131,7 @@ public:
   void stop_after(float distance) {
     forward.start(distance, forward.speed(), 0, forward.acceleration());
     console.print(F("STOP AFTER"));
-    while (not forward.is_finished()) {
-      delay(2);
-    }
+    forward.wait_until_finished();
   }
 
   /**
