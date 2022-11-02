@@ -4,7 +4,7 @@
  * File Created: Sunday, 11th September 2022 3:34:57 pm                       *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 10:26:16 pm                       *
+ * Last Modified: Wednesday, 2nd November 2022 12:41:18 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -43,6 +43,29 @@ const char board_name[] PROGMEM = "Nano - ATMega328P";
 #else
 const char board_name[] PROGMEM = "Unknown Board!";
 #endif
+
+/***
+ * Redirection for printf()
+ *
+ * If you want to be able to use the standard C printf() function
+ * you can uncomment the following definition.
+ *
+ * If your reason for doing so is to get better options for
+ * justifying numeric output, have a look in the src/utils.h file
+ * where there are other options available
+ *
+ * Be aware that doing using printf (or sprintf) may add quite a bit
+ * to the size of your code. Also, floating point will still not be
+ * available, at least for the AVR processors due to the Arduino
+ * compiler settings.
+ *
+ * When commented out, the printf code is still compiled so your
+ * program will increase in size but the output of printf will just
+ * not appear anywhere.
+ *
+ */
+
+//#define USE_PRINTF
 
 /***
  * Start with the pinouts for the robot. These are the pin

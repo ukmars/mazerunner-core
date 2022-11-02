@@ -48,6 +48,7 @@ Reporter reporter;
 void setup() {
 
   console.begin(BAUDRATE);
+  redirectPrintf(); // uncomment if you want to send printf output to console
   console.println((const __FlashStringHelper *)board_name);
   // group the front sensors
   adc.add_channel_to_group(0, 0);

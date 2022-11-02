@@ -4,7 +4,7 @@
  * File Created: Monday, 31st October 2022 12:42:39 pm                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 11:22:23 am                      * 
+ * Last Modified: Wednesday, 2nd November 2022 12:20:33 pm                    * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -15,6 +15,7 @@
  ******************************************************************************/
 
 #include "serial.h"
+#include "config.h"
 #include <Arduino.h>
 
 /***
@@ -96,7 +97,6 @@ Stream &debug = nullConsole;
  * TODO: this does not work with the NRF52 compiler. 
 */
 
-#define USE_PRINTF 1
 #if defined(USE_PRINTF) && !defined(ARDUINO_ARCH_NRF52840) 
 // Function that printf and related will use to print
 int serial_putchar(char c, FILE *f) {
