@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 11:14:12 am                      *
+ * Last Modified: Wednesday, 2nd November 2022 1:00:03 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -28,11 +28,6 @@ public:
 
   void begin() override {
     disable_emitters();
-    for (int i = 0; i < MAX_GROUPS; i++) {
-      if (m_emitter_pin[i] < 255) {
-        pinMode(m_emitter_pin[i], OUTPUT);
-      }
-    }
     converter_init();
     m_configured = true;
   }

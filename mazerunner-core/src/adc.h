@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:51:51 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 11:32:24 am                      *
+ * Last Modified: Wednesday, 2nd November 2022 12:58:56 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -106,6 +106,7 @@ public:
     if (group >= MAX_GROUPS) {
       return;
     }
+    pinMode(pin, OUTPUT);
     m_emitter_pin[group] = pin;
   };
 
