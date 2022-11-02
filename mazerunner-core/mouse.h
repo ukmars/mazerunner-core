@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 2nd November 2022 11:22:21 pm                    *
+ * Last Modified: Wednesday, 2nd November 2022 11:39:12 pm                    * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -615,6 +615,8 @@ public:
   }
 
   /**
+   * TODO: move this out to the mazerunner-setup code
+   * 
    * Edge detection test displays the position at which an edge is found when
    * the robot is travelling down a straight.
    *
@@ -741,7 +743,7 @@ public:
    * the raw readings, the next four are normalised then there
    * are two values for the sum and difference of the front sensors
    *
-   * The advanced user might use this a s a start for auto calibration
+   * The advanced user might use this as a start for auto calibration
    */
   void show_sensor_calibration() {
     reporter.wall_sensor_header();
