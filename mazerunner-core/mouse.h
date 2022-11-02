@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 2nd November 2022 1:52:19 pm                     *
+ * Last Modified: Wednesday, 2nd November 2022 10:33:52 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -48,7 +48,6 @@ class Mouse;
 extern Mouse mouse;
 
 class Mouse {
-public:
   unsigned char heading;
   unsigned char location;
   bool leftWall = false;
@@ -56,6 +55,7 @@ public:
   bool rightWall = false;
   bool handStart = false;
 
+public:
   Mouse() {
     init();
   }
@@ -103,9 +103,17 @@ public:
     }
   }
 
+  /**
+   * change the mouse heading but do not physically turn
+   */
+
+  void set_heading(unsigned char new_heading) {
+    heading = new_heading;
+  }
+
   //***************************************************************************//
   /**
-   * Used to bring the mouse to a halt, centred in a cell.
+   * Used to bring the mouse to a halt, centered in a cell.
    *
    * If there is a wall ahead, it will use that for a reference to make sure it
    * is well positioned.
@@ -171,16 +179,17 @@ public:
     bool triggered = false;
     sensors.set_steering_mode(STEERING_OFF);
     forward.set_target_speed(SEARCH_TURN_SPEED);
+    TurnParameters params = turn_params[turn_id];
 
-    float trigger = turn_params[turn_id].trigger;
+    float trigger = params.trigger;
     if (sensors.see_left_wall) {
-      trigger += 10;
+      trigger += 10; // MAGIC number
     }
     if (sensors.see_right_wall) {
-      trigger += 6;
+      trigger += 6; // MAGIC number
     }
 
-    float turn_point = FULL_CELL + turn_params[turn_id].run_in;
+    float turn_point = FULL_CELL + params.run_in;
     while (forward.position() < turn_point) {
       if (sensors.get_front_sum() > trigger) {
         forward.set_state(PS_FINISHED);
@@ -189,15 +198,15 @@ public:
       }
     }
     if (triggered) {
-      reporter.log_status('S', location, heading);
+      reporter.log_status('S', location, heading); // the sensors triggered the turn
     } else {
-      reporter.log_status('D', location, heading);
+      reporter.log_status('D', location, heading); // the position triggered the turn
     }
-    rotation.start(turn_params[turn_id].angle, turn_params[turn_id].omega, 0, turn_params[turn_id].alpha);
+    rotation.start(params.angle, params.omega, 0, params.alpha);
     while (not rotation.is_finished()) {
       delay(2);
     }
-    forward.start(turn_params[turn_id].run_out, forward.speed(), SEARCH_SPEED, SEARCH_ACCELERATION);
+    forward.start(params.run_out, forward.speed(), SEARCH_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
@@ -234,11 +243,13 @@ public:
     // Be sure robot has come to a halt.
     forward.stop();
     motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
-    forward.start(HALF_CELL - 10.0, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
+    // move from cell center to the sensing point and do not stop
+    // TODO: should this be here or in the caller?
+    forward.start(SENSING_POSITION - HALF_CELL, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     while (not forward.is_finished()) {
       delay(2);
     }
-    forward.set_position(FULL_CELL - 10.0);
+    forward.set_position(SENSING_POSITION);
   }
 
   void end_run() {
@@ -446,14 +457,6 @@ public:
     return 0;
   }
 
-  /**
-   * change the mouse heading but do not physically turn
-   */
-
-  void set_heading(unsigned char new_heading) {
-    heading = new_heading;
-  }
-
   void turn_to_face(unsigned char newHeading) {
     unsigned char hdgChange = (newHeading - heading) & 0x3;
     switch (hdgChange) {
@@ -538,8 +541,12 @@ public:
    * pass through unvisited cells.
    *
    * A better searcher will continue until a path generated through all
-   * cells, regardless of visited state,  does not pass through any
+   * cells, regardless of visited state, does not pass through any
    * unvisited cells.
+   *
+   * The return value is not currently used but could indicate whether
+   * the maze is 'solved'. That is, whether there is any need to search
+   * further.
    *
    */
   int search_maze() {
@@ -557,7 +564,7 @@ public:
 
   //***************************************************************************//
   //************  BELOW HERE ARE VARIOUS TEST FUNCTIONS ***********************//
-  //********** THEY ARE NOT ESSENTIALL TO THE BUSINESS OF *********************//
+  //********** THEY ARE NOT ESSENTIAL TO THE BUSINESS OF **********************//
   //******** SOLVING THE MAZE BUT THEY MAY HELP WITH SETUP ********************//
   //***************************************************************************//
 
