@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:56:33 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 2nd November 2022 12:43:24 pm                    *
+ * Last Modified: Wednesday, 2nd November 2022 1:06:27 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -48,8 +48,9 @@ Reporter reporter;
 void setup() {
 
   console.begin(BAUDRATE);
-  redirectPrintf(); // uncomment if you want to send printf output to console
+  // redirectPrintf(); // uncomment to send printf output to console
   console.println((const __FlashStringHelper *)board_name);
+  // set up the emitters and groups BEFORE starting the adc
   // group the front sensors
   adc.add_channel_to_group(0, 0);
   adc.add_channel_to_group(3, 0);
@@ -58,14 +59,13 @@ void setup() {
   adc.add_channel_to_group(1, 1);
   adc.add_channel_to_group(2, 1);
   adc.set_emitter_for_group(EMITTER_DIAGONAL, 1);
-
+  // now configure the hardware
   adc.begin();
-
-  pinMode(USER_IO_6, OUTPUT);
+  pinMode(LED_USER, OUTPUT);
+  digitalWrite(LED_USER, 0);
   pinMode(LED_BUILTIN, OUTPUT);
   motors.setup();
   encoders.setup();
-  console.print('-');
   systick.begin();
 
   if (switches.button_pressed()) {
@@ -81,8 +81,6 @@ void setup() {
   }
 
   sensors.disable();
-  // allow use of printf() calls direct to console
-  // redirectPrintf();
   console.println(F("RDY"));
 }
 
