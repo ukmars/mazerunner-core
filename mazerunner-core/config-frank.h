@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:15:50 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 2nd November 2022 10:42:46 am                    *
+ * Last Modified: Wednesday, 2nd November 2022 1:04:48 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -234,6 +234,9 @@ const float BATTERY_MULTIPLIER = (ADC_REF_VOLTS / ADC_FSR / BATTERY_DIVIDER_RATI
 // the ADVANCED sensor board has only one LED so use the value twice
 const int LED_LEFT = USER_IO_6;
 const int LED_RIGHT = USER_IO_6;
+const int LED_USER = USER_IO_6;
+const int LED_USER_A = USER_IO_6;
+const int LED_USER_B = USER_IO_6;
 
 //***** SENSOR HARDWARE *****************************************************//
 // the ADC channels corresponding to the sensor inputs. There are 8 available
