@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 10:59:56 am                       * 
  * Author: Peter Harrison                                                     * 
  * -----                                                                      * 
- * Last Modified: Monday, 31st October 2022 12:44:41 pm                       * 
+ * Last Modified: Wednesday, 2nd November 2022 10:38:50 am                    * 
  * -----                                                                      * 
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     * 
  * -----                                                                      * 
@@ -27,4 +27,6 @@ ISR(TCB2_INT_vect, ISR_NOBLOCK){
   systick.update();
   TCB2.INTFLAGS = TCB_CAPT_bm; // manually clear the interrupt
 }
+#else
+#warning you will need a systick interrupt running at 500Hz
 #endif
