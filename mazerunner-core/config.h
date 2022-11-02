@@ -33,6 +33,17 @@
  *
  */
 
+// work out the board architecture
+#if defined(ARDUINO_ARCH_MEGAAVR)
+const char board_name[] PROGMEM = "Nano Every - ATMEGA4809";
+#elif defined(ARDUINO_ARCH_NRF52840)
+const char board_name[] PROGMEM = "Nano 33 - NRF52840";
+#elif defined(ARDUINO_ARCH_AVR)
+const char board_name[] PROGMEM = "Nano - ATMega328P";
+#else
+const char board_name[] PROGMEM = "Unknown Board!";
+#endif
+
 /***
  * Start with the pinouts for the robot. These are the pin
  * definitions for the UKMARSBOT V1.x mainboard and should be

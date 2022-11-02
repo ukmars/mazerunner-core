@@ -30,23 +30,6 @@
 #include "src/systick.h"
 #include <Arduino.h>
 
-#ifdef ARDUINO_ARCH_MEGAAVR
-#warning this is an Arduino Nano Every ATMEGA4809?
-#endif
-#ifdef ARDUINO_ARCH_NRF52840
-#warning this is an Arduino Nano 33 something with the NRF52840 processor?
-#endif
-#ifdef ARDUINO_ARCH_AVR
-#warning this is an Arduino Nano or similar with the ATMega328P processor?
-#if defined(__AVR_ATmega328P__)
-#warning ATMEGA328P
-#endif
-#if defined(__AVR_ATmega328__)
-#warning ATMEGA328
-#endif
-
-#endif
-
 // Global objects
 Systick systick;
 
@@ -65,6 +48,7 @@ Reporter reporter;
 void setup() {
 
   console.begin(BAUDRATE);
+  console.println((const __FlashStringHelper *)board_name);
   // group the front sensors
   adc.add_channel_to_group(0, 0);
   adc.add_channel_to_group(3, 0);

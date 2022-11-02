@@ -4,7 +4,7 @@
  * File Created: Sunday, 11th September 2022 10:54:41 am                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 1:07:06 pm                        *
+ * Last Modified: Wednesday, 2nd November 2022 10:42:46 am                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -27,7 +27,7 @@
 #include "src/adc_atmega328.h"
 #elif defined(ARDUINO_ARCH_NRF52840)
 #include "src/adc_null.h"
-#warning need a nano33 ble header here
+#warning need a nano33 ble serial device
 #endif
 
 const uint32_t BAUDRATE = 115200;
