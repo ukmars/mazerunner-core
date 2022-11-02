@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 12:11:36 am                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 10:59:36 am                      *
+ * Last Modified: Wednesday, 2nd November 2022 1:52:19 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -233,6 +233,10 @@ public:
     digitalWrite(LED_LEFT, 0);
     delay(250);
     return choice;
+  }
+
+  float battery_voltage() {
+    return m_battery_volts;
   }
 
 private:

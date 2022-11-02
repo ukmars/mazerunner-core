@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 10:58:08 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 4:29:38 pm                        *
+ * Last Modified: Wednesday, 2nd November 2022 1:52:19 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -208,6 +208,11 @@ public:
         break;
       case 'R':
         maze.print_with_directions();
+        break;
+      case 'B':
+        console.print(F("Battery: "));
+        console.print(sensors.battery_voltage(), 2);
+        console.print(F(" Volts\n"));
         break;
       case 'S':
         sensors.enable();
