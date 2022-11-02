@@ -4,7 +4,7 @@
  * File Created: Tuesday, 25th October 2022 9:25:57 am                        *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 10:42:20 am                      *
+ * Last Modified: Wednesday, 2nd November 2022 10:49:38 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -19,17 +19,12 @@
 /**
  * The Queue class is used to speed up flooding of the maze
  */
-template <class item_t>
+template <class item_t, int num_items = 64>
 class Queue {
 public:
-  explicit Queue(int maxSize = 64) : MAX_ITEMS(maxSize) {
-    mData = new item_t[MAX_ITEMS + 1];
+  Queue() {
     clear();
   }
-
-  ~Queue() {
-    delete[] mData;
-  };
 
   int size() {
     return mItemCount;
@@ -45,24 +40,23 @@ public:
     mData[mTail] = item;
     ++mTail;
     ++mItemCount;
-    if (mTail > MAX_ITEMS) {
-      mTail -= MAX_ITEMS;
+    if (mTail > num_items) {
+      mTail -= num_items;
     }
   }
 
   item_t head() {
     item_t result = mData[mHead];
     ++mHead;
-    if (mHead > MAX_ITEMS) {
-      mHead -= MAX_ITEMS;
+    if (mHead > num_items) {
+      mHead -= num_items;
     }
     --mItemCount;
     return result;
   }
 
 protected:
-  item_t *mData = nullptr;
-  const int MAX_ITEMS = 10;
+  item_t mData[num_items + 1];
   int mHead = 0;
   int mTail = 0;
   int mItemCount = 0;

@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 10:35:58 am                      *
+ * Last Modified: Wednesday, 2nd November 2022 10:50:54 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -248,7 +248,7 @@ public:
     for (int i = 0; i < 256; i++) {
       m_cost[i] = MAX_COST;
     }
-    Queue<uint8_t> queue;
+    Queue<uint8_t, 64> queue;
     m_cost[target] = 0;
     queue.add(target);
     while (queue.size() > 0) {
