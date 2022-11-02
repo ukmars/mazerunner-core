@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:56:33 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 10:51:08 pm                       *
+ * Last Modified: Wednesday, 2nd November 2022 12:43:24 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -61,12 +61,13 @@ void setup() {
 
   adc.begin();
 
-  systick.begin();
   pinMode(USER_IO_6, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   motors.setup();
   encoders.setup();
   console.print('-');
+  systick.begin();
+
   if (switches.button_pressed()) {
     maze.initialise_maze();
     for (int i = 0; i < 4; i++) {
