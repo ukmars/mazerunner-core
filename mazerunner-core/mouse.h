@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 10:30:36 pm                      *
+ * Last Modified: Wednesday, 2nd November 2022 1:52:19 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -37,8 +37,6 @@ enum MouseState {
   FINISHED
 };
 
-const char hdg_letters[] = "FRAL";
-const char dirLetters[] = "NESW";
 enum TurnType {
   SS90EL = 0,
   SS90ER = 1,
@@ -102,24 +100,6 @@ public:
         sensors.disable();
         motion.reset_drive_system();
         break;
-    }
-  }
-
-  void print_walls() {
-    if (sensors.see_left_wall) {
-      console.print('L');
-    } else {
-      console.print('-');
-    }
-    if (sensors.see_front_wall) {
-      console.print('F');
-    } else {
-      console.print('-');
-    }
-    if (sensors.see_right_wall) {
-      console.print('R');
-    } else {
-      console.print('-');
     }
   }
 
@@ -209,9 +189,9 @@ public:
       }
     }
     if (triggered) {
-      log_status('S');
+      reporter.log_status('S', location, heading);
     } else {
-      log_status('D');
+      reporter.log_status('D', location, heading);
     }
     rotation.start(turn_params[turn_id].angle, turn_params[turn_id].omega, 0, turn_params[turn_id].alpha);
     while (not rotation.is_finished()) {
@@ -239,7 +219,7 @@ public:
   void turn_around() {
     bool has_wall = frontWall;
     sensors.set_steering_mode(STEERING_OFF);
-    log_status('A');
+    reporter.log_status('A', location, heading);
     float remaining = (FULL_CELL + HALF_CELL) - forward.position();
     forward.start(remaining, forward.speed(), 30, forward.acceleration());
     if (has_wall) {
@@ -264,7 +244,7 @@ public:
   void end_run() {
     bool has_wall = frontWall;
     sensors.set_steering_mode(STEERING_OFF);
-    log_status('T');
+    reporter.log_status('T', location, heading);
     float remaining = (FULL_CELL + HALF_CELL) - forward.position();
     forward.start(remaining, forward.speed(), 30, forward.acceleration());
     if (has_wall) {
@@ -276,7 +256,7 @@ public:
         delay(2);
       }
     }
-    log_status('x');
+    reporter.log_status('x', location, heading);
     // Be sure robot has come to a halt.
     forward.stop();
     motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
@@ -288,22 +268,6 @@ public:
     rightWall = (sensors.see_right_wall);
     leftWall = (sensors.see_left_wall);
     frontWall = (sensors.see_front_wall);
-  }
-
-  void log_status(char action) {
-    console.print('{');
-    console.print(action);
-    console.print(' ');
-    print_hex_2(location);
-    console.print(' ');
-    console.print(dirLetters[heading]);
-    print_justified(sensors.get_front_sum(), 4);
-    console.print('@');
-    print_justified((int)forward.position(), 4);
-    console.print(' ');
-    print_walls();
-    console.print('}');
-    console.print(' ');
   }
 
   /***
@@ -335,7 +299,7 @@ public:
         break;
       }
       console.println();
-      log_status('-');
+      reporter.log_status('-', location, heading);
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);
       check_the_walls();
@@ -347,26 +311,26 @@ public:
       console.write(' ');
       console.write('|');
       console.write(' ');
-      log_status('.');
+      reporter.log_status('.', location, heading);
       if (location == target) {
         end_run();
       } else if (!leftWall) {
         turn_smooth(SS90EL);
         heading = (heading + 3) & 0x03;
-        log_status('x');
+        reporter.log_status('x', location, heading);
       } else if (!frontWall) {
         forward.adjust_position(-FULL_CELL);
-        log_status('F');
+        reporter.log_status('F', location, heading);
         motion.wait_until_position(FULL_CELL - 10.0);
-        log_status('x');
+        reporter.log_status('x', location, heading);
       } else if (!rightWall) {
         turn_smooth(SS90ER);
         heading = (heading + 1) & 0x03;
-        log_status('x');
+        reporter.log_status('x', location, heading);
       } else {
         turn_around();
         heading = (heading + 2) & 0x03;
-        log_status('x');
+        reporter.log_status('x', location, heading);
       }
     }
     console.println();
@@ -429,7 +393,7 @@ public:
         break;
       }
       console.println();
-      log_status('-');
+      reporter.log_status('-', location, heading);
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);
       check_the_walls();
@@ -447,23 +411,22 @@ public:
         switch (hdgChange) {
           case 0: // ahead
             forward.adjust_position(-FULL_CELL);
-            log_status('F');
-            log_status('x');
+            reporter.log_status('x', location, heading);
             motion.wait_until_position(FULL_CELL - 10);
             break;
           case 1: // right
             turn_smooth(SS90ER);
-            log_status('x');
+            reporter.log_status('x', location, heading);
             heading = (heading + 1) & 0x03;
             break;
           case 2: // behind
             turn_around();
-            log_status('x');
+            reporter.log_status('x', location, heading);
             heading = (heading + 2) & 0x03;
             break;
           case 3: // left
             turn_smooth(SS90EL);
-            log_status('x');
+            reporter.log_status('x', location, heading);
             heading = (heading + 3) & 0x03;
             break;
         }

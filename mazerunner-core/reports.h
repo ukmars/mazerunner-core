@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 2:18:37 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 4:32:06 pm                        *
+ * Last Modified: Wednesday, 2nd November 2022 1:52:19 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -25,6 +25,9 @@
 #include "src/serial.h"
 #include "src/utils.h"
 #include <Arduino.h>
+
+const char hdg_letters[] = "FRAL";
+const char dirLetters[] = "NESW";
 
 class Reporter;
 extern Reporter reporter;
@@ -186,6 +189,40 @@ public:
   }
 
   //***************************************************************************//
+  void print_walls() {
+    if (sensors.see_left_wall) {
+      console.print('L');
+    } else {
+      console.print('-');
+    }
+    if (sensors.see_front_wall) {
+      console.print('F');
+    } else {
+      console.print('-');
+    }
+    if (sensors.see_right_wall) {
+      console.print('R');
+    } else {
+      console.print('-');
+    }
+  }
+
+  //***************************************************************************//
+  void log_status(char action, uint8_t location, uint8_t heading) {
+    console.print('{');
+    console.print(action);
+    console.print(' ');
+    print_hex_2(location);
+    console.print(' ');
+    console.print(dirLetters[heading]);
+    print_justified(sensors.get_front_sum(), 4);
+    console.print('@');
+    print_justified((int)forward.position(), 4);
+    console.print(' ');
+    // print_walls();
+    console.print('}');
+    console.print(' ');
+  }
 };
 
 #endif
