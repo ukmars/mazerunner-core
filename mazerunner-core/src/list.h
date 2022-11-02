@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 2:59:04 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 26th October 2022 11:48:44 pm                    *
+ * Last Modified: Wednesday, 2nd November 2022 10:49:38 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -22,14 +22,9 @@
 template <class item_t, int num_items = 8>
 class List {
 public:
-  explicit List(int maxSize = num_items) : mTail(0) {
-    mData = new item_t[num_items];
+  List() {
     clear();
   }
-
-  ~List() {
-    delete[] mData;
-  };
 
   int size() {
     return mTail;
@@ -48,8 +43,7 @@ public:
   int operator[](int i) const { return mData[i]; }
 
 protected:
-  item_t *mData;
-  //    const int MAX_ITEMS;
+  item_t mData[num_items];
   uint8_t mTail;
 
 private:
