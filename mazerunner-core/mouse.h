@@ -48,12 +48,6 @@ class Mouse;
 extern Mouse mouse;
 
 class Mouse {
-  unsigned char heading;
-  unsigned char location;
-  bool leftWall = false;
-  bool frontWall = false;
-  bool rightWall = false;
-  bool handStart = false;
 
 public:
   Mouse() {
@@ -760,6 +754,14 @@ public:
     delay(200);
     sensors.disable();
   }
+
+private:
+  unsigned char heading;
+  unsigned char location;
+  bool leftWall = false;
+  bool frontWall = false;
+  bool rightWall = false;
+  bool handStart = false;
 };
 
 #endif // MOUSE_H
