@@ -251,9 +251,9 @@ public:
     } else {
       forward.wait_until_finished();
     }
-    reporter.log_status('x', location, heading);
     // Be sure robot has come to a halt.
     forward.stop();
+    reporter.log_status('x', location, heading);
     motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
