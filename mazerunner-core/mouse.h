@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 2nd November 2022 11:39:12 pm                    * 
+ * Last Modified: Thursday, 3rd November 2022 8:27:43 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -29,27 +29,27 @@
 #include "src/switches.h"
 #include "src/utils.h"
 
-enum MouseState {
-  FRESH_START,
-  SEARCHING,
-  INPLACE_RUN,
-  SMOOTH_RUN,
-  FINISHED
-};
-
-enum TurnType {
-  SS90EL = 0,
-  SS90ER = 1,
-  SS90L = 3,
-  SS90R = 3,
-};
-
 class Mouse;
 extern Mouse mouse;
 
 class Mouse {
 
 public:
+  enum State {
+    FRESH_START,
+    SEARCHING,
+    INPLACE_RUN,
+    SMOOTH_RUN,
+    FINISHED
+  };
+
+  enum TurnType {
+    SS90EL = 0,
+    SS90ER = 1,
+    SS90L = 3,
+    SS90R = 3,
+  };
+
   Mouse() {
     init();
   }
@@ -616,7 +616,7 @@ public:
 
   /**
    * TODO: move this out to the mazerunner-setup code
-   * 
+   *
    * Edge detection test displays the position at which an edge is found when
    * the robot is travelling down a straight.
    *
