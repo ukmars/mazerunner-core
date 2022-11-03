@@ -11,5 +11,4 @@ html/
 # Ignore Mac files
 .DS_Store
 cmake-*/
-firmware.ram.txt
-firmware.flash.txt
+firmware.*
