@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:18:32 am                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 2nd November 2022 11:18:29 pm                    *
+ * Last Modified: Thursday, 3rd November 2022 8:50:31 am                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -110,8 +110,8 @@ public:
    */
   void stop_at(float position) {
     float remaining = position - forward.position();
-    forward.start(remaining, forward.speed(), 0, forward.acceleration());
     console.print(F("STOP AT"));
+    forward.start(remaining, forward.speed(), 0, forward.acceleration());
     forward.wait_until_finished();
   }
 
@@ -129,8 +129,8 @@ public:
    * @brief bring the robot to a halt after a specific distance
    */
   void stop_after(float distance) {
-    forward.start(distance, forward.speed(), 0, forward.acceleration());
     console.print(F("STOP AFTER"));
+    forward.start(distance, forward.speed(), 0, forward.acceleration());
     forward.wait_until_finished();
   }
 
