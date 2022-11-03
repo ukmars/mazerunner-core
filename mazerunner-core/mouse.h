@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 3rd November 2022 8:27:43 am                      *
+ * Last Modified: Thursday, 3rd November 2022 8:38:55 am                      * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -328,12 +328,7 @@ public:
     }
     console.println();
     console.println(F("Arrived!  "));
-    for (int i = 0; i < 4; i++) {
-      sensors.disable();
-      delay(250);
-      sensors.enable();
-      delay(250);
-    }
+    delay(250);
     sensors.disable();
 
     motion.reset_drive_system();
@@ -424,12 +419,7 @@ public:
     sensors.disable();
     console.println();
     console.println(F("Arrived!  "));
-    for (int i = 0; i < 4; i++) {
-      digitalWrite(LED_LEFT, 1);
-      delay(250);
-      digitalWrite(LED_LEFT, 0);
-      delay(250);
-    }
+    delay(250);
 
     motion.reset_drive_system();
     return 0;
