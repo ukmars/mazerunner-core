@@ -370,7 +370,7 @@ public:
     forward.wait_until_finished();
     forward.set_position(HALF_CELL);
     console.println(F("Off we go..."));
-    motion.wait_until_position(FULL_CELL - 10);
+    motion.wait_until_position(SENSING_POSITION);
     // TODO. the robot needs to start each iteration at the sensing point
     while (location != target) {
       if (switches.button_pressed()) {
