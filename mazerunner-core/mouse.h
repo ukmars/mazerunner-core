@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 3rd November 2022 8:55:02 am                      *
+ * Last Modified: Thursday, 3rd November 2022 11:06:38 am                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -203,22 +203,14 @@ public:
     forward.set_position(SENSING_POSITION);
   }
 
-  /**
-   * As with all the search turns, this command will be called after the robot has
-   * reached the search decision point and decided its next move. It is not known
-   * how long that takes or what the exact position will be.
-   *
-   * Turning around is always going to be an in-place operation so it is important
-   * that the robot is stationary and as well centred as possible.
-   *
-   * It only takes 27mm of travel to come to a halt from normal search speed.
-   *
-   *
+  /***
+   * bring the mouse to a halt in the center of the current cell. That is,
+   * the cell it is entering.
    */
-  void turn_around() {
+  void stop_at_center() {
     bool has_wall = frontWall;
     sensors.set_steering_mode(STEERING_OFF);
-    reporter.log_status('A', location, heading);
+    reporter.log_status('T', location, heading);
     float remaining = (FULL_CELL + HALF_CELL) - forward.position();
     forward.start(remaining, forward.speed(), 30, forward.acceleration());
     if (has_wall) {
@@ -230,29 +222,37 @@ public:
     }
     // Be sure robot has come to a halt.
     forward.stop();
+  }
+  /**
+   * As with all the search turns, this command will be called after the robot has
+   * reached the search decision point and decided its next move. It is not known
+   * how long that takes or what the exact position will be.
+   *
+   * Turning around is always going to be an in-place operation so it is important
+   * that the robot is stationary and as well centred as possible.
+   *
+   * It only takes 27mm of travel to come to a halt from normal search speed.
+   */
+  void turn_back() {
+    stop_at_center();
     motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
-    // move from cell center to the sensing point and do not stop
-    // TODO: should this be here or in the caller?
+
     forward.start(SENSING_POSITION - HALF_CELL, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     forward.wait_until_finished();
     forward.set_position(SENSING_POSITION);
   }
-
+  /***
+   * Called at the end of a run when the mouse is about to enter
+   * the target cell. The target is just where the mouse is
+   * going at this stage and may be the goal, the start cell or any
+   * other cell in the maze.
+   *
+   * The aim is to bring the mouse to a halt in the center of the
+   * cell and then do a spin turn of 180 degrees.
+   *
+   */
   void end_run() {
-    bool has_wall = frontWall;
-    sensors.set_steering_mode(STEERING_OFF);
-    reporter.log_status('T', location, heading);
-    float remaining = (FULL_CELL + HALF_CELL) - forward.position();
-    forward.start(remaining, forward.speed(), 30, forward.acceleration());
-    if (has_wall) {
-      while (sensors.get_front_sum() < 850) {
-        delay(2);
-      }
-    } else {
-      forward.wait_until_finished();
-    }
-    // Be sure robot has come to a halt.
-    forward.stop();
+    stop_at_center();
     reporter.log_status('x', location, heading);
     motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
@@ -321,7 +321,7 @@ public:
         heading = (heading + 1) & 0x03;
         reporter.log_status('x', location, heading);
       } else {
-        turn_around();
+        turn_back();
         heading = (heading + 2) & 0x03;
         reporter.log_status('x', location, heading);
       }
@@ -379,7 +379,7 @@ public:
       console.println();
       reporter.log_status('-', location, heading);
       sensors.set_steering_mode(STEER_NORMAL);
-      location = maze.neighbour(location, heading);
+      location = maze.neighbour(location, heading); // the cell we are about to enter
       check_the_walls();
       update_map();
       maze.flood_maze(target);
@@ -404,7 +404,7 @@ public:
             heading = (heading + 1) & 0x03;
             break;
           case 2: // behind
-            turn_around();
+            turn_back();
             reporter.log_status('x', location, heading);
             heading = (heading + 2) & 0x03;
             break;
