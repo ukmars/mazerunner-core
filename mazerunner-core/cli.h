@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 10:58:08 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 2nd November 2022 1:52:19 pm                     *
+ * Last Modified: Thursday, 3rd November 2022 11:03:16 pm                     *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -245,6 +245,7 @@ public:
     console.println(F("W   : display maze walls"));
     console.println(F("X   : reset maze"));
     console.println(F("R   : display maze with directions"));
+    console.println(F("B   : show battery voltage"));
     console.println(F("S   : show sensor readings"));
     console.println(F("F n : Run user function n"));
     console.println(F("       0 = ---"));
