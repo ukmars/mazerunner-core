@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 10:58:35 pm                    *
+ * Last Modified: Saturday, 26th November 2022 11:28:24 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -33,6 +33,37 @@
 #define WEST 3
 
 #define VISITED 0xF0
+
+typedef enum {
+  MASK_OPEN = 0x01,   // open maze for search
+  MASK_CLOSED = 0x03, // closed maze for fast run
+} mask_t;
+
+typedef enum {
+  EXIT = 0,
+  WALL = 1,
+  UNKNOWN = 2,
+  VIRTUAL = 3,
+} t_wall_state;
+
+typedef struct {
+  unsigned char north : 2;
+  unsigned char east : 2;
+  unsigned char south : 2;
+  unsigned char west : 2;
+} wall_info_t;
+
+typedef int direction_t;
+
+enum { north = 0,
+       east = 1,
+       south = 2,
+       west = 3,
+       blocked = 4 };
+enum { ahead = 0,
+       right = 1,
+       back = 2,
+       left = 3 };
 
 #define INVALID_DIRECTION (0)
 #define MAX_COST 255
