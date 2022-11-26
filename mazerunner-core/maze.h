@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 10:37:33 pm                    *
+ * Last Modified: Saturday, 26th November 2022 10:41:45 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -176,6 +176,11 @@ public:
     return nextCell;
   }
 
+  static uint8_t ahead_from(uint8_t heading) { return (heading); }
+  static uint8_t right_from(uint8_t heading) { return ((heading + 1) % 4); }
+  static uint8_t behind(uint8_t heading) { return ((heading + 2) % 4); }
+  static uint8_t left_from(uint8_t heading) { return ((heading + 3) % 4); }
+
   uint8_t neighbour(uint8_t cell, uint8_t direction) {
     uint16_t next;
     switch (direction) {
@@ -261,19 +266,19 @@ public:
       smallestCost = nextCost;
       smallestDirection = nextDirection;
     };
-    nextDirection = (startDirection + 1) % 4; // right
+    nextDirection = right_from(startDirection);
     nextCost = neighbour_cost(cell, nextDirection);
     if (nextCost < smallestCost) {
       smallestCost = nextCost;
       smallestDirection = nextDirection;
     };
-    nextDirection = (startDirection + 3) % 4; // left
+    nextDirection = left_from(startDirection);
     nextCost = neighbour_cost(cell, nextDirection);
     if (nextCost < smallestCost) {
       smallestCost = nextCost;
       smallestDirection = nextDirection;
     };
-    nextDirection = (startDirection + 2) % 4; // behind
+    nextDirection = behind(startDirection);
     nextCost = neighbour_cost(cell, nextDirection);
     if (nextCost < smallestCost) {
       smallestCost = nextCost;
