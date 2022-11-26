@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 2nd November 2022 10:50:54 pm                    *
+ * Last Modified: Saturday, 26th November 2022 10:36:06 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -65,9 +65,6 @@ public:
     return ((m_walls[cell] & (1 << direction)) == 0);
   }
 
-  bool is_wall(uint8_t cell, uint8_t direction) {
-    return ((m_walls[cell] & (1 << direction)) != 0);
-  }
   /***
    * Set a single wall in the maze. Each wall is set from two directions
    * so that it is consistent when seen from the neighbouring cell.
@@ -315,10 +312,10 @@ public:
     for (int col = 0; col < 16; col++) {
       unsigned char cell = row + 16 * col;
       console.print('o');
-      if (is_wall(cell, NORTH)) {
-        console.print(("---"));
-      } else {
+      if (is_exit(cell, NORTH)) {
         console.print(("   "));
+      } else {
+        console.print(("---"));
       }
     }
     console.println('o');
@@ -328,10 +325,10 @@ public:
     for (int col = 0; col < 16; col++) {
       unsigned char cell = row + 16 * col;
       console.print('o');
-      if (is_wall(cell, SOUTH)) {
-        console.print(("---"));
-      } else {
+      if (is_exit(cell, SOUTH)) {
         console.print(("   "));
+      } else {
+        console.print(("---"));
       }
     }
     console.println('o');
@@ -384,10 +381,10 @@ public:
       printNorthWalls(row);
       for (int col = 0; col < 16; col++) {
         unsigned char cell = row + 16 * col;
-        if (is_wall(cell, WEST)) {
-          console.print('|');
-        } else {
+        if (is_exit(cell, WEST)) {
           console.print(' ');
+        } else {
+          console.print('|');
         }
         unsigned char direction = direction_to_smallest(cell, NORTH);
         if (cell == maze_goal()) {
