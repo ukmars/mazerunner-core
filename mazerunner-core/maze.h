@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 10:41:45 pm                    *
+ * Last Modified: Saturday, 26th November 2022 10:58:35 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -37,8 +37,6 @@
 #define INVALID_DIRECTION (0)
 #define MAX_COST 255
 
-const char dirChars[] = "^>v<*";
-
 class Maze {
 
 public:
@@ -64,6 +62,8 @@ public:
   bool is_exit(uint8_t cell, uint8_t direction) {
     return ((m_walls[cell] & (1 << direction)) == 0);
   }
+
+  uint8_t get_walls(uint8_t cell) { return m_walls[cell]; };
 
   /***
    * Set a single wall in the maze. Each wall is set from two directions
@@ -290,114 +290,7 @@ public:
     return smallestDirection;
   }
 
-  void printNorthWalls(int row) {
-    for (int col = 0; col < 16; col++) {
-      unsigned char cell = row + 16 * col;
-      console.print('o');
-      if (is_exit(cell, NORTH)) {
-        console.print(("   "));
-      } else {
-        console.print(("---"));
-      }
-    }
-    console.println('o');
-  }
-
-  void printSouthWalls(int row) {
-    for (int col = 0; col < 16; col++) {
-      unsigned char cell = row + 16 * col;
-      console.print('o');
-      if (is_exit(cell, SOUTH)) {
-        console.print(("   "));
-      } else {
-        console.print(("---"));
-      }
-    }
-    console.println('o');
-  }
-
-  void print_plain() {
-    console.println();
-    for (int row = 15; row >= 0; row--) {
-      printNorthWalls(row);
-      for (int col = 0; col < 16; col++) {
-        unsigned char cell = static_cast<unsigned char>(row + 16 * col);
-        if (is_exit(cell, WEST)) {
-          console.print(("    "));
-        } else {
-          console.print(("|   "));
-        }
-      }
-      console.println('|');
-    }
-    printSouthWalls(0);
-    console.println();
-    ;
-  }
-
-  void print_with_costs() {
-    console.println();
-    ;
-    for (int row = 15; row >= 0; row--) {
-      printNorthWalls(row);
-      for (int col = 0; col < 16; col++) {
-        unsigned char cell = static_cast<unsigned char>(row + 16 * col);
-        if (is_exit(cell, WEST)) {
-          console.print(' ');
-        } else {
-          console.print('|');
-        }
-        print_justified(m_cost[cell], 3);
-      }
-      console.println('|');
-    }
-    printSouthWalls(0);
-    console.println();
-    ;
-  }
-
-  void print_with_directions() {
-    console.println();
-    flood_maze(maze_goal());
-    for (int row = 15; row >= 0; row--) {
-      printNorthWalls(row);
-      for (int col = 0; col < 16; col++) {
-        unsigned char cell = row + 16 * col;
-        if (is_exit(cell, WEST)) {
-          console.print(' ');
-        } else {
-          console.print('|');
-        }
-        unsigned char direction = direction_to_smallest(cell, NORTH);
-        if (cell == maze_goal()) {
-          direction = 4;
-        }
-        console.print(' ');
-        console.print(dirChars[direction]);
-        console.print(' ');
-      }
-      console.println('|');
-    }
-    printSouthWalls(0);
-    console.println();
-    ;
-  }
-
-  void print_maze_wall_data() {
-    console.println();
-    ;
-    for (int row = 15; row >= 0; row--) {
-      for (int col = 0; col < 16; col++) {
-        int cell = row + 16 * col;
-        print_hex_2(m_walls[cell]);
-        console.print(' ');
-      }
-      console.println();
-      ;
-    }
-    console.println();
-    ;
-  }
+  friend class MazePrinter;
 
 private:
   uint8_t m_goal = 0x077;
