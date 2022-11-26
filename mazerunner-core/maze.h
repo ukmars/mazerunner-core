@@ -51,19 +51,17 @@ public:
     return m_goal;
   }
 
-  void mark_cell_visited(uint8_t cell) {
-    m_walls[cell] |= VISITED;
-  }
+  // void mark_cell_visited(uint8_t cell) {
+  //   m_walls[cell] |= VISITED;
+  // }
 
-  bool cell_is_visited(uint8_t cell) {
-    return (m_walls[cell] & VISITED) == VISITED;
-  }
+  // bool cell_is_visited(uint8_t cell) {
+  //   return (m_walls[cell] & VISITED) == VISITED;
+  // }
 
   bool is_exit(uint8_t cell, uint8_t direction) {
     return ((m_walls[cell] & (1 << direction)) == 0);
   }
-
-  uint8_t get_walls(uint8_t cell) { return m_walls[cell]; };
 
   /***
    * Set a single wall in the maze. Each wall is set from two directions
