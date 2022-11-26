@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 10:36:06 pm                    *
+ * Last Modified: Saturday, 26th November 2022 10:37:33 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -201,34 +201,11 @@ public:
    * Assumes the maze has been flooded
    */
   uint8_t neighbour_cost(uint8_t cell, uint8_t direction) {
-    uint8_t result = MAX_COST;
-    uint8_t wallData = m_walls[cell];
-    switch (direction) {
-      case NORTH:
-        if ((wallData & (1 << NORTH)) == 0) {
-          result = m_cost[cell_north(cell)];
-        }
-        break;
-      case EAST:
-        if ((wallData & (1 << EAST)) == 0) {
-          result = m_cost[cell_east(cell)];
-        }
-        break;
-      case SOUTH:
-        if ((wallData & (1 << SOUTH)) == 0) {
-          result = m_cost[cell_south(cell)];
-        }
-        break;
-      case WEST:
-        if ((wallData & (1 << WEST)) == 0) {
-          result = m_cost[cell_west(cell)];
-        }
-        break;
-      default:
-        // TODO: this is an error. We should handle it.
-        break;
+    if (not is_exit(cell, direction)) {
+      return MAX_COST;
     }
-    return result;
+    int next_cell = neighbour(cell, direction);
+    return m_cost[next_cell];
   }
 
   /***
