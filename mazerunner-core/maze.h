@@ -132,6 +132,16 @@ public:
     }
   }
 
+  void set_wall_state(uint8_t cell, uint8_t direction, t_wall_state state) {
+    if (state == WALL) {
+      set_wall_present(cell, direction);
+    };
+
+    if (state == EXIT) {
+      set_wall_absent(cell, direction);
+    };
+  }
+
   /***
    * Initialise a maze and the costs with border m_walls and the start cell
    *
@@ -146,14 +156,14 @@ public:
     }
     // place the boundary m_walls.
     for (uint8_t i = 0; i < 16; i++) {
-      set_wall_present(i, WEST);
-      set_wall_present(15 * 16 + i, EAST);
-      set_wall_present(i * 16, SOUTH);
-      set_wall_present((16 * i + 15), NORTH);
+      set_wall_state(i, WEST, WALL);
+      set_wall_state(15 * 16 + i, EAST, WALL);
+      set_wall_state(i * 16, SOUTH, WALL);
+      set_wall_state((16 * i + 15), NORTH, WALL);
     }
     // and the start cell m_walls.
-    set_wall_present(START, EAST);
-    set_wall_absent(START, NORTH);
+    set_wall_state(START, EAST, WALL);
+    set_wall_state(START, NORTH, EXIT);
   }
 
   uint8_t cell_north(uint8_t cell) {
