@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:56:33 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 11:06:37 pm                    *
+ * Last Modified: Saturday, 26th November 2022 11:41:55 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -49,9 +49,7 @@ Reporter reporter;
 void setup() {
 
   console.begin(BAUDRATE);
-  maze.initialise_maze();
-  maze.flood_maze(0x77);
-  MazePrinter::print_maze(maze, COSTS);
+
   // redirectPrintf(); // uncomment to send printf output to console
   console.println((const __FlashStringHelper *)board_name);
   // set up the emitters and groups BEFORE starting the adc
