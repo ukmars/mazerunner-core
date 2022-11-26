@@ -4,7 +4,7 @@
  * File Created: Saturday, 26th November 2022 10:44:24 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 11:11:15 pm                    *
+ * Last Modified: Saturday, 26th November 2022 11:44:36 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -87,13 +87,31 @@ public:
     ;
   }
 
+  static int walls_to_int(wall_info_t walls, int mask) {
+    int result = 0;
+    if ((walls.north & mask) == WALL) {
+      result |= 0x01;
+    }
+    if ((walls.east & mask) == WALL) {
+      result |= 0x02;
+    }
+    if ((walls.south & mask) == WALL) {
+      result |= 0x04;
+    }
+    if ((walls.west & mask) == WALL) {
+      result |= 0x08;
+    }
+    return result;
+  }
+
   static void print_maze_wall_data(Maze &maze) {
     console.println();
     ;
     for (int row = 15; row >= 0; row--) {
       for (int col = 0; col < 16; col++) {
         int cell = row + 16 * col;
-        print_hex_2(maze.m_walls[cell]);
+        wall_info_t w = maze.m_walls[cell];
+        print_hex_2(MazePrinter::walls_to_int(w, MASK_OPEN));
         console.print(' ');
       }
       console.println();

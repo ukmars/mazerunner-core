@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 11:28:24 pm                    *
+ * Last Modified: Saturday, 26th November 2022 11:44:14 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -60,6 +60,7 @@ enum { north = 0,
        south = 2,
        west = 3,
        blocked = 4 };
+
 enum { ahead = 0,
        right = 1,
        back = 2,
@@ -67,6 +68,9 @@ enum { ahead = 0,
 
 #define INVALID_DIRECTION (0)
 #define MAX_COST 255
+#define MAX_COST 255
+#define MAZE_WIDTH 16
+#define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_WIDTH)
 
 class Maze {
 
@@ -82,93 +86,63 @@ public:
     return m_goal;
   }
 
-  // void mark_cell_visited(uint8_t cell) {
-  //   m_walls[cell] |= VISITED;
-  // }
+  bool has_unknown_walls(int cell) {
+    wall_info_t walls_here = m_walls[cell];
+    if (walls_here.north == UNKNOWN || walls_here.east == UNKNOWN || walls_here.south == UNKNOWN || walls_here.west == UNKNOWN) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  // bool cell_is_visited(uint8_t cell) {
-  //   return (m_walls[cell] & VISITED) == VISITED;
-  // }
+  bool cell_is_visited(uint8_t cell) {
+    return not has_unknown_walls(cell);
+  }
 
   bool is_exit(uint8_t cell, uint8_t direction) {
-    return ((m_walls[cell] & (1 << direction)) == 0);
-  }
-
-  /***
-   * Set a single wall in the maze. Each wall is set from two directions
-   * so that it is consistent when seen from the neighbouring cell.
-   *
-   * The wall is set unconditionally regardless of whether there is
-   * already a wall present
-   *
-   * No check is made on the provided value for direction
-   */
-  void set_wall_present(uint8_t cell, uint8_t direction) {
-    uint16_t nextCell = neighbour(cell, direction);
+    bool result = false;
     switch (direction) {
-      case NORTH:
-        m_walls[cell] |= (1 << NORTH);
-        m_walls[nextCell] |= (1 << SOUTH);
+      case north:
+        result = (m_walls[cell].north & m_mask) == EXIT;
         break;
-      case EAST:
-        m_walls[cell] |= (1 << EAST);
-        m_walls[nextCell] |= (1 << WEST);
+      case east:
+        result = (m_walls[cell].east & m_mask) == EXIT;
         break;
-      case SOUTH:
-        m_walls[cell] |= (1 << SOUTH);
-        m_walls[nextCell] |= (1 << NORTH);
+      case south:
+        result = (m_walls[cell].south & m_mask) == EXIT;
         break;
-      case WEST:
-        m_walls[cell] |= (1 << WEST);
-        m_walls[nextCell] |= (1 << EAST);
+      case west:
+        result = (m_walls[cell].west & m_mask) == EXIT;
         break;
-      default:; // do nothing - although this is an error
+      default:
+        result = false;
         break;
     }
-  }
-
-  /***
-   * Clear a single wall in the maze. Each wall is cleared from two directions
-   * so that it is consistent when seen from the neighbouring cell.
-   *
-   * The wall is cleared unconditionally regardless of whether there is
-   * already a wall present
-   *
-   * No check is made on the provided value for direction. Take care not
-   * to clear m_walls around maze boundary.
-   */
-  void set_wall_absent(uint8_t cell, uint8_t direction) {
-    uint16_t nextCell = neighbour(cell, direction);
-    switch (direction) {
-      case NORTH:
-        m_walls[cell] &= ~(1 << NORTH);
-        m_walls[nextCell] &= ~(1 << SOUTH);
-        break;
-      case EAST:
-        m_walls[cell] &= ~(1 << EAST);
-        m_walls[nextCell] &= ~(1 << WEST);
-        break;
-      case SOUTH:
-        m_walls[cell] &= ~(1 << SOUTH);
-        m_walls[nextCell] &= ~(1 << NORTH);
-        break;
-      case WEST:
-        m_walls[cell] &= ~(1 << WEST);
-        m_walls[nextCell] &= ~(1 << EAST);
-        break;
-      default:; // do nothing - although this is an error
-        break;
-    }
+    return result;
   }
 
   void set_wall_state(uint8_t cell, uint8_t direction, t_wall_state state) {
-    if (state == WALL) {
-      set_wall_present(cell, direction);
-    };
-
-    if (state == EXIT) {
-      set_wall_absent(cell, direction);
-    };
+    switch (direction) {
+      case north:
+        m_walls[cell].north = state;
+        m_walls[cell_north(cell)].south = state;
+        break;
+      case east:
+        m_walls[cell].east = state;
+        m_walls[cell_east(cell)].west = state;
+        break;
+      case west:
+        m_walls[cell].west = state;
+        m_walls[cell_west(cell)].east = state;
+        break;
+      case south:
+        m_walls[cell].south = state;
+        m_walls[cell_south(cell)].north = state;
+        break;
+      default:
+        // ignore any other direction (blocked)
+        break;
+    }
   }
 
   /***
@@ -179,21 +153,30 @@ public:
    *
    */
   void initialise_maze() {
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MAZE_CELL_COUNT; i++) {
       m_cost[i] = 0;
-      m_walls[i] = 0;
+      set_wall_state(i, north, UNKNOWN);
+      set_wall_state(i, east, UNKNOWN);
+      set_wall_state(i, south, UNKNOWN);
+      set_wall_state(i, west, UNKNOWN);
     }
-    // place the boundary m_walls.
-    for (uint8_t i = 0; i < 16; i++) {
-      set_wall_state(i, WEST, WALL);
-      set_wall_state(15 * 16 + i, EAST, WALL);
-      set_wall_state(i * 16, SOUTH, WALL);
-      set_wall_state((16 * i + 15), NORTH, WALL);
+    // place the boundary walls.
+    for (uint8_t i = 0; i < MAZE_WIDTH; i++) {
+      set_wall_state(i, west, WALL);
+      set_wall_state(MAZE_WIDTH * (MAZE_WIDTH - 1) + i, east, WALL);
+      set_wall_state(MAZE_WIDTH * i, south, WALL);
+      set_wall_state(MAZE_WIDTH * i + MAZE_WIDTH - 1, north, WALL);
     }
     // and the start cell m_walls.
-    set_wall_state(START, EAST, WALL);
-    set_wall_state(START, NORTH, EXIT);
+    set_wall_state(START, north, EXIT);
+    set_wall_state(START, east, WALL);
+    // the open maze treats unknowns as exits
+    set_mask(MASK_OPEN);
   }
+
+  void set_mask(mask_t mask) { m_mask = mask; }
+
+  mask_t get_mask() { return m_mask; }
 
   uint8_t cell_north(uint8_t cell) {
     uint8_t nextCell = (cell + (1));
@@ -332,9 +315,10 @@ public:
   friend class MazePrinter;
 
 private:
+  mask_t m_mask = MASK_OPEN;
   uint8_t m_goal = 0x077;
   uint8_t m_cost[256] = {0};
-  uint8_t m_walls[256] = {0};
+  wall_info_t m_walls[256] = {0};
 };
 
 extern Maze maze;
