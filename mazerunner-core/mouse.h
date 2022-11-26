@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 3rd November 2022 11:06:38 am                     *
+ * Last Modified: Saturday, 26th November 2022 11:21:08 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -447,53 +447,52 @@ public:
     switch (heading) {
       case NORTH:
         if (frontWall) {
-          maze.set_wall_present(location, NORTH);
+          maze.set_wall_state(location, NORTH, WALL);
         }
         if (rightWall) {
-          maze.set_wall_present(location, EAST);
+          maze.set_wall_state(location, EAST, WALL);
         }
         if (leftWall) {
-          maze.set_wall_present(location, WEST);
+          maze.set_wall_state(location, WEST, WALL);
         }
         break;
       case EAST:
         if (frontWall) {
-          maze.set_wall_present(location, EAST);
+          maze.set_wall_state(location, EAST, WALL);
         }
         if (rightWall) {
-          maze.set_wall_present(location, SOUTH);
+          maze.set_wall_state(location, SOUTH, WALL);
         }
         if (leftWall) {
-          maze.set_wall_present(location, NORTH);
+          maze.set_wall_state(location, NORTH, WALL);
         }
         break;
       case SOUTH:
         if (frontWall) {
-          maze.set_wall_present(location, SOUTH);
+          maze.set_wall_state(location, SOUTH, WALL);
         }
         if (rightWall) {
-          maze.set_wall_present(location, WEST);
+          maze.set_wall_state(location, WEST, WALL);
         }
         if (leftWall) {
-          maze.set_wall_present(location, EAST);
+          maze.set_wall_state(location, EAST, WALL);
         }
         break;
       case WEST:
         if (frontWall) {
-          maze.set_wall_present(location, WEST);
+          maze.set_wall_state(location, WEST, WALL);
         }
         if (rightWall) {
-          maze.set_wall_present(location, NORTH);
+          maze.set_wall_state(location, NORTH, WALL);
         }
         if (leftWall) {
-          maze.set_wall_present(location, SOUTH);
+          maze.set_wall_state(location, SOUTH, WALL);
         }
         break;
       default:
         // This is an error. We should handle it.
         break;
     }
-    maze.mark_cell_visited(location);
   }
 
   /***
