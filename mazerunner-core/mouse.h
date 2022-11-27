@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 11:21:08 pm                    *
+ * Last Modified: Sunday, 27th November 2022 11:39:11 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -393,22 +393,22 @@ public:
       } else {
 
         switch (hdgChange) {
-          case 0: // ahead
+          case AHEAD:
             forward.adjust_position(-FULL_CELL);
             reporter.log_status('x', location, heading);
             motion.wait_until_position(FULL_CELL - 10);
             break;
-          case 1: // right
+          case RIGHT:
             turn_smooth(SS90ER);
             reporter.log_status('x', location, heading);
             heading = (heading + 1) & 0x03;
             break;
-          case 2: // behind
+          case BACK:
             turn_back();
             reporter.log_status('x', location, heading);
             heading = (heading + 2) & 0x03;
             break;
-          case 3: // left
+          case LEFT:
             turn_smooth(SS90EL);
             reporter.log_status('x', location, heading);
             heading = (heading + 3) & 0x03;
@@ -428,15 +428,15 @@ public:
   void turn_to_face(unsigned char newHeading) {
     unsigned char hdgChange = (newHeading - heading) & 0x3;
     switch (hdgChange) {
-      case 0: // already got it
+      case AHEAD:
         break;
-      case 1: // right
+      case RIGHT:
         turn_IP90R();
         break;
-      case 2: // behind
+      case BACK:
         turn_IP180();
         break;
-      case 3: // left
+      case LEFT:
         turn_IP90L();
         break;
     }

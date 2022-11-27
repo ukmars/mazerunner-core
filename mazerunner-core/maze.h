@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Sunday, 27th November 2022 11:30:44 pm                      * 
+ * Last Modified: Sunday, 27th November 2022 11:37:16 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -22,15 +22,8 @@
 #include "src/utils.h"
 #include <stdint.h>
 
-#define MAZE_WIDTH 16
 #define GOAL 0x22
 #define START 0x00
-
-// directions for mapping
-#define NORTH 0
-#define EAST 1
-#define SOUTH 2
-#define WEST 3
 
 #define VISITED 0xF0
 
@@ -55,19 +48,17 @@ typedef struct {
 
 typedef int direction_t;
 
-enum { north = 0,
-       east = 1,
-       south = 2,
-       west = 3,
-       blocked = 4 };
+enum { NORTH = 0,
+       EAST = 1,
+       SOUTH = 2,
+       WEST = 3,
+       BLOCKED = 4 };
 
-enum { ahead = 0,
-       right = 1,
-       back = 2,
-       left = 3 };
+enum { AHEAD = 0,
+       RIGHT = 1,
+       BACK = 2,
+       LEFT = 3 };
 
-#define INVALID_DIRECTION (0)
-#define MAX_COST 255
 #define MAX_COST 255
 #define MAZE_WIDTH 16
 #define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_WIDTH)
@@ -116,16 +107,16 @@ public:
   bool is_exit(uint8_t cell, uint8_t direction) {
     bool result = false;
     switch (direction) {
-      case north:
+      case NORTH:
         result = (m_walls[cell].north & m_mask) == EXIT;
         break;
-      case east:
+      case EAST:
         result = (m_walls[cell].east & m_mask) == EXIT;
         break;
-      case south:
+      case SOUTH:
         result = (m_walls[cell].south & m_mask) == EXIT;
         break;
-      case west:
+      case WEST:
         result = (m_walls[cell].west & m_mask) == EXIT;
         break;
       default:
@@ -137,19 +128,19 @@ public:
 
   void set_wall_state(uint8_t cell, uint8_t direction, t_wall_state state) {
     switch (direction) {
-      case north:
+      case NORTH:
         m_walls[cell].north = state;
         m_walls[cell_north(cell)].south = state;
         break;
-      case east:
+      case EAST:
         m_walls[cell].east = state;
         m_walls[cell_east(cell)].west = state;
         break;
-      case west:
+      case WEST:
         m_walls[cell].west = state;
         m_walls[cell_west(cell)].east = state;
         break;
-      case south:
+      case SOUTH:
         m_walls[cell].south = state;
         m_walls[cell_south(cell)].north = state;
         break;
@@ -169,21 +160,21 @@ public:
   void initialise_maze() {
     for (int i = 0; i < MAZE_CELL_COUNT; i++) {
       m_cost[i] = 0;
-      set_wall_state(i, north, UNKNOWN);
-      set_wall_state(i, east, UNKNOWN);
-      set_wall_state(i, south, UNKNOWN);
-      set_wall_state(i, west, UNKNOWN);
+      set_wall_state(i, NORTH, UNKNOWN);
+      set_wall_state(i, EAST, UNKNOWN);
+      set_wall_state(i, SOUTH, UNKNOWN);
+      set_wall_state(i, WEST, UNKNOWN);
     }
     // place the boundary walls.
     for (uint8_t i = 0; i < MAZE_WIDTH; i++) {
-      set_wall_state(i, west, WALL);
-      set_wall_state(MAZE_WIDTH * (MAZE_WIDTH - 1) + i, east, WALL);
-      set_wall_state(MAZE_WIDTH * i, south, WALL);
-      set_wall_state(MAZE_WIDTH * i + MAZE_WIDTH - 1, north, WALL);
+      set_wall_state(i, WEST, WALL);
+      set_wall_state(MAZE_WIDTH * (MAZE_WIDTH - 1) + i, EAST, WALL);
+      set_wall_state(MAZE_WIDTH * i, SOUTH, WALL);
+      set_wall_state(MAZE_WIDTH * i + MAZE_WIDTH - 1, NORTH, WALL);
     }
     // and the start cell m_walls.
-    set_wall_state(START, north, EXIT);
-    set_wall_state(START, east, WALL);
+    set_wall_state(START, NORTH, EXIT);
+    set_wall_state(START, EAST, WALL);
     // the open maze treats unknowns as exits
     set_mask(MASK_OPEN);
   }
@@ -294,7 +285,7 @@ public:
    */
   uint8_t direction_to_smallest(uint8_t cell, uint8_t startDirection) {
     uint8_t nextDirection = startDirection;
-    uint8_t smallestDirection = INVALID_DIRECTION;
+    uint8_t smallestDirection = BLOCKED;
     uint16_t nextCost;
     uint16_t smallestCost = m_cost[cell];
     nextCost = neighbour_cost(cell, nextDirection);
