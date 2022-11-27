@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 10:58:08 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 11:08:21 pm                    *
+ * Last Modified: Sunday, 27th November 2022 10:51:41 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -21,7 +21,6 @@
 #include "maze.h"
 #include "mouse.h"
 #include "reports.h"
-#include "src/mazeprinter.h"
 #include "src/sensors.h"
 #include "src/serial.h"
 #include "src/utils.h"
@@ -198,17 +197,20 @@ public:
         help();
         break;
       case 'W':
-        MazePrinter::print_maze(maze, PLAIN);
+        // MazePrinter::print_maze(maze, PLAIN);
+        maze.print(console, PLAIN);
         break;
       case 'X':
         console.println(F("Reset Maze"));
         maze.initialise_maze();
         break;
       case 'C':
-        MazePrinter::print_maze(maze, COSTS);
+        // MazePrinter::print_maze(maze, COSTS);
+        maze.print(console, COSTS);
         break;
       case 'R':
-        MazePrinter::print_maze(maze, DIRS);
+        // MazePrinter::print_maze(maze, DIRS);
+        maze.print(console, DIRS);
         break;
       case 'B':
         console.print(F("Battery: "));

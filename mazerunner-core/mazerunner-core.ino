@@ -4,7 +4,7 @@
  * File Created: Wednesday, 26th October 2022 10:56:33 pm                     *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 11:41:55 pm                    *
+ * Last Modified: Sunday, 27th November 2022 11:13:57 pm                      *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -22,7 +22,6 @@
 #include "src/adc.h"
 #include "src/encoders.h"
 #include "src/list.h"
-#include "src/mazeprinter.h"
 #include "src/motion.h"
 #include "src/motors.h"
 #include "src/sensors.h"

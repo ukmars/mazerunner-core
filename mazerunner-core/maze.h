@@ -4,7 +4,7 @@
  * File Created: Wednesday, 12th October 2022 9:47:23 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Saturday, 26th November 2022 11:44:14 pm                    *
+ * Last Modified: Sunday, 27th November 2022 11:30:44 pm                      * 
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -71,6 +71,20 @@ enum { ahead = 0,
 #define MAX_COST 255
 #define MAZE_WIDTH 16
 #define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_WIDTH)
+
+// for the print function
+#define POST 'o'
+#define ERR '?'
+#define GAP "   "
+#define H_WALL F("---")
+#define H_EXIT F("   ")
+#define H_UNKN F("···")
+#define V_WALL '|'
+#define V_EXIT ' '
+#define V_UNKN ':'
+enum { PLAIN,
+       COSTS,
+       DIRS };
 
 class Maze {
 
@@ -312,7 +326,73 @@ public:
     return smallestDirection;
   }
 
-  friend class MazePrinter;
+  void printNorthWalls(Stream &stream, int row) {
+    for (int col = 0; col < 16; col++) {
+      unsigned char cell = row + 16 * col;
+      stream.print('o');
+      uint8_t state = m_walls[cell].north & m_mask;
+      if (state == EXIT) {
+        stream.print(H_EXIT);
+      } else if (state == WALL) {
+        stream.print(H_WALL);
+      } else {
+        stream.print(H_UNKN);
+      }
+    }
+    stream.println(POST);
+  }
+
+  void printSouthWalls(Stream &stream, int row) {
+    for (int col = 0; col < 16; col++) {
+      unsigned char cell = row + 16 * col;
+      stream.print(POST);
+      uint8_t state = m_walls[cell].south & m_mask;
+      if (state == EXIT) {
+        stream.print(H_EXIT);
+      } else if (state == WALL) {
+        stream.print(H_WALL);
+      } else {
+        stream.print(H_UNKN);
+      }
+    }
+    stream.println(POST);
+  }
+
+  void print(Stream &stream, int style = PLAIN) {
+    const char dirChars[] = "^>v<*";
+    stream.println();
+    flood_maze(maze_goal());
+    for (int row = 15; row >= 0; row--) {
+      printNorthWalls(stream, row);
+      for (int col = 0; col < 16; col++) {
+        unsigned char cell = row + 16 * col;
+        uint8_t state = m_walls[cell].west & m_mask;
+        if (state == EXIT) {
+          stream.print(V_EXIT);
+        } else if (state == WALL) {
+          stream.print(V_WALL);
+        } else {
+          stream.print(V_UNKN);
+        }
+        if (style == COSTS) {
+          print_justified(m_cost[cell], 3);
+        } else if (style == DIRS) {
+          unsigned char direction = direction_to_smallest(cell, NORTH);
+          if (cell == maze_goal()) {
+            direction = 4;
+          }
+          stream.print(' ');
+          stream.print(dirChars[direction]);
+          stream.print(' ');
+        } else {
+          stream.print(GAP);
+        }
+      }
+      stream.println(V_WALL);
+    }
+    printSouthWalls(stream, 0);
+    stream.println();
+  }
 
 private:
   mask_t m_mask = MASK_OPEN;
