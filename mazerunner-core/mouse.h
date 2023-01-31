@@ -4,7 +4,7 @@
  * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Sunday, 27th November 2022 11:39:11 pm                      *
+ * Last Modified: Tuesday, 31st January 2023 9:06:55 am                       *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -46,7 +46,7 @@ public:
   enum TurnType {
     SS90EL = 0,
     SS90ER = 1,
-    SS90L = 3,
+    SS90L = 2,
     SS90R = 3,
   };
 
