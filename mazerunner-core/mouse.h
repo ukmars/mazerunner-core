@@ -446,24 +446,24 @@ public:
   void update_map() {
     switch (heading) {
       case NORTH:
-        maze.set_wall_state(location, NORTH, t_wall_state(frontWall)); //DCH
-        maze.set_wall_state(location, EAST, t_wall_state(rightWall));
-        maze.set_wall_state(location, WEST, t_wall_state(leftWall));
+        maze.set_wall_state(location, NORTH, frontWall ? WALL : EXIT);
+        maze.set_wall_state(location, EAST, rightWall ? WALL : EXIT);
+        maze.set_wall_state(location, WEST, leftWall ? WALL : EXIT);
         break;
       case EAST:
-        maze.set_wall_state(location, EAST, t_wall_state(frontWall));
-        maze.set_wall_state(location, SOUTH, t_wall_state(rightWall));
-        maze.set_wall_state(location, NORTH, t_wall_state(leftWall));
+        maze.set_wall_state(location, EAST, frontWall ? WALL : EXIT);
+        maze.set_wall_state(location, SOUTH, rightWall ? WALL : EXIT);
+        maze.set_wall_state(location, NORTH, leftWall ? WALL : EXIT);
         break;
       case SOUTH:
-        maze.set_wall_state(location, SOUTH, t_wall_state(frontWall));
-        maze.set_wall_state(location, WEST, t_wall_state(rightWall));
-        maze.set_wall_state(location, EAST, t_wall_state(leftWall));
+        maze.set_wall_state(location, SOUTH, frontWall ? WALL : EXIT);
+        maze.set_wall_state(location, WEST, rightWall ? WALL : EXIT);
+        maze.set_wall_state(location, EAST, leftWall ? WALL : EXIT);
         break;
       case WEST:
-        maze.set_wall_state(location, WEST, t_wall_state(frontWall));
-        maze.set_wall_state(location, NORTH, t_wall_state(rightWall));
-        maze.set_wall_state(location, SOUTH, t_wall_state(leftWall));
+        maze.set_wall_state(location, WEST, frontWall ? WALL : EXIT);
+        maze.set_wall_state(location, NORTH, rightWall ? WALL : EXIT);
+        maze.set_wall_state(location, SOUTH, leftWall ? WALL : EXIT);
         break;
       default:
         // This is an error. We should handle it.
