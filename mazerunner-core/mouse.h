@@ -446,48 +446,24 @@ public:
   void update_map() {
     switch (heading) {
       case NORTH:
-        if (frontWall) {
-          maze.set_wall_state(location, NORTH, WALL);
-        }
-        if (rightWall) {
-          maze.set_wall_state(location, EAST, WALL);
-        }
-        if (leftWall) {
-          maze.set_wall_state(location, WEST, WALL);
-        }
+        maze.set_wall_state(location, NORTH, frontWall ? WALL : EXIT);
+        maze.set_wall_state(location, EAST, rightWall ? WALL : EXIT);
+        maze.set_wall_state(location, WEST, leftWall ? WALL : EXIT);
         break;
       case EAST:
-        if (frontWall) {
-          maze.set_wall_state(location, EAST, WALL);
-        }
-        if (rightWall) {
-          maze.set_wall_state(location, SOUTH, WALL);
-        }
-        if (leftWall) {
-          maze.set_wall_state(location, NORTH, WALL);
-        }
+        maze.set_wall_state(location, EAST, frontWall ? WALL : EXIT);
+        maze.set_wall_state(location, SOUTH, rightWall ? WALL : EXIT);
+        maze.set_wall_state(location, NORTH, leftWall ? WALL : EXIT);
         break;
       case SOUTH:
-        if (frontWall) {
-          maze.set_wall_state(location, SOUTH, WALL);
-        }
-        if (rightWall) {
-          maze.set_wall_state(location, WEST, WALL);
-        }
-        if (leftWall) {
-          maze.set_wall_state(location, EAST, WALL);
-        }
+        maze.set_wall_state(location, SOUTH, frontWall ? WALL : EXIT);
+        maze.set_wall_state(location, WEST, rightWall ? WALL : EXIT);
+        maze.set_wall_state(location, EAST, leftWall ? WALL : EXIT);
         break;
       case WEST:
-        if (frontWall) {
-          maze.set_wall_state(location, WEST, WALL);
-        }
-        if (rightWall) {
-          maze.set_wall_state(location, NORTH, WALL);
-        }
-        if (leftWall) {
-          maze.set_wall_state(location, SOUTH, WALL);
-        }
+        maze.set_wall_state(location, WEST, frontWall ? WALL : EXIT);
+        maze.set_wall_state(location, NORTH, rightWall ? WALL : EXIT);
+        maze.set_wall_state(location, SOUTH, leftWall ? WALL : EXIT);
         break;
       default:
         // This is an error. We should handle it.
