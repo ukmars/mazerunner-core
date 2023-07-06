@@ -135,7 +135,7 @@ public:
    * @return robot cross-track-error. Too far left is negative.
    */
   void update() {
-    m_battery_adc = adc[BATTERY_CHANNEL];
+    m_battery_adc = adc[BATTERY_PIN];
 
     update_battery_voltage();
     if (not m_enabled) {

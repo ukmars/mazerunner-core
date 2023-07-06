@@ -33,7 +33,7 @@
 // Global objects
 Systick systick;
 
-Switches switches(SWITCHES_CHANNEL);
+Switches switches(SWITCHES_PIN);
 Encoders encoders;
 Sensors sensors;
 Motion motion;
