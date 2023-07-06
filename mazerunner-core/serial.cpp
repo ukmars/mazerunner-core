@@ -36,22 +36,7 @@
  *
  *
  */
-#if defined(ARDUINO_AVR_NANO) || defined(ARDUINO_AVR_NANO_EVERY)
 HardwareSerial &console = Serial;
-#elif defined(ARDUINO_AVR_LEONARDO)
-/***
- * On the Leonardo platform, Serial is a virtual com port and so
- * useless without a USB connection.
- *
- * Here we ensure that a 'proper' serial connection is made with the
- * Arduino TX and RX pins.
- */
-HardwareSerial &console = Serial1;
-#elif defined(ARDUINO_ARDUINO_NANO33BLE)
-HardwareSerial &console = Serial1;
-#else
-#error Unsupported hardware
-#endif
 
 /***
  * The code also has a NULL serial device. You can use this exactly
