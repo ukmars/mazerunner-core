@@ -124,5 +124,5 @@ const float ADC_REF_VOLTS = 5.0; // Reference voltage of ADC
 const float BATTERY_MULTIPLIER = (ADC_REF_VOLTS / ADC_FSR / BATTERY_DIVIDER_RATIO);
 
 // Finally include the hardware drivers
-#include "src/adc_atmega328.h"
+#include "adc_atmega328.h"
 //***************************************************************************//

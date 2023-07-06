@@ -17,8 +17,8 @@
 #ifndef SYSTICK_H
 #define SYSTICK_H
 
-#include "../config.h"
 #include "adc.h"
+#include "config.h"
 #include "motors.h"
 #include "sensors.h"
 #include "switches.h"

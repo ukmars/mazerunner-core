@@ -14,20 +14,20 @@
  *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
 
+#include "adc.h"
 #include "cli.h"
 #include "config.h"
+#include "encoders.h"
+#include "list.h"
 #include "maze.h"
+#include "motion.h"
+#include "motors.h"
 #include "mouse.h"
 #include "reports.h"
-#include "src/adc.h"
-#include "src/encoders.h"
-#include "src/list.h"
-#include "src/motion.h"
-#include "src/motors.h"
-#include "src/sensors.h"
-#include "src/serial.h"
-#include "src/switches.h"
-#include "src/systick.h"
+#include "sensors.h"
+#include "serial.h"
+#include "switches.h"
+#include "systick.h"
 #include <Arduino.h>
 
 // Global objects

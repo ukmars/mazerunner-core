@@ -51,7 +51,7 @@ const char board_name[] PROGMEM = "Unknown Board!";
  * you can uncomment the following definition.
  *
  * If your reason for doing so is to get better options for
- * justifying numeric output, have a look in the src/utils.h file
+ * justifying numeric output, have a look in the utils.h file
  * where there are other options available
  *
  * Be aware that doing using printf (or sprintf) may add quite a bit

@@ -17,13 +17,13 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#include "encoders.h"
+#include "motors.h"
+#include "profile.h"
 #include "reports.h"
-#include "src/encoders.h"
-#include "src/motors.h"
-#include "src/profile.h"
-#include "src/sensors.h"
-#include "src/serial.h"
-#include "src/utils.h"
+#include "sensors.h"
+#include "serial.h"
+#include "utils.h"
 #include <Arduino.h>
 
 const char hdg_letters[] = "FRAL";

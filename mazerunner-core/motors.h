@@ -18,7 +18,7 @@
 #define MOTORS_H
 
 // #include <Arduino.h>
-#include "../config.h"
+#include "config.h"
 #include "digitalWriteFast.h"
 #include "encoders.h"
 #include "profile.h"

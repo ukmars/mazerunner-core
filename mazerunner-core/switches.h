@@ -17,9 +17,9 @@
 #ifndef SWITCHES_H
 #define SWITCHES_H
 
-#include "../config.h"
 #include "adc.h"
 #include "atomic.h"
+#include "config.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <wiring_private.h>

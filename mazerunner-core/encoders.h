@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "../config.h"
 #include "atomic.h"
+#include "config.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <stdint.h>

@@ -21,9 +21,9 @@
 #include "maze.h"
 #include "mouse.h"
 #include "reports.h"
-#include "src/sensors.h"
-#include "src/serial.h"
-#include "src/utils.h"
+#include "sensors.h"
+#include "serial.h"
+#include "utils.h"
 #include <Arduino.h>
 #include <stdint.h>
 

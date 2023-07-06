@@ -4,7 +4,7 @@
  * File Created: Thursday, 27th October 2022 12:12:56 pm                      *
  * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 12:51:02 am                       * 
+ * Last Modified: Monday, 31st October 2022 12:51:02 am                       *
  * -----                                                                      *
  * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
@@ -60,69 +60,69 @@
  * If different types of sensor are used or the I2C is needed, there
  * will need to be changes here.
  */
- static int channel;
+static int channel;
 void adc_isr(IAnalogueConverter &adc) {
-    switch (adc.m_phase) {
-        case 0: { // initialisation
-            adc.m_group_index = 0;
-            adc.m_index = 0;
-            channel = adc.m_index;
-            adc.start_conversion(channel);
-            adc.m_phase = 1;
-        } break;
-        case 1: { // all channels get read 'dark' first
-            adc.m_adc_reading[adc.m_index] = adc.get_adc_result();
-            adc.m_index += 1;
-            if (adc.m_index >= adc.MAX_CHANNELS) {
-                if (adc.m_emitters_enabled) {
-                    adc.m_index = 0;
-                    adc.m_phase = 2;
-                    adc.emitter_on(adc.m_emitter_pin[0]);
-                    adc.start_conversion(7); // dummy conversion to get to the next isr
-                } else {
-                    adc.end_conversion_cycle(); // finish the cycle
-                }
-                break;
-            }
-            channel = adc.m_index;
-            adc.start_conversion(adc.m_index);
-        } break;
-        case 2: { // start the first lit group
-            channel = adc.m_group[0][adc.m_index];
-            adc.start_conversion(channel);
-            adc.m_phase = 3;
-        } break;
-        case 3: { // first group conversions
-            adc.m_adc_reading[channel] = adc.get_adc_result()- adc.m_adc_reading[channel];
-            adc.m_index += 1;
-            if (adc.m_index >= adc.m_group[0].size()) {
-                adc.m_index = 0;
-                adc.m_phase = 4;
-                adc.emitter_off(adc.m_emitter_pin[0]);
-                adc.emitter_on(adc.m_emitter_pin[1]);
-                adc.start_conversion(7); // dummy conversion to delay one cycle
-                break;
-            }
-            channel = adc.m_group[0][adc.m_index];
-            adc.start_conversion(channel);
-        } break;
-        case 4: { // start the second group
-            adc.m_index = 0;
-            channel = adc.m_group[1][adc.m_index];
-            adc.start_conversion(channel);
-            adc.m_phase = 5;
-        } break;
-        case 5: { // second group conversions
-            adc.m_adc_reading[channel] = adc.get_adc_result() - adc.m_adc_reading[channel];
-            adc.m_index += 1;
-            if (adc.m_index >= adc.m_group[1].size()) {
-                adc.m_index = 0;
-                adc.emitter_off(adc.m_emitter_pin[1]);
-                adc.end_conversion_cycle();
-                break;
-            }
-            channel = adc.m_group[1][adc.m_index];
-            adc.start_conversion(channel);
-        } break;
-    }
+  switch (adc.m_phase) {
+    case 0: { // initialisation
+      adc.m_group_index = 0;
+      adc.m_index = 0;
+      channel = adc.m_index;
+      adc.start_conversion(channel);
+      adc.m_phase = 1;
+    } break;
+    case 1: { // all channels get read 'dark' first
+      adc.m_adc_reading[adc.m_index] = adc.get_adc_result();
+      adc.m_index += 1;
+      if (adc.m_index >= adc.MAX_CHANNELS) {
+        if (adc.m_emitters_enabled) {
+          adc.m_index = 0;
+          adc.m_phase = 2;
+          adc.emitter_on(adc.m_emitter_pin[0]);
+          adc.start_conversion(7); // dummy conversion to get to the next isr
+        } else {
+          adc.end_conversion_cycle(); // finish the cycle
+        }
+        break;
+      }
+      channel = adc.m_index;
+      adc.start_conversion(adc.m_index);
+    } break;
+    case 2: { // start the first lit group
+      channel = adc.m_group[0][adc.m_index];
+      adc.start_conversion(channel);
+      adc.m_phase = 3;
+    } break;
+    case 3: { // first group conversions
+      adc.m_adc_reading[channel] = adc.get_adc_result() - adc.m_adc_reading[channel];
+      adc.m_index += 1;
+      if (adc.m_index >= adc.m_group[0].size()) {
+        adc.m_index = 0;
+        adc.m_phase = 4;
+        adc.emitter_off(adc.m_emitter_pin[0]);
+        adc.emitter_on(adc.m_emitter_pin[1]);
+        adc.start_conversion(7); // dummy conversion to delay one cycle
+        break;
+      }
+      channel = adc.m_group[0][adc.m_index];
+      adc.start_conversion(channel);
+    } break;
+    case 4: { // start the second group
+      adc.m_index = 0;
+      channel = adc.m_group[1][adc.m_index];
+      adc.start_conversion(channel);
+      adc.m_phase = 5;
+    } break;
+    case 5: { // second group conversions
+      adc.m_adc_reading[channel] = adc.get_adc_result() - adc.m_adc_reading[channel];
+      adc.m_index += 1;
+      if (adc.m_index >= adc.m_group[1].size()) {
+        adc.m_index = 0;
+        adc.emitter_off(adc.m_emitter_pin[1]);
+        adc.end_conversion_cycle();
+        break;
+      }
+      channel = adc.m_group[1][adc.m_index];
+      adc.start_conversion(channel);
+    } break;
+  }
 }

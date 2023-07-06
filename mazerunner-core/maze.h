@@ -17,9 +17,9 @@
 #ifndef MAZE_H
 #define MAZE_H
 
-#include "src/queue.h"
-#include "src/serial.h"
-#include "src/utils.h"
+#include "queue.h"
+#include "serial.h"
+#include "utils.h"
 #include <stdint.h>
 
 #define GOAL 0x22

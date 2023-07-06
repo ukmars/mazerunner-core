@@ -21,7 +21,7 @@
  * It looks like this is where we decide the target and include appropriate drivers?
  */
 
-#include "src/adc_atmega328.h"
+#include "adc_atmega328.h"
 
 const uint32_t BAUDRATE = 115200;
 const int SENSOR_COUNT = 4;

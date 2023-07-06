@@ -18,16 +18,16 @@
 #define MOUSE_H
 #include "Arduino.h"
 #include "config.h"
+#include "encoders.h"
 #include "maze.h"
+#include "motion.h"
+#include "motors.h"
+#include "profile.h"
 #include "reports.h"
-#include "src/encoders.h"
-#include "src/motion.h"
-#include "src/motors.h"
-#include "src/profile.h"
-#include "src/sensors.h"
-#include "src/serial.h"
-#include "src/switches.h"
-#include "src/utils.h"
+#include "sensors.h"
+#include "serial.h"
+#include "switches.h"
+#include "utils.h"
 
 class Mouse;
 extern Mouse mouse;
