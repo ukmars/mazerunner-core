@@ -3,103 +3,23 @@
  * File:    config-frank.h                                                    *
  * File Created: Wednesday, 26th October 2022 10:15:50 pm                     *
  * Author: Peter Harrison                                                     *
+ *
  * -----                                                                      *
- * Last Modified: Tuesday, 31st January 2023 9:07:31 am                       *
- * -----                                                                      *
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
  * Licence:                                                                   *
  *     Use of this source code is governed by an MIT-style                    *
  *     license that can be found in the LICENSE file or at                    *
  *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
+#pragma once
 
-#ifndef FRANK_H
-#define FRANK_H
-
-/***
- * It looks like this is where we decide the target and include appropriate drivers?
- */
-
-#include "adc_atmega328.h"
-
-const uint32_t BAUDRATE = 115200;
-const int SENSOR_COUNT = 4;
-const float MAX_MOTOR_VOLTS = 6.0;
-
-//***************************************************************************//
-
-// time between logged lined when reporting is enabled (milliseconds)
-const int REPORTING_INTERVAL = 10;
-
-const float WHEEL_DIAMETER = 32.0;
-const float ENCODER_PULSES = 12.0;
-const float GEAR_RATIO = 19.54;
-const float MOUSE_RADIUS = 37.0;
-
-//*** MOTION CONTROL CONSTANTS **********************************************//
-
-// forward motion controller constants
-const float FWD_KP = 2.0;
-const float FWD_KD = 1.1;
-
-// rotation motion controller constants
-const float ROT_KP = 2.1;
-const float ROT_KD = 1.2;
-
-// controller constants for the steering controller
-const float STEERING_KP = 0.25;
-const float STEERING_KD = 0.00;
-const float STEERING_ADJUST_LIMIT = 10.0; // deg/s
-
-// Motor Feedforward
-/***
- * Speed Feedforward is used to add a drive voltage proportional to the motor speed
- * The units are Volts per mm/s and the value will be different for each
- * robot where the motor + gearbox + wheel diamter + robot weight are different
- * You can experimentally determine a suitable value by turning off the controller
- * and then commanding a set voltage to the motors. The same voltage is applied to
- * each motor. Have the robot report its speed regularly or have it measure
- * its steady state speed after a period of acceleration.
- * Do this for several applied voltages from 0.5 Volts to 5 Volts in steps of 0.5V
- * Plot a chart of steady state speed against voltage. The slope of that graph is
- * the speed feedforward, SPEED_FF.
- * Note that the line will not pass through the origin because there will be
- * some minimum voltage needed just to ovecome friction and get the wheels to turn at all.
- * That minimum voltage is the BIAS_FF.
- */
-const float ACC_FF = 0.000392;
-const float SPEED_FF = 0.00357;
-const float BIAS_FF = 0.121;
-
-// encoder polarity is either 1 or -1 and is used to account for reversal of the encoder phases
-#define ENCODER_LEFT_POLARITY (-1)
-#define ENCODER_RIGHT_POLARITY (1)
-
-// similarly, the motors may be wired with different polarity and that is defined here so that
-// setting a positive voltage always moves the robot forwards
-#define MOTOR_LEFT_POLARITY (-1)
-#define MOTOR_RIGHT_POLARITY (1)
-
-//***************************************************************************//
-
-//***** PERFORMANCE CONSTANTS************************************************//
-// search and run speeds in mm/s and mm
-const int SEARCH_SPEED = 400;
-const int SEARCH_ACCELERATION = 3000;
-const int SEARCH_TURN_SPEED = 300;
-const int OMEGA_SPIN_TURN = 360;
-const int ALPHA_SPIN_TURN = 3600;
-
-//***************************************************************************//
+#include <Arduino.h>
 
 //***** SENSOR CALIBRATION **************************************************//
-// the position in the cell where the sensors are sampled.
-const float SENSING_POSITION = 170.0;
 
-// wall sensor thresholds and constants
-// if you have the basic sensor board enter the same value for both front constants
 #if EVENT == EVENT_HOME
+// wall sensor thresholds and constants
 // RAW values for the front sensor when the robot is backed up to a wall
 // with another wall ahead
 const int FRONT_LEFT_CALIBRATION = 97;
@@ -145,7 +65,155 @@ const int RIGHT_CALIBRATION = 80;
 const int TURN_THRESHOLD_SS90E = 115;
 const int EXTRA_WALL_ADJUST = 6;
 
+#elif EVENT == EVENT_APEC
+
 #endif
+
+//***** IO PINS *****************************************************//
+
+// the BASIC sensor board has two LEDs
+// const int LED_LEFT = USER_IO;
+// const int LED_RIGHT = EMITTER_A;
+// const int LED_USER = USER_IO;
+// but only one emitter pin
+// const int EMITTER_FRONT = EMITTER_B;
+// const int EMITTER_DIAGONAL = EMITTER_B;
+
+// the ADVANCED sensor board has only one LED so use the value twice
+const int LED_LEFT = USER_IO;
+const int LED_RIGHT = USER_IO;
+const int LED_USER = USER_IO;
+// but two emitter pins
+const int EMITTER_FRONT = EMITTER_A;
+const int EMITTER_DIAGONAL = EMITTER_B;
+
+//***** SENSOR HARDWARE *****************************************************//
+// the ADC channels corresponding to the sensor inputs. There are 8 available
+// Channels 0..3 are normally used for sensors.
+// Channels 4 and 5 are available if you do not want to add an I2C device
+// Channel 6 is pre-allocated to the Battery monitor
+// Channel 7 is re-allocated to the function switch and button
+// ADVANCED SENSOR
+#define RFS_CHANNEL 0
+#define RSS_CHANNEL 1
+#define LSS_CHANNEL 2
+#define LFS_CHANNEL 3
+// BASIC SENSOR - just repeat the front sensor to make the code cleaner
+// #define RFS_CHANNEL 1
+// #define RSS_CHANNEL 0
+// #define LSS_CHANNEL 2
+// #define LFS_CHANNEL 1
+
+//***************************************************************************//
+const uint32_t BAUDRATE = 115200;
+
+//***************************************************************************//
+// set this to zero to disable profile data logging over serial
+// #define DEBUG_LOGGING 1
+// time between logged lines when reporting is enabled (milliseconds)
+const int REPORTING_INTERVAL = 10;
+
+//***************************************************************************//
+// Some physical constants that are likely to be robot-specific
+
+//***************************************************************************//
+// We need to know about the drive mechanics.
+const float WHEEL_DIAMETER = 32.0;
+const float ENCODER_PULSES = 12.0;
+const float GEAR_RATIO = 19.54;
+
+// Mouse radius is the distance between the contact patches of the drive wheels.
+// A good starting approximation is half the distance between the wheel centres.
+// After testing, you may find the working value to be larger or smaller by some
+// small amount.
+const float MOUSE_RADIUS = 38.070; // 39.50; // Adjust on test
+
+// The robot is likely to have wheels of different diameters and that must be
+// compensated for if the robot is to reliably drive in a straight line
+const float ROTATION_BIAS = 0.0025; // Negative makes robot curve to left
+
+const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO); // 0.429
+const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * MM_PER_COUNT;
+const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * MM_PER_COUNT;
+const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI)); // 0.7525
+
+//*** MOTION CONTROL CONSTANTS **********************************************//
+
+// Dynamic performance constants RETEST FOR FRANK
+const float FWD_KM = 475.0; // mm/s/Volt
+const float FWD_TM = 0.190; // forward time constant
+const float ROT_KM = 775.0; // deg/s/Volt
+const float ROT_TM = 0.210; // rotation time constant
+
+// Motor Feedforward
+/***
+ * Speed Feedforward is used to add a drive voltage proportional to the motor speed
+ * The units are Volts per mm/s and the value will be different for each
+ * robot where the motor + gearbox + wheel diamter + robot weight are different
+ * You can experimentally determine a suitable value by turning off the controller
+ * and then commanding a set voltage to the motors. The same voltage is applied to
+ * each motor. Have the robot report its speed regularly or have it measure
+ * its steady state speed after a period of acceleration.
+ * Do this for several applied voltages from 0.5 Volts to 5 Volts in steps of 0.5V
+ * Plot a chart of steady state speed against voltage. The slope of that graph is
+ * the speed feedforward, SPEED_FF.
+ * Note that the line will not pass through the origin because there will be
+ * some minimum voltage needed just to ovecome friction and get the wheels to turn at all.
+ * That minimum voltage is the BIAS_FF. It is not dependent upon speed but is expressed
+ * here as a fraction for comparison.
+ */
+const float MAX_MOTOR_VOLTS = 6.0;
+
+const float SPEED_FF = 0.00357;
+const float ACC_FF = 0.000392;
+const float BIAS_FF = 0.121;
+const float TOP_SPEED = (6.0 - BIAS_FF) / SPEED_FF;
+
+//*** MOTION CONTROL CONSTANTS **********************************************//
+
+// forward motion controller constants
+// const float FWD_ZETA = 0.707;
+// const float FWD_TD = FWD_TM;
+
+const float FWD_KP = 2.0;
+const float FWD_KD = 1.1;
+
+// rotation motion controller constants
+// const float ROT_ZETA = 0.707;
+// const float ROT_TD = ROT_TM;
+
+const float ROT_KP = 2.1;
+const float ROT_KD = 1.2;
+
+// controller constants for the steering controller
+const float STEERING_KP = 0.25;
+const float STEERING_KD = 0.00;
+const float STEERING_ADJUST_LIMIT = 10.0; // deg/s
+
+// encoder polarity is either 1 or -1 and is used to account for reversal of the encoder phases
+#define ENCODER_LEFT_POLARITY (-1)
+#define ENCODER_RIGHT_POLARITY (1)
+
+// similarly, the motors may be wired with different polarity and that is defined here so that
+// setting a positive voltage always moves the robot forwards
+#define MOTOR_LEFT_POLARITY (-1)
+#define MOTOR_RIGHT_POLARITY (1)
+
+//***************************************************************************//
+
+//***** PERFORMANCE CONSTANTS************************************************//
+// search and run speeds in mm/s and mm
+const int SEARCH_SPEED = 400;
+const int SEARCH_ACCELERATION = 3000;
+const int SEARCH_TURN_SPEED = 300;
+const int SMOOTH_TURN_SPEED = 500;
+const int FAST_TURN_SPEED = 600;
+const int FAST_RUN_SPEED_MAX = 2500;
+
+const float FAST_RUN_ACCELERATION = 3000;
+
+const int OMEGA_SPIN_TURN = 360;
+const int ALPHA_SPIN_TURN = 3600;
 
 //***** SENSOR SCALING ******************************************************//
 // This is the normalised value seen by the front sensor when the mouse is
@@ -161,12 +229,12 @@ const float RIGHT_SCALE = (float)SIDE_NOMINAL / RIGHT_CALIBRATION;
 
 // the values above which, a wall is seen
 const int LEFT_THRESHOLD = 40;   // minimum value to register a wall
-const int FRONT_THRESHOLD = 20;  // minimum value to register a wall
 const int RIGHT_THRESHOLD = 40;  // minimum value to register a wall
+const int FRONT_THRESHOLD = 20;  // minimum value to register a wall
 const int FRONT_REFERENCE = 850; // reading when mouse centered with wall ahead
 
-const float left_edge_pos = 90.0f;
-const float right_edge_pos = 93.0f;
+const int left_edge_pos = 90;
+const int right_edge_pos = 90;
 
 // These take no storage - the compiler uses the values directly
 // speed, runin, runout, angle, omega, alpha, threshold
@@ -176,27 +244,6 @@ const TurnParameters turn_params[4] = {
     {SEARCH_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90L
     {SEARCH_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90R
 };
-
-//***************************************************************************//
-//***************************************************************************//
-// Some physical constants that are likely to be board -specific
-
-// with robot against back wall, how much travel is there to the cell center?
-const int BACK_WALL_TO_CENTER = 48;
-
-// The robot is likely to have wheels of different diameters and that must be
-// compensated for if the robot is to reliably drive in a straight line
-const float ROTATION_BIAS = 0.0025; // Negative makes robot curve to left
-
-const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
-const float COUNTS_PER_METER = 1000.0 / MM_PER_COUNT;
-// we can calculate wheel diameter as:
-// D = (1000 * ENCODER_PULSES * GEAR_RATIO)/(PI * COUNTS_PER_METER)
-// push the robot 500mm on the ground and record the encoder sum
-
-const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * MM_PER_COUNT;
-const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * MM_PER_COUNT;
-const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 
 //***************************************************************************//
 // Battery resistor bridge //Derek Hall//
@@ -230,41 +277,5 @@ const float ADC_REF_VOLTS = 5.0; // Reference voltage of ADC
 
 const float BATTERY_MULTIPLIER = (ADC_REF_VOLTS / ADC_FSR / BATTERY_DIVIDER_RATIO);
 
-// these are aliases of convenience
-// the BASIC sensor board has two LEDs
-// const int LED_LEFT = USER_IO_6;
-// const int LED_RIGHT = USER_IO_11;
-// the ADVANCED sensor board has only one LED so use the value twice
-const int LED_LEFT = USER_IO_6;
-const int LED_RIGHT = USER_IO_6;
-const int LED_USER = USER_IO_6;
-const int LED_USER_A = USER_IO_6;
-const int LED_USER_B = USER_IO_6;
-
-//***** SENSOR HARDWARE *****************************************************//
-// the ADC channels corresponding to the sensor inputs. There are 8 available
-// Channels 0..3 are normally used for sensors.
-// Channels 4 and 5 are available if you do not want to add an I2C device
-// Channel 6 is pre-allocated to the Battery monitor
-// Channel 7 is re-allocated to the function switch and button
-// ADVANCED SENSOR
-#define RFS_CHANNEL 0
-#define RSS_CHANNEL 1
-#define LSS_CHANNEL 2
-#define LFS_CHANNEL 3
-// BASIC SENSOR - just repeat the front sensor to make the code cleaner
-// #define RFS_CHANNEL 1
-// #define RSS_CHANNEL 0
-// #define LSS_CHANNEL 2
-// #define LFS_CHANNEL 1
-
-// if you have  basic sensor board with a single emitter pin,
-// put the same pin number for both entries
-// BASIC
-// const int EMITTER_FRONT = USER_IO_12;
-// const int EMITTER_DIAGONAL = USER_IO_12;
-// ADVANCED
-const int EMITTER_FRONT = USER_IO_11;
-const int EMITTER_DIAGONAL = USER_IO_12;
-
-#endif
+// the position in the cell where the sensors are sampled.
+const float SENSING_POSITION = 170.0;

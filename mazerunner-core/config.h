@@ -6,7 +6,7 @@
  * -----                                                                      *
  * Last Modified: Wednesday, 2nd November 2022 12:41:18 pm                    *
  * -----                                                                      *
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
  * Licence:                                                                   *
  *     Use of this source code is governed by an MIT-style                    *
@@ -33,41 +33,8 @@
  *
  */
 
-// work out the board architecture
-#if defined(ARDUINO_ARCH_MEGAAVR)
-const char board_name[] PROGMEM = "Nano Every - ATMEGA4809";
-#elif defined(ARDUINO_ARCH_NRF52840)
-const char board_name[] PROGMEM = "Nano 33 - NRF52840";
-#elif defined(ARDUINO_ARCH_AVR)
-const char board_name[] PROGMEM = "Nano - ATMega328P";
-#else
-const char board_name[] PROGMEM = "Unknown Board!";
-#endif
-
-/***
- * Redirection for printf()
- *
- * If you want to be able to use the standard C printf() function
- * you can uncomment the following definition.
- *
- * If your reason for doing so is to get better options for
- * justifying numeric output, have a look in the utils.h file
- * where there are other options available
- *
- * Be aware that doing using printf (or sprintf) may add quite a bit
- * to the size of your code. Also, floating point will still not be
- * available, at least for the AVR processors due to the Arduino
- * compiler settings.
- *
- * When commented out, the printf code is still compiled so your
- * program will increase in size but the output of printf will just
- * not appear anywhere.
- *
- */
-
-//#define USE_PRINTF
-
 /*************************************************************************/
+
 /***
  * Structure definitions used in the software. Declared here for lack of a
  * better place.
@@ -83,6 +50,7 @@ struct TurnParameters {
   int trigger; // sensor value
 };
 
+/*************************************************************************/
 /***
  * You may use a slightly different hardware platform than UKMARSBOT
  * Here you can include a suitable hardware configuration to define
@@ -113,8 +81,7 @@ struct TurnParameters {
 #define EVENT_PORTUGAL 3
 #define EVENT_APEC 4
 
-// choose the one you will be using
-// this MUST be defined before selecting the robot below
+// choose the one you will be using BEFORE selecting the robot below
 #define EVENT EVENT_UK
 
 /*************************************************************************/
@@ -142,7 +109,6 @@ struct TurnParameters {
 #endif
 
 /*************************************************************************/
-/*************************************************************************/
 
 //***************************************************************************//
 /***
@@ -161,8 +127,5 @@ struct TurnParameters {
 // This is the size for each cell in the maze. Normally 180mm for a classic maze
 const float FULL_CELL = 180.0f;
 const float HALF_CELL = FULL_CELL / 2.0;
-
-// the position in the cell where the sensors are sampled.
-const float SENSING_POSITION = 170.0;
 
 #endif
