@@ -78,25 +78,17 @@ Stream &debug = nullConsole;
  * To use this facility add a call to redirectPrintf() early in the
  * setup() function of your code.
  *
- * TODO: this does not work with the NRF52 compiler.
  */
 
-#if defined(USE_PRINTF) && !defined(ARDUINO_ARCH_NRF52840)
 // Function that printf and related will use to print
 int serial_putchar(char c, FILE *f) {
-  if (c == '\n') {
-    // TODO do we need to add carriage returns? I think not.
-    console.write('\r');
-  }
   return console.write(c) == 1 ? 0 : 1;
 }
 
 FILE serial_stdout;
+
 void redirectPrintf() {
   // Redirect stdout so that we can use printf() with the console
   fdev_setup_stream(&serial_stdout, serial_putchar, NULL, _FDEV_SETUP_WRITE);
   stdout = &serial_stdout;
 }
-#else
-void redirectPrintf(){};
-#endif
