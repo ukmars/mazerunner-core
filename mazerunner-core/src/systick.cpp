@@ -18,15 +18,8 @@
 #include "systick.h"
 #include "Arduino.h"
 
-#if defined(ARDUINO_ARCH_AVR)
+
 ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
   systick.update();
 }
-#elif defined(ARDUINO_ARCH_MEGAAVR)
-ISR(TCB2_INT_vect, ISR_NOBLOCK){
-  systick.update();
-  TCB2.INTFLAGS = TCB_CAPT_bm; // manually clear the interrupt
-}
-#else
-#warning you will need a systick interrupt running at 500Hz
-#endif
+

@@ -21,14 +21,7 @@
  * It looks like this is where we decide the target and include appropriate drivers?
  */
 
-#if defined(ARDUINO_ARCH_MEGAAVR)
-#include "src/adc_atmega4809.h"
-#elif defined(ARDUINO_ARCH_AVR)
 #include "src/adc_atmega328.h"
-#elif defined(ARDUINO_ARCH_NRF52840)
-#warning need a nano33 ble serial device
-#include "src/adc_null.h"
-#endif
 
 const uint32_t BAUDRATE = 115200;
 const int SENSOR_COUNT = 4;
@@ -194,6 +187,16 @@ const int BACK_WALL_TO_CENTER = 48;
 // The robot is likely to have wheels of different diameters and that must be
 // compensated for if the robot is to reliably drive in a straight line
 const float ROTATION_BIAS = 0.0025; // Negative makes robot curve to left
+
+const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
+const float COUNTS_PER_METER = 1000.0 / MM_PER_COUNT;
+// we can calculate wheel diameter as:
+// D = (1000 * ENCODER_PULSES * GEAR_RATIO)/(PI * COUNTS_PER_METER)
+// push the robot 500mm on the ground and record the encoder sum
+
+const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * MM_PER_COUNT;
+const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * MM_PER_COUNT;
+const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 
 //***************************************************************************//
 // Battery resistor bridge //Derek Hall//

@@ -67,36 +67,6 @@ const char board_name[] PROGMEM = "Unknown Board!";
 
 //#define USE_PRINTF
 
-/***
- * Start with the pinouts for the robot. These are the pin
- * definitions for the UKMARSBOT V1.x mainboard and should be
- * suitable for a number of derivatives.
- */
-
-const int SERIAL_TX = 0;
-const int SERIAL_RX = 1;
-const int ENCODER_LEFT_CLK = 2;
-const int ENCODER_RIGHT_CLK = 3;
-const int ENCODER_LEFT_B = 4;
-const int ENCODER_RIGHT_B = 5;
-const int USER_IO_6 = 6;
-const int MOTOR_LEFT_DIR = 7;
-const int MOTOR_RIGHT_DIR = 8;
-const int MOTOR_LEFT_PWM = 9;
-const int MOTOR_RIGHT_PWM = 10;
-const int USER_IO_11 = 11;
-const int USER_IO_12 = 12;
-const int SENSOR0 = A0;
-const int SENSOR1 = A1;
-const int SENSOR2 = A2;
-const int SENSOR3 = A3;
-const int SENSOR4 = A4;
-const int SENSOR5 = A5;
-const int FUNCTION_PIN = A6;
-const int BATTERY_VOLTS = A7;
-const int SWITCHES_CHANNEL = 6;
-const int BATTERY_CHANNEL = 7;
-
 /*************************************************************************/
 /***
  * Structure definitions used in the software. Declared here for lack of a
@@ -113,6 +83,23 @@ struct TurnParameters {
   int trigger; // sensor value
 };
 
+/***
+ * You may use a slightly different hardware platform than UKMARSBOT
+ * Here you can include a suitable hardware configuration to define
+ * things like IO pins, ADC channels and so on
+ */
+
+#define HARDWARE_UNKNOWN 0
+#define HARDWARE_UKMARSBOT_1_3A 1
+
+#define HARDWARE HARDWARE_UKMARSBOT_1_3A
+
+#if HARDWARE == HARDWARE_UKMARSBOT_1_3A
+#include "config-hardware-ukmarsbot.h"
+#else
+#error "NO HARDWARE DEFINED"
+#endif
+
 /*************************************************************************/
 /***
  * It is possible that you might want to run the robot in a number of
@@ -124,69 +111,38 @@ struct TurnParameters {
 #define EVENT_HOME 1
 #define EVENT_UK 2
 #define EVENT_PORTUGAL 3
+#define EVENT_APEC 4
 
 // choose the one you will be using
+// this MUST be defined before selecting the robot below
 #define EVENT EVENT_UK
 
 /*************************************************************************/
 /***
- * Since you may build for different physical robots, their characteristics
- * are kept in their own config files. Add you robot to the list and create
+ * Even with the same basic hardware,you may build robots with different characteristics
+ * such as the motor gear ratio or the whieel size of sensor arrangement.
+ * These characteristics are kept in their own config files. Add you robot to the list and create
  * a corresponding config file with its custom values.
  *
  * If you have only one robot then you can reduce this section to a single
  * include line.
  */
-#define ROBOT_DOROTHY 4
-#define ROBOT_EMILY 5
-#define ROBOT_FRANK 6
+#define ROBOT_NOT_DEFINED 0
+#define ROBOT_FRANK 1
+#define ROBOT_ORION 2
 
-#define ROBOT_NAME ROBOT_EMILY
+#define ROBOT_NAME ROBOT_ORION
 
-#if ROBOT_NAME == ROBOT_DOROTHY
-#include "config-dorothy.h"
-#elif ROBOT_NAME == ROBOT_EMILY
-#include "config-emily.h"
-#elif ROBOT_NAME == ROBOT_FRANK
-#include "config-frank.h"
+#if ROBOT_NAME == ROBOT_FRANK
+#include "config-robot-frank.h"
+#elif ROBOT_NAME == ROBOT_ORION
+#include "config-robot-orion.h"
 #else
 #error "NO ROBOT DEFINED"
 #endif
 
 /*************************************************************************/
 /*************************************************************************/
-
-/***
- * these are the defaults for some system-wide settings regardless of the robot
- * or environment. It would be best not to mess with these without good reason.
- * Sometimes the controller needs the interval, sometimes the frequency
- * define one and pre-calculate the other. The compiler does the work and no flash or
- * RAM storage is used. Constants are used for better type checking and traceability.
- */
-
-const float LOOP_FREQUENCY = 500.0f;
-const float LOOP_INTERVAL = (1.0f / LOOP_FREQUENCY);
-
-//***************************************************************************//
-
-// This is the size fo each cell in the maze. Normally 180mm for a classic maze
-const float FULL_CELL = 180.0f;
-const float HALF_CELL = FULL_CELL / 2.0f;
-
-//***************************************************************************//
-/***
- * Use the physical constants from the robot config file to pre-calculate
- * some essential scaling factors. In that robot specific config file you
- * must provide:
- *      - ROTATION_BIAS
- *      - WHEEL_DIAMETER
- *      - ENCODER_PULSES
- *      - GEAR_RATIO
- *      - MOUSE_RADIUS
- */
-const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
-const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
-const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 
 //***************************************************************************//
 /***
@@ -201,5 +157,12 @@ const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
  * a reset.
  */
 #define PERSISTENT __attribute__((section(".noinit")))
+
+// This is the size for each cell in the maze. Normally 180mm for a classic maze
+const float FULL_CELL = 180.0f;
+const float HALF_CELL = FULL_CELL / 2.0;
+
+// the position in the cell where the sensors are sampled.
+const float SENSING_POSITION = 170.0;
 
 #endif

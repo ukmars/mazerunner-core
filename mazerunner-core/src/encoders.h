@@ -35,16 +35,12 @@ void callback_right();
 class Encoders {
 public:
   void setup() {
-#if defined(ARDUINO_ARCH_MEGAAVR) || defined(ARDUINO_ARCH_AVR)
     pinMode(ENCODER_LEFT_CLK, INPUT);
     pinMode(ENCODER_LEFT_B, INPUT);
     pinMode(ENCODER_RIGHT_CLK, INPUT);
     pinMode(ENCODER_RIGHT_B, INPUT);
     attachInterrupt(digitalPinToInterrupt(ENCODER_LEFT_CLK), callback_left, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENCODER_RIGHT_CLK), callback_right, CHANGE);
-#elif ARDUINO_ARCH_NRF52840
-#warning Code for setup of encoders is needed
-#endif
     reset();
   }
 
