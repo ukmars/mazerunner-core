@@ -24,6 +24,27 @@
 #include <Arduino.h>
 #include <wiring_private.h>
 
+/***
+ * The Switches class looks after the multifunction analogue input on UKMARSBOT.
+ *
+ * A single analogue channel lets you examine four dip switches and a pushbutton.
+ *
+ * The dip switches short out combinations of resistors in a potential divider chain
+ * and thus cause a different voltage to be presented to the ADC input pin. The
+ * maximum voltage is applied when all switches are open. That voltage will be
+ * about 66% of the full range of the analogue channel with the resistors chosen.
+ *
+ * The top resistor in this chain has a pushbutton in parallel so that pressing
+ * the button pulls the input all the way up to the positive supply giving a
+ * full scale adc reading.
+ *
+ * There is no debounce on this circuit or in the software. None has yet proven
+ * necessary. The simplest option would be to place a small capacitor between
+ * the ADC input and ground.
+ *
+ * NOTE: The switches class relies upon the ADC being updated regularly in the
+ *       systick event.
+ */
 class Switches {
 public:
   explicit Switches(uint8_t channel) : m_channel(channel){};
@@ -40,6 +61,7 @@ public:
    */
   int read() {
     const int adc_thesholds[] = {660, 647, 630, 614, 590, 570, 545, 522, 461, 429, 385, 343, 271, 212, 128, 44, 0};
+    update();
 
     if (m_switches_adc > 800) {
       return 16;
@@ -72,6 +94,12 @@ public:
     wait_for_button_press();
     wait_for_button_release();
     delay(250);
+  }
+
+  // for testing
+  int adc_reading() {
+    update();
+    return m_switches_adc;
   }
 
 private:
