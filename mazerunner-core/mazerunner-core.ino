@@ -49,20 +49,7 @@ void setup() {
 
   console.begin(BAUDRATE);
   // redirectPrintf(); // send printf output to console (uses 20 bytes RAM)
-
-  // set up the emitters and groups BEFORE starting the adc
-  // group the front sensors
-  // adc.add_channel_to_group(0, 0);
-  // adc.add_channel_to_group(3, 0);
-  // adc.set_emitter_for_group(EMITTER_FRONT, 0);
-  // // group the side sensors
-  // adc.add_channel_to_group(1, 1);
-  // adc.add_channel_to_group(2, 1);
-  // adc.set_emitter_for_group(EMITTER_DIAGONAL, 1);
-
-  // now configure the hardware
   adc.begin();
-
   pinMode(LED_USER, OUTPUT);
   digitalWrite(LED_USER, 0);
   pinMode(LED_BUILTIN, OUTPUT);
