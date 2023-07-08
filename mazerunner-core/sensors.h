@@ -156,6 +156,11 @@ public:
     lss.raw = adc.get_raw(LSS_CHANNEL);
     lfs.raw = adc.get_raw(LFS_CHANNEL);
 
+    lfs.value = FRONT_LEFT_SCALE * lfs.raw;
+    lss.value = LEFT_SCALE * lss.raw;
+    rss.value = RIGHT_SCALE * rss.raw;
+    rfs.value = FRONT_RIGHT_SCALE * rfs.raw;
+
     // set the wall detection flags
     see_left_wall = lss.value > LEFT_THRESHOLD;
     see_right_wall = rss.value > RIGHT_THRESHOLD;
