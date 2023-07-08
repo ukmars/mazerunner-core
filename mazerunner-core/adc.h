@@ -23,72 +23,49 @@
 #include <Arduino.h>
 #include <wiring_private.h>
 /***
- * This is an interface class for an actual adc subsystem. It is a pure
- * virtual class and cannot be instantiated. Instead, you must create
- * a derived class with appropriate code for the target hardware.
- *
- * Currently there are 8 available channels and 2 groups.
- *
- * The channels currently refer to the hardware ADC channel numbers,
- * starting at zero.
- * TODO: A future development should allow the use of any subset of
- * hardware channels.
- *
- * It is expected that all the channels will be read at least once in a
- * conversion cycle. These are the 'dark' readings.
- *
- * This is done on the assumption that not all adc channels are associated
- * with active sensors. For example, on the basic UKMARSBOT, one of the
- * channels is used for the battery voltage measurement and another is
- * used for the analogue switches. Using this technique, the battery monitor
- * and switches just need to grab a reading for the adc converter. If
- * your platform has a different arrangement it should not be affected
- * by this ADC code.
- *
- * After the first read each group will be read again with its associated
- * emitter pin set high. The result for that channel will then be the
- * difference between 'lit' reading and the previous 'dark' reading.
- *
- * Pin numbers are in the range 0..255 and are not necessarily mapped
- * to specific hardware pins. That depends on the target hardware. For
- * An arduino target, pins 0..13 have their usual meaning. Pins 14..23
- * are the pins associated with the Arduino A0..A7 pins.
- *
- * A pin number of 255 is treated as a null value and will be ignored
- * for all operations.
- *
- * Any, or all, of the channels can be added to one (or both) of the
- * groups. At present the groups are hard-coded in sequence in the
- * hardware implementation.
- *
- * Before the converter is used, you should assign emitter pin numbers to
- * each group. If there is no pin number assigned, the channels in group
- * will still be read a second time and so are likely to return a value of
- * zero. TODO: this needs to be fixed
- *
- * Next, each group should have one or more channel numbers allocated to it.
- * These are the channels that will get a second read with the associated
- * emitter lit.
- *
- * Once the emitters and groups have been assigned, call the begin() method
- * to configure the underlying hardware ADC and allow conversion cycle to begin.
- *
- * It is assumed that the conversion cycle happens under interrupt control and
- * is triggered at the end of the systick function by calling the
- * start_conversion_cycle() method.
- *
- * If you have a suitably fast ADC or some other hardware that gathers the
- * sensor readings then the start_conversion_cycle() method should be used to
- * perform the complete cycle in one call.
- *
- * NOTE: Manual analogue conversions:
- * All ADC channels are automatically converted by the sensor interrupt.
- * Attempting to performa a manual ADC conversion will disrupt that
- * process so avoid doing that if you value your sanity.
- *
- * The use of virtual functions comes at some small cost. The VTABLE
- * takes up at least another 8 bytes and there is an overhead in the
- * function call. If this is a problem consider the use of CRTP techniques.
+ * The AnalogueConverter class samples a fixed number of ADC from 0 to MAX_CHANNELS and
+ * makes the readings available to the resto of the program.
+ * 
+ * Each channel is samples once with the sensor emitters off and once with the emitters on.
+ * 
+ * The first set of samples is stored in tyhe array m_adc_dark[].
+ * 
+ * The second set, with the emitter on, is stored in m_adc_lit[].
+ * 
+ * The class does not care what is connected to the adc channel. It just gathers readings.
+ * 
+ * The battery monitor and analogue button channels are also converted here to avoid conflict.
+ * Your config file should declare the channel number for these as well as the actual sensors.
+ * 
+ * This class is specific to UKMARSBOT with a ATmega328p processor. If you are using any other
+ * processor, you will need to re-write this class.
+ * 
+ * To save overhead, the class works by using the conversion complete interrupt to gather
+ * results only after a successful conversion. The entire sequence is begun by enabling the
+ * appropriate interrupt and then starting an ADC conversion. Each interrupt action takes 
+ * about 5us and conversions take about 30us. Since each channel gets converted twice, the
+ * entire sequence takes about 620us to complete but only uses about 100us of processor time.
+ * 
+ * 
+ * Although the code exists almost entirely in this header file, C++ requires the actual 
+ * instance of the class and its interrupt service routine to be in a .cpp file.
+ * 
+ * TODO: The inclusion in the class of information about the emitters is unfortunate but this
+ * is the simplest scheme I could envisage. If there are two emitters, both are turned on 
+ * together in this version. It would be better to use different enitters for each sensor type.
+ * that is left as an exercise for the reader. 
+ * 
+ * The code assumes the use of the avanced wall sensor board where there are two emitters. It
+ * will work just as well with the basic wall sensor if you simply use the same pin name for 
+ * both emitter entries.
+ * 
+ * TODO: The A4 and A5 channels get converted in the sequence. If you are expecting to use
+ * these for an I2C device, they may need to be skipped.
+ * 
+ * TODO: If only four sensor channels are used, there are opportunities to optimise this 
+ * code if you are so inclined.
+ * 
+ * 
  */
 
 class AnalogueConverter;
@@ -171,6 +148,10 @@ public:
 
   int get_dark(int i) {
     return m_adc_dark[i];
+  }
+
+  int get_difference(int i) {
+    return m_adc_lit[i] - m_adc_dark[i];
   }
 
   int do_conversion(uint8_t channel) {
