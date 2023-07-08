@@ -13,12 +13,16 @@
  *     license that can be found in the LICENSE file or at                    *
  *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
+#include "Arduino.h"
 #include "adc.h"
-
-// TODO: should these few lines go into some sort of global variables file?
-// along with the maze, encoders and so on?
-AnalogueConverter adc;
+#include "systick.h"
 
 ISR(ADC_vect) {
   adc.isr();
+}
+
+// Systick systick;
+
+ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
+  systick.update();
 }
