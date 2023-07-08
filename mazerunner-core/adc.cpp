@@ -14,6 +14,8 @@
  *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
 #include "adc.h"
+#include "config.h"
+#include "digitalWriteFast.h"
 
 /***
  * This function should be independent of the hardware but is called from the
@@ -60,69 +62,88 @@
  * If different types of sensor are used or the I2C is needed, there
  * will need to be changes here.
  */
-static int channel;
-void adc_isr(IAnalogueConverter &adc) {
+
+AnalogueConverter adc;
+
+ISR(ADC_vect) {
+  adc_isr(adc);
+}
+
+// int battery_adc_reading;
+// int switches_adc_reading;
+// static int sensor_phase = 0;
+// static int channel = 0;
+
+void adc_isr(AnalogueConverter &adc) {
   switch (adc.m_phase) {
-    case 0: { // initialisation
-      adc.m_group_index = 0;
-      adc.m_index = 0;
-      channel = adc.m_index;
-      adc.start_conversion(channel);
-      adc.m_phase = 1;
-    } break;
-    case 1: { // all channels get read 'dark' first
-      adc.m_adc_reading[adc.m_index] = adc.get_adc_result();
-      adc.m_index += 1;
-      if (adc.m_index >= adc.MAX_CHANNELS) {
-        if (adc.m_emitters_enabled) {
-          adc.m_index = 0;
-          adc.m_phase = 2;
-          adc.emitter_on(adc.m_emitter_pin[0]);
-          adc.start_conversion(7); // dummy conversion to get to the next isr
-        } else {
-          adc.end_conversion_cycle(); // finish the cycle
-        }
-        break;
+    case 0:
+      // always start conversions as soon as  possible so they get a
+      // full 50us to convert
+      adc.start_conversion(7);
+      break;
+    case 1:
+      adc.m_adc[7] = adc.get_adc_result();
+      adc.start_conversion(6);
+      break;
+    case 2:
+      adc.m_adc[6] = adc.get_adc_result();
+      adc.start_conversion(0);
+      break;
+    case 3:
+      adc.m_adc_dark[0] = adc.get_adc_result();
+      adc.start_conversion(1);
+      break;
+    case 4:
+      adc.m_adc_dark[1] = adc.get_adc_result();
+      adc.start_conversion(2);
+      break;
+    case 5:
+      adc.m_adc_dark[2] = adc.get_adc_result();
+      adc.start_conversion(3);
+      break;
+    case 6:
+      adc.m_adc_dark[3] = adc.get_adc_result();
+      adc.start_conversion(4);
+      break;
+    case 7:
+      adc.m_adc_dark[4] = adc.get_adc_result();
+      adc.start_conversion(5);
+      break;
+    case 8:
+      adc.m_adc_dark[5] = adc.get_adc_result();
+      if (adc.m_emitters_enabled) {
+        // got all the dark ones so light them up
+        digitalWriteFast(adc.emitter_diagonal(), 1);
+        digitalWriteFast(adc.emitter_front(), 1);
       }
-      channel = adc.m_index;
-      adc.start_conversion(adc.m_index);
-    } break;
-    case 2: { // start the first lit group
-      channel = adc.m_group[0][adc.m_index];
-      adc.start_conversion(channel);
-      adc.m_phase = 3;
-    } break;
-    case 3: { // first group conversions
-      adc.m_adc_reading[channel] = adc.get_adc_result() - adc.m_adc_reading[channel];
-      adc.m_index += 1;
-      if (adc.m_index >= adc.m_group[0].size()) {
-        adc.m_index = 0;
-        adc.m_phase = 4;
-        adc.emitter_off(adc.m_emitter_pin[0]);
-        adc.emitter_on(adc.m_emitter_pin[1]);
-        adc.start_conversion(7); // dummy conversion to delay one cycle
-        break;
-      }
-      channel = adc.m_group[0][adc.m_index];
-      adc.start_conversion(channel);
-    } break;
-    case 4: { // start the second group
-      adc.m_index = 0;
-      channel = adc.m_group[1][adc.m_index];
-      adc.start_conversion(channel);
-      adc.m_phase = 5;
-    } break;
-    case 5: { // second group conversions
-      adc.m_adc_reading[channel] = adc.get_adc_result() - adc.m_adc_reading[channel];
-      adc.m_index += 1;
-      if (adc.m_index >= adc.m_group[1].size()) {
-        adc.m_index = 0;
-        adc.emitter_off(adc.m_emitter_pin[1]);
-        adc.end_conversion_cycle();
-        break;
-      }
-      channel = adc.m_group[1][adc.m_index];
-      adc.start_conversion(channel);
-    } break;
+      adc.start_conversion(7); // dummy read of the battery to provide delay
+      // wait at least one cycle for the detectors to respond
+      break;
+    case 9:
+      adc.get_adc_result(); // dummy read to clear the flag
+      adc.start_conversion(0);
+      break;
+    case 10:
+      adc.m_adc[0] = adc.get_adc_result() - adc.m_adc_dark[0];
+      adc.start_conversion(1);
+      break;
+    case 11:
+      adc.m_adc[1] = adc.get_adc_result() - adc.m_adc_dark[1];
+      adc.start_conversion(2);
+      break;
+    case 12:
+      adc.m_adc[2] = adc.get_adc_result() - adc.m_adc_dark[2];
+      adc.start_conversion(3);
+      break;
+    case 13:
+      adc.m_adc[3] = adc.get_adc_result() - adc.m_adc_dark[3];
+      // uncoditionally turn off emitters for safety
+      digitalWriteFast(adc.emitter_diagonal(), 0);
+      digitalWriteFast(adc.emitter_front(), 0);
+      bitClear(ADCSRA, ADIE); // turn off the interrupt
+      break;
+    default:
+      break;
   }
+  adc.m_phase++;
 }

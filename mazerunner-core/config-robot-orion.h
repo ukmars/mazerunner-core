@@ -83,7 +83,6 @@ const int EXTRA_WALL_ADJUST = 6;
 #endif
 
 //***** IO PINS *****************************************************//
-
 // the BASIC sensor board has two LEDs
 // const int LED_LEFT = USER_IO;
 // const int LED_RIGHT = EMITTER_A;
@@ -106,17 +105,24 @@ const int EMITTER_DIAGONAL = EMITTER_B;
 // Channels 4 and 5 are available if you do not want to add an I2C device
 // Channel 6 is pre-allocated to the Battery monitor
 // Channel 7 is re-allocated to the function switch and button
+
+// NOTE - these are the AnalogueConverter channel indexes, not cecessarlity the
+// hardware ADC channel numbers
+
 // ADVANCED SENSOR
-#define RFS_CHANNEL 0
-#define RSS_CHANNEL 1
-#define LSS_CHANNEL 2
-#define LFS_CHANNEL 3
+const int RFS_CHANNEL = 0;
+const int RSS_CHANNEL = 1;
+const int LSS_CHANNEL = 2;
+const int LFS_CHANNEL = 3;
+
 // BASIC SENSOR - just repeat the front sensor to make the code cleaner
 // #define RFS_CHANNEL 1
 // #define RSS_CHANNEL 0
 // #define LSS_CHANNEL 2
 // #define LFS_CHANNEL 1
-
+// there are two other ADC channels used by the robot
+const int SWITCHES_CHANNEL = 6;
+const int BATTERY_CHANNEL = 7;
 //***************************************************************************//
 const uint32_t BAUDRATE = 115200;
 

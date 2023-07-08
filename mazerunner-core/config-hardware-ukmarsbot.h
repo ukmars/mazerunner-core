@@ -18,7 +18,7 @@
 
 // hardware configuration for for UKMARSBOT with an Arduino nano processor
 
-#include "adc_atmega328.h"
+// #include "adc.h"
 
 //***************************************************************************//
 // Some physical constants that are likely to be board -specific

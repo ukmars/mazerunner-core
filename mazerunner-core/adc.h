@@ -17,10 +17,11 @@
 #ifndef ADC_H
 #define ADC_H
 
+#include "config.h"
 #include "digitalWriteFast.h"
 #include "list.h"
 #include <Arduino.h>
-
+#include <wiring_private.h>
 /***
  * This is an interface class for an actual adc subsystem. It is a pure
  * virtual class and cannot be instantiated. Instead, you must create
@@ -89,35 +90,14 @@
  * takes up at least another 8 bytes and there is an overhead in the
  * function call. If this is a problem consider the use of CRTP techniques.
  */
-class IAnalogueConverter {
+
+class AnalogueConverter;
+
+extern AnalogueConverter adc;
+class AnalogueConverter {
 public:
   enum {
-    MAX_GROUPS = 2,
     MAX_CHANNELS = 8,
-  };
-
-  IAnalogueConverter() {
-    for (int i = 0; i < MAX_GROUPS; i++) {
-      m_emitter_pin[i] = 255; // pin 255 is a null, or invalid pin
-    }
-  }
-
-  void set_emitter_for_group(uint8_t pin, uint8_t group) {
-    if (group >= MAX_GROUPS) {
-      return;
-    }
-    pinMode(pin, OUTPUT);
-    m_emitter_pin[group] = pin;
-  };
-
-  void add_channel_to_group(uint8_t channel, uint8_t group) {
-    if (channel >= MAX_CHANNELS) {
-      return;
-    }
-    if (group >= MAX_GROUPS) {
-      return;
-    }
-    m_group[group].add(channel);
   };
 
   void enable_emitters() {
@@ -129,30 +109,91 @@ public:
   }
 
   // for convenience allow access in an array-like manner
-  volatile int &operator[](int i) { return m_adc_reading[i]; }
+  volatile int &operator[](int i) { return m_adc_dark[i]; }
 
-  // all of these MUST be defined in the derived hardware class
-  virtual void begin() = 0;
-  virtual void start_conversion_cycle() = 0;
-  virtual void end_conversion_cycle() = 0;
-  virtual void start_conversion(uint8_t channel) = 0;
-  virtual int get_adc_result() = 0;
-  virtual void emitter_on(uint8_t pin) = 0;
-  virtual void emitter_off(uint8_t pin) = 0;
+  virtual void begin() {
+    disable_emitters();
+    set_front_emitter_pin(EMITTER_FRONT);
+    set_side_emitter_pin(EMITTER_DIAGONAL);
+    converter_init();
+    m_configured = true;
+  };
+
+  void set_front_emitter_pin(uint8_t pin) {
+    pinMode(pin, OUTPUT);
+    m_emitter_front_pin = pin;
+  };
+  void set_side_emitter_pin(uint8_t pin) {
+    pinMode(pin, OUTPUT);
+    m_emitter_diagonal_pin = pin;
+  };
+
+  uint8_t emitter_front() { return m_emitter_front_pin; };
+  uint8_t emitter_diagonal() { return m_emitter_diagonal_pin; };
+
+  void converter_init() {
+    // Change the clock prescaler from 128 to 32 for a 500kHz clock
+    bitSet(ADCSRA, ADPS2);
+    bitClear(ADCSRA, ADPS1);
+    bitSet(ADCSRA, ADPS0);
+    // Set the reference to AVcc and right adjust the result
+    ADMUX = DEFAULT << 6;
+  }
+
+  void start_conversion_cycle() {
+    if (not m_configured) {
+      return;
+    }
+
+    m_phase = 0;          // sync up the start of the sensor sequence
+    bitSet(ADCSRA, ADIE); // enable the ADC interrupt
+    start_conversion(0);  // begin a conversion to get things started
+  }
+
+  void end_conversion_cycle() {
+    bitClear(ADCSRA, ADIE); // disable the ADC interrupt
+  }
+
+  void start_conversion(uint8_t channel) {
+    ADMUX = (ADMUX & 0xF0) | (channel & 0x0F); // select the channel
+    sbi(ADCSRA, ADSC);                         // start the conversion
+  }
+
+  int get_adc_result() {
+    return ADC;
+  }
+
+  int do_conversion(uint8_t channel) {
+    start_conversion(channel);
+    while (ADCSRA & (1 << ADSC)) {
+      // do nothing
+    }
+    return get_adc_result();
+  }
+
+  void emitter_on(uint8_t pin) {
+    if (pin == 255 || not m_emitters_enabled) {
+      return;
+    }
+    digitalWriteFast(pin, 1);
+  }
+
+  void emitter_off(uint8_t pin) {
+    if (pin == 255) {
+      return;
+    }
+    digitalWriteFast(pin, 0);
+  }
 
   // an external function called from the hardware end of conversion ISR
-  friend void adc_isr(IAnalogueConverter &a);
+  friend void adc_isr(AnalogueConverter &a);
 
-protected:
-  volatile int m_adc_reading[MAX_CHANNELS] = {0};
-
-  uint8_t m_emitter_pin[MAX_GROUPS] = {0};
-
-  List<uint8_t, MAX_CHANNELS> m_group[MAX_GROUPS];
-
+public:
+  volatile int m_adc_dark[MAX_CHANNELS] = {0};
+  volatile int m_adc[MAX_CHANNELS] = {0};
+  uint8_t m_emitter_front_pin = -1;
+  uint8_t m_emitter_diagonal_pin = -1;
   uint8_t m_index = 0;
-  uint8_t m_group_index = 0;
-
   bool m_emitters_enabled = false;
   bool m_configured = false;
   uint8_t m_phase = 0; // used in the isr
