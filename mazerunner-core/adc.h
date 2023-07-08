@@ -123,6 +123,7 @@ public:
     pinMode(pin, OUTPUT);
     m_emitter_front_pin = pin;
   };
+
   void set_side_emitter_pin(uint8_t pin) {
     pinMode(pin, OUTPUT);
     m_emitter_diagonal_pin = pin;
@@ -145,9 +146,10 @@ public:
       return;
     }
 
-    m_phase = 0;          // sync up the start of the sensor sequence
-    bitSet(ADCSRA, ADIE); // enable the ADC interrupt
-    start_conversion(0);  // begin a conversion to get things started
+    m_phase = 1; // sync up the start of the sensor sequence
+    m_channel = 0; 
+    bitSet(ADCSRA, ADIE);        // enable the ADC interrupt
+    start_conversion(m_channel); // begin a conversion to get things started
   }
 
   void end_conversion_cycle() {
@@ -161,6 +163,14 @@ public:
 
   int get_adc_result() {
     return ADC;
+  }
+
+  int get_lit(int i) {
+    return m_adc_lit[i];
+  }
+
+  int get_dark(int i) {
+    return m_adc_dark[i];
   }
 
   int do_conversion(uint8_t channel) {
@@ -190,13 +200,14 @@ public:
 
 public:
   volatile int m_adc_dark[MAX_CHANNELS] = {0};
-  volatile int m_adc[MAX_CHANNELS] = {0};
+  volatile int m_adc_lit[MAX_CHANNELS] = {0};
   uint8_t m_emitter_front_pin = -1;
   uint8_t m_emitter_diagonal_pin = -1;
   uint8_t m_index = 0;
   bool m_emitters_enabled = false;
   bool m_configured = false;
   uint8_t m_phase = 0; // used in the isr
+  uint8_t m_channel;
 };
 
 #endif

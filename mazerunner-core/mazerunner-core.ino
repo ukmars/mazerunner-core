@@ -83,10 +83,21 @@ void setup() {
   }
 
   sensors.disable();
+  sensors.enable();
   console.println(F("RDY"));
 }
 
 void loop() {
+  for (int i = 0; i < 4; i++) {
+    print_justified(adc.get_lit(i), 5);
+    Serial.print(' ');
+  }
+  for (int i = 6; i < 8; i++) {
+    print_justified(adc.get_dark(i), 5);
+    Serial.print(' ');
+  }
+  Serial.println();
+  delay(50);
   if (cli.read_serial() > 0) {
     cli.interpret_line();
   }
