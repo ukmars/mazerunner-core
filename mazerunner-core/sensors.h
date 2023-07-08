@@ -135,9 +135,10 @@ public:
    * @return robot cross-track-error. Too far left is negative.
    */
   void update() {
-    m_battery_adc = adc[BATTERY_PIN];
-
+    // digitalWriteFast(LED_USER, 1);
+    m_battery_adc = adc.get_dark(BATTERY_CHANNEL);
     update_battery_voltage();
+
     if (not m_enabled) {
       // NOTE: No values will be updated although the ADC is working
       m_cross_track_error = 0;
