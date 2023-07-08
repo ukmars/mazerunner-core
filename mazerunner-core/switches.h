@@ -29,7 +29,7 @@ public:
   explicit Switches(uint8_t channel) : m_channel(channel){};
 
   void update() {
-    m_switches_adc = adc[m_channel];
+    m_switches_adc = adc.get_dark(m_channel);
   }
 
   /**
