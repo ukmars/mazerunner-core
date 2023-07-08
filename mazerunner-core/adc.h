@@ -90,9 +90,6 @@ public:
     m_emitters_enabled = false;
   }
 
-  // for convenience allow access in an array-like manner
-  volatile int &operator[](int i) { return m_adc_dark[i]; }
-
   virtual void begin() {
     disable_emitters();
     set_front_emitter_pin(EMITTER_FRONT);
