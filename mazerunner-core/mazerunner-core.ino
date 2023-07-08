@@ -47,6 +47,16 @@ Reporter reporter;
 FILE serial_stdout;
 HardwareSerial &console = Serial;
 
+ISR(ADC_vect) {
+  adc.isr();
+}
+
+// Systick systick;
+
+ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
+  systick.update();
+}
+
 void setup() {
 
   console.begin(BAUDRATE);
