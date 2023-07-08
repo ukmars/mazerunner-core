@@ -32,8 +32,8 @@
 
 // Global objects
 Systick systick;
-
-Switches switches(SWITCHES_PIN);
+AnalogueConverter adc;
+Switches switches(SWITCHES_CHANNEL);
 Encoders encoders;
 Sensors sensors;
 Motion motion;
