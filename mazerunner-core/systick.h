@@ -27,25 +27,16 @@ public:
   // don't let this start firing up before we are ready.
   // call the begin method explicitly.
   void begin() {
-#if defined(ARDUINO_ARCH_AVR)
+    // set
+    bitClear(TCCR2B, WGM22);
     bitClear(TCCR2A, WGM20);
     bitSet(TCCR2A, WGM21);
-    bitClear(TCCR2B, WGM22);
     // set divisor to 128 => 125kHz
     bitSet(TCCR2B, CS22);
     bitClear(TCCR2B, CS21);
     bitSet(TCCR2B, CS20);
     OCR2A = 249; // (16000000/128/500)-1 => 500Hz
     bitSet(TIMSK2, OCIE2A);
-#elif defined(ARDUINO_ARCH_MEGAAVR)
-    TCB2.CTRLA &= ~TCB_ENABLE_bm;      // stop the timer
-    TCB2.CTRLA = TCB_CLKSEL_CLKTCA_gc; // Clock selection is same as TCA (F_CPU/64 -- 250kHz)
-    TCB2.CTRLB = (TCB_CNTMODE_INT_gc); // set periodic interrupt Mode
-    // timer is clocked at 250000Hz = 4us per tick
-    TCB2.CCMP = 2000 / (1000000 / 250000) - 1; // we want 2000us => 5000 ticks
-    TCB2.CTRLA |= TCB_ENABLE_bm;               // Enable & start
-    TCB2.INTCTRL |= TCB_CAPT_bm;               // Enable timer interrupt
-#endif
     delay(10); // make sure it runs for a few cycles before we continue
   }
   /***
