@@ -69,9 +69,7 @@ ISR(ADC_vect) {
   adc_isr(adc);
 }
 
-// int battery_adc_reading;
-// int switches_adc_reading;
-// static int sensor_phase = 0;
+// int battet sensor_phase = 0;
 // static int channel = 0;
 
 void adc_isr(AnalogueConverter &adc) {
