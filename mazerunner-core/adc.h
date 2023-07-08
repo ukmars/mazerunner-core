@@ -32,7 +32,7 @@
  *
  * The second set, with the emitter on, is stored in m_adc_lit[].
  *
- * for wall sensors, you should use the get_difference() method to read the lit-dark values.
+ * for wall sensors, you should use the get_raw() method to read the lit-dark values.
  *
  * The class does not care what is connected to the adc channel. It just gathers readings.
  *
@@ -144,15 +144,15 @@ public:
     return ADC;
   }
 
-  int get_lit(int i) {
+  int get_lit(const int i) const {
     return m_adc_lit[i];
   }
 
-  int get_dark(int i) {
+  int get_dark(const int i) const {
     return m_adc_dark[i];
   }
 
-  int get_difference(int i) {
+  int get_raw(const int i) const {
     return max(0, m_adc_lit[i] - m_adc_dark[i]);
   }
 
