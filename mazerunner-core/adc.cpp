@@ -15,6 +15,8 @@
  ******************************************************************************/
 #include "adc.h"
 
+// TODO: should these few lines go into some sort of global variables file?
+// along with the maze, encoders and so on?
 AnalogueConverter adc;
 
 ISR(ADC_vect) {
