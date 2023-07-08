@@ -184,7 +184,6 @@ public:
   }
 
   void isr() {
-    digitalWriteFast(LED_USER, 1);
     switch (m_phase) {
       case 1:
         m_adc_dark[m_channel] = get_adc_result();
@@ -226,9 +225,9 @@ public:
         digitalWriteFast(emitter_diagonal(), 0);
         digitalWriteFast(emitter_front(), 0);
         bitClear(ADCSRA, ADIE); // turn off the interrupt
+        // digitalWriteFast(LED_USER, 0);
         break;
     }
-    digitalWriteFast(LED_USER, 0);
   }
 
 private:
