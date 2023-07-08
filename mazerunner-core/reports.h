@@ -228,7 +228,7 @@ public:
     while (true) {
       sensors.enable();
       for (int i = 0; i < 4; i++) {
-        print_justified(adc.get_difference(i), 5);
+        print_justified(adc.get_raw(i), 5);
         Serial.print(' ');
       }
       for (int i = 6; i < 8; i++) {
