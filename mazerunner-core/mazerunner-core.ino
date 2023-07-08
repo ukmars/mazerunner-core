@@ -44,6 +44,8 @@ Maze maze PERSISTENT;
 Mouse mouse;
 CommandLineInterface cli;
 Reporter reporter;
+FILE serial_stdout;
+HardwareSerial &console = Serial;
 
 void setup() {
 
