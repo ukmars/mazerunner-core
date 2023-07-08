@@ -40,6 +40,16 @@ public:
     }
     mData[mTail++] = item;
   }
+
+  bool contains(item_t item) {
+    for (int i = 0; i < num_items; i++) {
+      if (mData[i] == item) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   int operator[](int i) const { return mData[i]; }
 
 protected:
