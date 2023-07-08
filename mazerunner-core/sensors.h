@@ -151,16 +151,10 @@ public:
     // just used twice
     // keep these values for calibration assistance
     // they should never be negative
-    rfs.raw = max(0, adc[RFS_CHANNEL]);
-    rss.raw = max(0, adc[RSS_CHANNEL]);
-    lss.raw = max(0, adc[LSS_CHANNEL]);
-    lfs.raw = max(0, adc[LFS_CHANNEL]);
-
-    // normalise to a nominal value of 100
-    rfs.value = (int)(rfs.raw * FRONT_RIGHT_SCALE);
-    rss.value = (int)(rss.raw * RIGHT_SCALE);
-    lss.value = (int)(lss.raw * LEFT_SCALE);
-    lfs.value = (int)(lfs.raw * FRONT_LEFT_SCALE);
+    rfs.raw = adc.get_raw(RFS_CHANNEL);
+    rss.raw = adc.get_raw(RSS_CHANNEL);
+    lss.raw = adc.get_raw(LSS_CHANNEL);
+    lfs.raw = adc.get_raw(LFS_CHANNEL);
 
     // set the wall detection flags
     see_left_wall = lss.value > LEFT_THRESHOLD;
