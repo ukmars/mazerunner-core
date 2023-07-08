@@ -17,9 +17,9 @@
 #ifndef PROFILE_H
 #define PROFILE_H
 
-#include "atomic.h"
 #include "config.h"
 #include <Arduino.h>
+#include <util/atomic.h>
 //***************************************************************************//
 class Profile;
 

@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include "atomic.h"
 #include "config.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <stdint.h>
+#include <util/atomic.h>
 
 // TODO: consider a single Encoder class and an Odometry class
 // that has two Encoder instances

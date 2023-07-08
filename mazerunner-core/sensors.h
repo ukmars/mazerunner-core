@@ -18,10 +18,10 @@
 #define SENSORS_H
 
 #include "adc.h"
-#include "atomic.h"
 #include "config.h"
 #include "digitalWriteFast.h"
 #include <Arduino.h>
+#include <util/atomic.h>
 #include <wiring_private.h>
 
 enum {
