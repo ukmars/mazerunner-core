@@ -223,6 +223,23 @@ public:
     console.print('}');
     console.print(' ');
   }
+  //***************************************************************************//
+  void show_adc() {
+    while (true) {
+      sensors.enable();
+      for (int i = 0; i < 4; i++) {
+        print_justified(adc.get_difference(i), 5);
+        Serial.print(' ');
+      }
+      for (int i = 6; i < 8; i++) {
+        print_justified(adc.get_dark(i), 5);
+        Serial.print(' ');
+      }
+      Serial.println();
+      delay(50);
+    }
+    sensors.disable();
+  }
 };
 
 #endif
