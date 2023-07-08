@@ -211,7 +211,8 @@ public:
         m_phase = 4;
         break;
       case 4:
-        m_adc_lit[m_channel] = get_adc_result() - m_adc_dark[m_channel];
+        // avoid zero result so we know it is working
+        m_adc_lit[m_channel] = max(1, get_adc_result() - m_adc_dark[m_channel]);
         m_channel++;
         start_conversion(m_channel);
         if (m_channel > 7) {
