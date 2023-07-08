@@ -26,9 +26,12 @@
 // that has two Encoder instances
 
 class Encoders;
+// TODO: where should we really define  these global singletons?
+extern Encoders encoders; // defined in main file to keep it all together
 
-extern Encoders encoders; // declared in main file to keep it all together
-
+// Forward declaration of the callbacks ...
+// ... which cannot be defined until the Encoder class is complete.
+// tacky!
 void callback_left();
 void callback_right();
 
@@ -149,3 +152,14 @@ private:
   int m_left_counter;
   int m_right_counter;
 };
+
+// A bit of indirection for convenience because the encoder instance is
+// unknown until the linker has done its thing
+// This is ugly
+inline void callback_left() {
+  encoders.left_input_change();
+}
+
+inline void callback_right() {
+  encoders.right_input_change();
+}
