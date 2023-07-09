@@ -204,7 +204,6 @@ public:
   }
 
   void set_pwm_frequency(int frequency = PWM_31250_HZ) {
-#if defined(ARDUINO_ARCH_AVR)
     switch (frequency) {
       case PWM_31250_HZ:
         // Divide by 1. frequency = 31.25 kHz;
@@ -223,12 +222,6 @@ public:
         bitSet(TCCR1B, CS10);
         break;
     }
-#elif defined(ARDUINO_ARCH_MEGAAVR)
-    // TCA0 is used for analogWrite on pins 9 and 10
-    // The clock for TCA0 is also used as the clock for TCBx
-    // so changing that screws up millis() and anythin else timed of TCBx
-    // so just ignore a frequency change request and leave it at 977Hz
-#endif
   }
 
 private:
