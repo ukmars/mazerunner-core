@@ -16,6 +16,11 @@
 
 #include <Arduino.h>
 
+/*************************************************************************/
+// if you are using a VT100 compatible console, uncomment this line for
+// pretty display
+#define USE_VT100
+
 //***** SENSOR CALIBRATION **************************************************//
 
 #if EVENT == EVENT_HOME

@@ -169,23 +169,31 @@ public:
    *
    */
   void wall_sensor_header() {
-    console.println(F("   lf_   ls_   rs_   rf_   lfs   lss   rss   rfs   sum  diff"));
+    vt100_red();
+    console.println(F("|           RAW            |          NORMALISED       |             |            |"));
+    console.println(F("|   lf_   ls_   rs_   rf_  |    lfs   lss   rss   rfs  |   sum diff  | front_dist |"));
+    vt100_default();
+    vt100_cursor_off();
   }
 
   void show_wall_sensors() {
+    console.print(F("|"));
     print_justified(sensors.lfs.raw, 6);
     print_justified(sensors.lss.raw, 6);
     print_justified(sensors.rss.raw, 6);
     print_justified(sensors.rfs.raw, 6);
-    console.print(" | ");
+    console.print(F("  | "));
     print_justified(sensors.lfs.value, 6);
     print_justified(sensors.lss.value, 6);
     print_justified(sensors.rss.value, 6);
     print_justified(sensors.rfs.value, 6);
-    console.print(" | ");
-    print_justified(sensors.get_front_sum(), 6);
-    print_justified(sensors.get_front_diff(), 6);
-    console.println();
+    console.print(F("  | "));
+    print_justified(sensors.get_front_sum(), 5);
+    print_justified(sensors.get_front_diff(), 5);
+    console.print(F("  | "));
+    print_justified((int)sensors.get_distance(sensors.get_front_sum(), FRONT_LINEAR_CONSTANT), 6);
+    console.print(F("     | "));
+    console.print('\r');
   }
 
   //***************************************************************************//
