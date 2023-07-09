@@ -33,6 +33,9 @@ const int FRONT_RIGHT_CALIBRATION = 174;
 // and there is no wall ahead
 const int LEFT_CALIBRATION = 162;
 const int RIGHT_CALIBRATION = 258;
+
+const int FRONT_LINEAR_CONSTANT = 934;
+
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
 // when the robot is 20mm past the cell boundary. That is, the distance
@@ -48,6 +51,8 @@ const int FRONT_RIGHT_CALIBRATION = 39;
 // RAW side sensor values when robot is centred in a cell and wall ahead
 const int LEFT_CALIBRATION = 80;
 const int RIGHT_CALIBRATION = 72;
+
+const int FRONT_LINEAR_CONSTANT = 934;
 
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
@@ -79,6 +84,9 @@ const int FRONT_RIGHT_CALIBRATION = 156;
 // and there is no wall ahead
 const int LEFT_CALIBRATION = 125;
 const int RIGHT_CALIBRATION = 200;
+
+const int FRONT_LINEAR_CONSTANT = 934;
+
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
 // when the robot is 20mm past the threshold.
