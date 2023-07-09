@@ -1,10 +1,5 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    config.h                                                          *
- * File Created: Sunday, 11th September 2022 3:34:57 pm                       *
- * Author: Peter Harrison                                                     *
- * -----                                                                      *
- * Last Modified: Wednesday, 2nd November 2022 12:41:18 pm                    *
  * -----                                                                      *
  * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *

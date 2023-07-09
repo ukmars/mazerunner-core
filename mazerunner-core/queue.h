@@ -1,12 +1,7 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    queue.h                                                           *
- * File Created: Tuesday, 25th October 2022 9:25:57 am                        *
- * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Wednesday, 2nd November 2022 10:49:38 pm                    *
- * -----                                                                      *
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
  * Licence:                                                                   *
  *     Use of this source code is governed by an MIT-style                    *

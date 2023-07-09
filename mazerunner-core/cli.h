@@ -1,12 +1,7 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    cli.h                                                             *
- * File Created: Saturday, 10th September 2022 10:58:08 pm                    *
- * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Sunday, 27th November 2022 10:51:41 pm                      *
- * -----                                                                      *
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
  * Licence:                                                                   *
  *     Use of this source code is governed by an MIT-style                    *

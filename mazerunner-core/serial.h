@@ -1,12 +1,7 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    serial.h                                                          *
- * File Created: Monday, 31st October 2022 12:42:31 pm                        *
- * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Monday, 31st October 2022 4:17:25 pm                        *
- * -----                                                                      *
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
  * Licence:                                                                   *
  *     Use of this source code is governed by an MIT-style                    *

@@ -1,12 +1,7 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    encoders.h                                                        *
- * File Created: Tuesday, 25th October 2022 9:53:01 am                        *
- * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 1st November 2022 11:46:28 pm                      *
- * -----                                                                      *
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
  * Licence:                                                                   *
  *     Use of this source code is governed by an MIT-style                    *

@@ -1,12 +1,7 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    mazerunner-core.ino                                               *
- * File Created: Wednesday, 26th October 2022 10:56:33 pm                     *
- * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Sunday, 27th November 2022 11:13:57 pm                      *
- * -----                                                                      *
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
  * Licence:                                                                   *
  *     Use of this source code is governed by an MIT-style                    *

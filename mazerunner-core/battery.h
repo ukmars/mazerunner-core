@@ -1,9 +1,7 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    battery.h                                                        *
- * Last Modified: Tuesday, 1st November 2022 10:42:08 am                      *
  * -----                                                                      *
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
  * Licence:                                                                   *
  *     Use of this source code is governed by an MIT-style                    *

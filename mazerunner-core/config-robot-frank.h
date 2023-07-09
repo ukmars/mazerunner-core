@@ -1,9 +1,5 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    config-frank.h                                                    *
- * File Created: Wednesday, 26th October 2022 10:15:50 pm                     *
- * Author: Peter Harrison                                                     *
- *
  * -----                                                                      *
  * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *

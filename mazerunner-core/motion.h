@@ -1,12 +1,7 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    motion.h                                                          *
- * File Created: Saturday, 10th September 2022 11:18:32 am                    *
- * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Thursday, 3rd November 2022 8:50:31 am                      *
- * -----                                                                      *
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
  * Licence:                                                                   *
  *     Use of this source code is governed by an MIT-style                    *

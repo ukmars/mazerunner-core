@@ -1,12 +1,7 @@
 /******************************************************************************
  * Project: mazerunner-core                                                   *
- * File:    mouse.h                                                           *
- * File Created: Saturday, 10th September 2022 11:24:12 pm                    *
- * Author: Peter Harrison                                                     *
  * -----                                                                      *
- * Last Modified: Tuesday, 31st January 2023 9:06:55 am                       *
- * -----                                                                      *
- * Copyright 2022 - 2022 Peter Harrison, Micromouseonline                     *
+ * Copyright 2022 - 2023 Peter Harrison, Micromouseonline                     *
  * -----                                                                      *
  * Licence:                                                                   *
  *     Use of this source code is governed by an MIT-style                    *
