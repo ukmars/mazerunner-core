@@ -77,7 +77,10 @@ void setup() {
 
   sensors.disable();
   sensors.enable();
-  Serial.println(F("\n\nRDY"));
+  Serial.println();
+  Serial.println();
+  Serial.println(F("RDY"));
+  cli.prompt();
 }
 
 void loop() {

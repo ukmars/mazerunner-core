@@ -167,7 +167,7 @@ public:
     Serial.println(F("|   lf_   ls_   rs_   rf_  |    lfs   lss   rss   rfs  |   sum diff  | front_dist |"));
   }
 
-  void show_wall_sensors() {
+  void print_wall_sensors() {
     Serial.print(F("|"));
     print_justified(sensors.lfs.raw, 6);
     print_justified(sensors.lss.raw, 6);
@@ -186,6 +186,8 @@ public:
     Serial.print(F("     | "));
     Serial.print('\r');
   }
+
+  // void
 
   //***************************************************************************//
   void print_walls() {

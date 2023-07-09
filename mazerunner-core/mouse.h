@@ -63,24 +63,33 @@ public:
     if (cmd == 0) {
       return;
     }
-    sensors.wait_for_user_start(); // cover front sensor with hand to start
     switch (cmd) {
       case 1:
         show_sensor_calibration();
         break;
       case 2:
+        sensors.wait_for_user_start(); // cover front sensor with hand to start
         search_maze();
         break;
       case 3:
+        sensors.wait_for_user_start(); // cover front sensor with hand to start
         follow_to(maze.maze_goal());
         break;
       case 4:
+        sensors.wait_for_user_start(); // cover front sensor with hand to start
         test_SS90E();
         break;
       case 5:
+        sensors.wait_for_user_start(); // cover front sensor with hand to start
+        // test_SS90F();
+        break;
+
+      case 6:
+        sensors.wait_for_user_start(); // cover front sensor with hand to start
         test_edge_detection();
         break;
-      case 6:
+      case 7:
+        sensors.wait_for_user_start(); // cover front sensor with hand to start
         test_sensor_spin_calibrate();
         break;
       default:
@@ -566,7 +575,7 @@ public:
     rotation.start(360, 180, 0, 1800);
     while (not rotation.is_finished()) {
       // reporter.report_sensor_track(true);
-      reporter.show_wall_sensors();
+      reporter.print_wall_sensors();
     }
     motion.reset_drive_system();
     sensors.disable();
@@ -708,7 +717,7 @@ public:
     reporter.wall_sensor_header();
     sensors.enable();
     while (not switches.button_pressed()) {
-      reporter.show_wall_sensors();
+      reporter.print_wall_sensors();
     }
     switches.wait_for_button_release();
     Serial.println();

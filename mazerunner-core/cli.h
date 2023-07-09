@@ -214,7 +214,7 @@ public:
       case 'S':
         sensors.enable();
         delay(10);
-        reporter.show_wall_sensors();
+        reporter.print_wall_sensors();
         sensors.disable();
         break;
       default:
@@ -228,7 +228,7 @@ public:
   }
 
   void prompt() {
-    Serial.print('\n');
+    Serial.println();
     Serial.print('>');
     Serial.print(' ');
   }
@@ -246,13 +246,13 @@ public:
     Serial.println(F("S   : show sensor readings"));
     Serial.println(F("F n : Run user function n"));
     Serial.println(F("       0 = ---"));
-    Serial.println(F("       1 = Sensor Calibration"));
+    Serial.println(F("       1 = Sensor Static Calibration"));
     Serial.println(F("       2 = Search to the goal and back"));
     Serial.println(F("       3 = Follow a wall to the goal"));
-    Serial.println(F("       4 = "));
-    Serial.println(F("       5 = "));
-    Serial.println(F("       6 = "));
-    Serial.println(F("       7 = "));
+    Serial.println(F("       4 = Test SS90E Turn"));
+    Serial.println(F("       5 = Test SS90F Turn"));
+    Serial.println(F("       6 = Test Edge Detect Position"));
+    Serial.println(F("       7 = Sensor Spin Calibration"));
     Serial.println(F("       8 = "));
     Serial.println(F("       9 = "));
     Serial.println(F("      10 = "));
