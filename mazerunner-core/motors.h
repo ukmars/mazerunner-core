@@ -32,7 +32,8 @@ enum { PWM_488_HZ,
 class Motors {
 public:
   /***
-   *
+   * TODO: the constructor should really get at least the hardware pins
+   * to do a safe setup.
    */
   void enable_controllers() {
     m_controller_output_enabled = true;
@@ -67,6 +68,24 @@ public:
     stop();
   }
 
+  /**
+   * At each iteration of the main control loop we need to calculate
+   * now outputs form the two position controllers - one for forward
+   * motion, one for rotation.
+   *
+   * The current error increases by an amount determined by the speed
+   * and the control loop interval.
+   *
+   * It is then decreased by the amount the robot has actually moved
+   * in the previous loop interval.
+   *
+   * These changes are both done in the first line.
+   *
+   * After that we have a simple PD contoller.
+   *
+   * NOTE: the D-term constant is premultiplied in the config by the
+   * loop frequency to dsave a little time.
+   */
   float position_controller() {
     m_fwd_error += forward.increment() - encoders.robot_fwd_change();
     float diff = m_fwd_error - m_previous_fwd_error;
@@ -75,6 +94,19 @@ public:
     return output;
   }
 
+  /**
+   * The rotation controller is exactly like the forward controller
+   * except that there is an additional error term from the steering.
+   * All steering correction is done by treating the error term as an
+   * angular velocity. Depending on your method of analysis, you might
+   * also try feeding the steering corection back as an angular
+   * acceleration.
+   *
+   * If you have a gyro, you can use the output from that instead of
+   * the encoders.
+   *
+   * A separate controller calculates the steering adjustment term.
+   */
   float angle_controller(float steering_adjustment) {
     m_rot_error += rotation.increment() - encoders.robot_rot_change();
     m_rot_error += steering_adjustment;
@@ -84,11 +116,16 @@ public:
     return output;
   }
 
-  /** calculate the voltage to be applied to the motor for a given speed
-   *  the drive train is not symmetric and there is significant stiction.
-   *  If used with PID, a simpler, single value will be sufficient.
+  /**
+   * Feed forward attempts to work out what voltage the motors would need
+   * to run at the current speed and acceleration.
    *
-   *  Multiply by (1/x) is generally more efficient than just divide by x
+   * Without this, the controller has a lot of work to do and will be
+   * much harder to tune for good performance.
+   *
+   * The drive train is not symmetric and there is significant stiction.
+   * If used with PID, a simpler, single value will be sufficient.
+   *
    */
 
   float leftFeedForward(float speed) {
@@ -111,6 +148,11 @@ public:
     return rightFF;
   }
 
+  /**
+   * Calculate the outputs of the feedback and feedforward controllers
+   * for both forward and rotation, and combine them to obtain drive
+   * voltages for the left and right motors.
+   */
   void update_controllers(float steering_adjustment) {
     float pos_output = position_controller();
     float rot_output = angle_controller(steering_adjustment);
@@ -134,30 +176,19 @@ public:
     }
   }
 
-  int get_fwd_millivolts() {
-    return 1000 * (get_right_motor_volts() + get_left_motor_volts());
-  }
-
-  int get_rot_millivolts() {
-    return 1000 * (get_right_motor_volts() - get_left_motor_volts());
-  }
-
-  float get_left_motor_volts() {
-    float volts = 0;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      volts = m_left_motor_volts;
-    }
-    return volts;
-  }
-
-  float get_right_motor_volts() {
-    float volts = 0;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      volts = m_right_motor_volts;
-    }
-    return volts;
-  }
-
+  /**
+   * Once the motor voltages have been calculated, they need to be converted
+   * into suitable PWM values for the motor drivers.
+   *
+   * In this section, the calculations for that are done, taking into account
+   * the available battery voltage and the limits of the PWM hardware.
+   *
+   * If there is not enough voltage available from the battery, the output
+   * will just saturate and the motor will not get up to speed.
+   *
+   * Some people add code to light up an LED whenever the drive output is
+   * saturated.
+   */
   int pwm_compensated(float desired_voltage, float battery_voltage) {
     int pwm = MOTOR_MAX_PWM * desired_voltage / battery_voltage;
     return pwm;
@@ -207,6 +238,17 @@ public:
     }
   }
 
+  /**
+   * Choosing the best PWM frequency for your motors depends on a lot of factors.
+   *
+   * For most cases, just pick the highest frequency that you can get. For the
+   * comfort of you and any audience, pick a frequency that is outside the normal
+   * range of human hearing.
+   *
+   * Extremely high frequencies can result in losses in the motor drive. That is not
+   * going to be a problem with the standard UKMARSBOT.
+   *
+   */
   void set_pwm_frequency(int frequency = PWM_31250_HZ) {
     switch (frequency) {
       case PWM_31250_HZ:
@@ -226,6 +268,33 @@ public:
         bitSet(TCCR1B, CS10);
         break;
     }
+  }
+
+  /**
+   * These getters are used for logging and debugging.
+   */
+  int get_fwd_millivolts() {
+    return 1000 * (get_right_motor_volts() + get_left_motor_volts());
+  }
+
+  int get_rot_millivolts() {
+    return 1000 * (get_right_motor_volts() - get_left_motor_volts());
+  }
+
+  float get_left_motor_volts() {
+    float volts = 0;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      volts = m_left_motor_volts;
+    }
+    return volts;
+  }
+
+  float get_right_motor_volts() {
+    float volts = 0;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      volts = m_right_motor_volts;
+    }
+    return volts;
   }
 
 private:
