@@ -21,14 +21,16 @@
 #include "digitalWriteFast.h"
 #include "list.h"
 #include <Arduino.h>
+#include <util/atomic.h>
 #include <wiring_private.h>
+
 /***
  * The AnalogueConverter class samples a fixed number of ADC from 0 to MAX_CHANNELS and
  * makes the readings available to the resto of the program.
  *
  * Each channel is samples once with the sensor emitters off and once with the emitters on.
  *
- * The first set of samples is stored in tyhe array m_adc_dark[].
+ * The first set of samples is stored in the array m_adc_dark[].
  *
  * The second set, with the emitter on, is stored in m_adc_lit[].
  *
@@ -51,9 +53,9 @@
  * Even if the emitters are disabled, the conversions are still performed but the lit
  * values and dark values will be very similar.
  *
- *
  * Although the code exists almost entirely in this header file, C++ requires the actual
- * instance of the class and its interrupt service routine to be in a .cpp file.
+ * instance of the class and its interrupt service routine to be somewhere in a .cpp file.
+ * I have placed the instances in the main project file.
  *
  * TODO: The inclusion in the class of information about the emitters is unfortunate but this
  * is the simplest scheme I could envisage. If there are two emitters, both are turned on
@@ -90,6 +92,7 @@ public:
     m_emitters_enabled = false;
   }
 
+  // call this or nothing will work
   virtual void begin() {
     disable_emitters();
     set_front_emitter_pin(EMITTER_FRONT);
@@ -153,7 +156,11 @@ public:
   }
 
   int get_raw(const int i) const {
-    return max(0, m_adc_lit[i] - m_adc_dark[i]);
+    int diff;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      diff = max(1, m_adc_lit[i] - m_adc_dark[i]);
+    }
+    return diff;
   }
 
   /// Perform a 'manual' conversion of a channel
@@ -208,7 +215,7 @@ public:
         break;
       case 4:
         // avoid zero result so we know it is working
-        m_adc_lit[m_channel] = max(1, get_adc_result() - m_adc_dark[m_channel]);
+        m_adc_lit[m_channel] = max(1, get_adc_result());
         m_channel++;
         start_conversion(m_channel);
         if (m_channel > 7) {
