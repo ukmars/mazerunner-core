@@ -169,11 +169,8 @@ public:
    *
    */
   void wall_sensor_header() {
-    vt100_red();
     console.println(F("|           RAW            |          NORMALISED       |             |            |"));
     console.println(F("|   lf_   ls_   rs_   rf_  |    lfs   lss   rss   rfs  |   sum diff  | front_dist |"));
-    vt100_default();
-    vt100_cursor_off();
   }
 
   void show_wall_sensors() {

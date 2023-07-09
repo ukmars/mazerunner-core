@@ -85,7 +85,7 @@ void setup() {
 
   sensors.disable();
   sensors.enable();
-  console.println(F("RDY"));
+  console.println(F("\n\nRDY"));
 }
 
 void loop() {
