@@ -276,6 +276,6 @@ const float ADC_FSR = 1023.0;    // The maximum reading for the ADC
 const float ADC_REF_VOLTS = 5.0; // Reference voltage of ADC
 
 const float BATTERY_MULTIPLIER = (ADC_REF_VOLTS / ADC_FSR / BATTERY_DIVIDER_RATIO);
-
+const int MOTOR_MAX_PWM = 255;
 // the position in the cell where the sensors are sampled.
 const float SENSING_POSITION = 170.0;

@@ -23,7 +23,6 @@
 #include "encoders.h"
 #include "profile.h"
 #include <Arduino.h>
-// #include "sensors.h"
 
 enum { PWM_488_HZ,
        PWM_977_HZ,
@@ -159,17 +158,22 @@ public:
     return volts;
   }
 
+  int pwm_compensated(float desired_voltage, float battery_voltage) {
+    int pwm = 255.0 * desired_voltage / battery_voltage;
+    return pwm;
+  }
+
   void set_left_motor_volts(float volts) {
     volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
     m_left_motor_volts = volts;
-    int motorPWM = (int)(volts * battery.compensation());
+    int motorPWM = pwm_compensated(volts, battery.voltage());
     set_left_motor_pwm(motorPWM);
   }
 
   void set_right_motor_volts(float volts) {
     volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
     m_right_motor_volts = volts;
-    int motorPWM = (int)(volts * battery.compensation());
+    int motorPWM = pwm_compensated(volts, battery.voltage());
     set_right_motor_pwm(motorPWM);
   }
 
