@@ -159,7 +159,7 @@ public:
   }
 
   int pwm_compensated(float desired_voltage, float battery_voltage) {
-    int pwm = 255.0 * desired_voltage / battery_voltage;
+    int pwm = MOTOR_MAX_PWM * desired_voltage / battery_voltage;
     return pwm;
   }
 
