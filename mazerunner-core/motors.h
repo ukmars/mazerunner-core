@@ -186,7 +186,7 @@ public:
    * analogueWrite function in other targtes
    */
   void set_left_motor_pwm(int pwm) {
-    pwm = MOTOR_LEFT_POLARITY * constrain(pwm, -255, 255);
+    pwm = MOTOR_LEFT_POLARITY * constrain(pwm, -MOTOR_MAX_PWM, MOTOR_MAX_PWM);
     if (pwm < 0) {
       digitalWriteFast(MOTOR_LEFT_DIR, 1);
       analogWrite(MOTOR_LEFT_PWM, -pwm);
@@ -197,7 +197,7 @@ public:
   }
 
   void set_right_motor_pwm(int pwm) {
-    pwm = MOTOR_RIGHT_POLARITY * constrain(pwm, -255, 255);
+    pwm = MOTOR_RIGHT_POLARITY * constrain(pwm, -MOTOR_MAX_PWM, MOTOR_MAX_PWM);
     if (pwm < 0) {
       digitalWriteFast(MOTOR_RIGHT_DIR, 1);
       analogWrite(MOTOR_RIGHT_PWM, -pwm);
