@@ -311,53 +311,61 @@ public:
     return smallestDirection;
   }
 
-  void printNorthWalls(Stream &stream, int row) {
+  /**
+   * Maze printing.
+   *
+   * Included here for want of a better place.
+   *
+   *
+   */
+
+  void printNorthWalls(int row) {
     for (int col = 0; col < 16; col++) {
       unsigned char cell = row + 16 * col;
-      stream.print('o');
+      Serial.print('o');
       uint8_t state = m_walls[cell].north & m_mask;
       if (state == EXIT) {
-        stream.print(H_EXIT);
+        Serial.print(H_EXIT);
       } else if (state == WALL) {
-        stream.print(H_WALL);
+        Serial.print(H_WALL);
       } else {
-        stream.print(H_UNKN);
+        Serial.print(H_UNKN);
       }
     }
-    stream.println(POST);
+    Serial.println(POST);
   }
 
-  void printSouthWalls(Stream &stream, int row) {
+  void printSouthWalls(int row) {
     for (int col = 0; col < 16; col++) {
       unsigned char cell = row + 16 * col;
-      stream.print(POST);
+      Serial.print(POST);
       uint8_t state = m_walls[cell].south & m_mask;
       if (state == EXIT) {
-        stream.print(H_EXIT);
+        Serial.print(H_EXIT);
       } else if (state == WALL) {
-        stream.print(H_WALL);
+        Serial.print(H_WALL);
       } else {
-        stream.print(H_UNKN);
+        Serial.print(H_UNKN);
       }
     }
-    stream.println(POST);
+    Serial.println(POST);
   }
 
-  void print(Stream &stream, int style = PLAIN) {
+  void print(int style = PLAIN) {
     const char dirChars[] = "^>v<*";
-    stream.println();
+    Serial.println();
     flood_maze(maze_goal());
     for (int row = 15; row >= 0; row--) {
-      printNorthWalls(stream, row);
+      printNorthWalls(row);
       for (int col = 0; col < 16; col++) {
         unsigned char cell = row + 16 * col;
         uint8_t state = m_walls[cell].west & m_mask;
         if (state == EXIT) {
-          stream.print(V_EXIT);
+          Serial.print(V_EXIT);
         } else if (state == WALL) {
-          stream.print(V_WALL);
+          Serial.print(V_WALL);
         } else {
-          stream.print(V_UNKN);
+          Serial.print(V_UNKN);
         }
         if (style == COSTS) {
           print_justified(m_cost[cell], 3);
@@ -366,17 +374,17 @@ public:
           if (cell == maze_goal()) {
             direction = 4;
           }
-          stream.print(' ');
-          stream.print(dirChars[direction]);
-          stream.print(' ');
+          Serial.print(' ');
+          Serial.print(dirChars[direction]);
+          Serial.print(' ');
         } else {
-          stream.print(GAP);
+          Serial.print(GAP);
         }
       }
-      stream.println(V_WALL);
+      Serial.println(V_WALL);
     }
-    printSouthWalls(stream, 0);
-    stream.println();
+    printSouthWalls(0);
+    Serial.println();
   }
 
 private:

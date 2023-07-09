@@ -192,7 +192,7 @@ public:
         break;
       case 'W':
         // MazePrinter::print_maze(maze, PLAIN);
-        maze.print(Serial, PLAIN);
+        maze.print(PLAIN);
         break;
       case 'X':
         Serial.println(F("Reset Maze"));
@@ -200,11 +200,11 @@ public:
         break;
       case 'C':
         // MazePrinter::print_maze(maze, COSTS);
-        maze.print(Serial, COSTS);
+        maze.print(COSTS);
         break;
       case 'R':
         // MazePrinter::print_maze(maze, DIRS);
-        maze.print(Serial, DIRS);
+        maze.print(DIRS);
         break;
       case 'B':
         Serial.print(F("Battery: "));

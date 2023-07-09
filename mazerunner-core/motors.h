@@ -79,7 +79,7 @@ public:
    * After that we have a simple PD contoller.
    *
    * NOTE: the D-term constant is premultiplied in the config by the
-   * loop frequency to dsave a little time.
+   * loop frequency to save a little time.
    */
   float position_controller() {
     m_fwd_error += forward.increment() - encoders.robot_fwd_change();
