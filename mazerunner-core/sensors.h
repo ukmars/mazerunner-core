@@ -69,7 +69,6 @@ public:
   int get_front_diff() { return int(m_front_diff); };
   float get_steering_feedback() { return m_steering_adjustment; }
   float get_cross_track_error() { return m_cross_track_error; };
-  float get_battery_comp() { return m_battery_compensation; };
 
   //***************************************************************************//
 
@@ -121,11 +120,6 @@ public:
 
   //***************************************************************************//
 
-  void update_battery_voltage() {
-    m_battery_volts = BATTERY_MULTIPLIER * m_battery_adc;
-    m_battery_compensation = 255.0 / m_battery_volts;
-  }
-
   /*********************************** Wall tracking **************************/
   // calculate the alignment errors - too far left is negative
 
@@ -136,8 +130,6 @@ public:
    */
   void update() {
     // digitalWriteFast(LED_USER, 1);
-    m_battery_adc = adc.get_dark(BATTERY_CHANNEL);
-    update_battery_voltage();
 
     if (not m_enabled) {
       // NOTE: No values will be updated although the ADC is working
@@ -235,16 +227,9 @@ public:
     return choice;
   }
 
-  float battery_voltage() {
-    return m_battery_volts;
-  }
-
 private:
   float last_steering_error = 0;
   volatile bool m_enabled = false;
-  volatile int m_battery_adc;
-  volatile float m_battery_volts;
-  volatile float m_battery_compensation;
   volatile float m_cross_track_error;
   volatile float m_steering_adjustment;
 };

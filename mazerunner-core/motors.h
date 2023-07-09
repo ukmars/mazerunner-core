@@ -17,11 +17,12 @@
 #ifndef MOTORS_H
 #define MOTORS_H
 
-// #include <Arduino.h>
+#include "battery.h"
 #include "config.h"
 #include "digitalWriteFast.h"
 #include "encoders.h"
 #include "profile.h"
+#include <Arduino.h>
 // #include "sensors.h"
 
 enum { PWM_488_HZ,
@@ -134,10 +135,6 @@ public:
     }
   }
 
-  void set_battery_compensation(float comp) {
-    m_battery_compensation = comp;
-  }
-
   int get_fwd_millivolts() {
     return 1000 * (get_right_motor_volts() + get_left_motor_volts());
   }
@@ -165,14 +162,14 @@ public:
   void set_left_motor_volts(float volts) {
     volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
     m_left_motor_volts = volts;
-    int motorPWM = (int)(volts * m_battery_compensation);
+    int motorPWM = (int)(volts * battery.compensation());
     set_left_motor_pwm(motorPWM);
   }
 
   void set_right_motor_volts(float volts) {
     volts = constrain(volts, -MAX_MOTOR_VOLTS, MAX_MOTOR_VOLTS);
     m_right_motor_volts = volts;
-    int motorPWM = (int)(volts * m_battery_compensation);
+    int motorPWM = (int)(volts * battery.compensation());
     set_right_motor_pwm(motorPWM);
   }
 
@@ -241,7 +238,6 @@ private:
   float m_previous_rot_error;
   float m_fwd_error;
   float m_rot_error;
-  float m_battery_compensation = 1.0f;
   // these are maintained only for logging
   float m_left_motor_volts;
   float m_right_motor_volts;

@@ -214,7 +214,7 @@ public:
         break;
       case 'B':
         console.print(F("Battery: "));
-        console.print(sensors.battery_voltage(), 2);
+        console.print(battery.voltage(), 2);
         console.print(F(" Volts\n"));
         break;
       case 'S':

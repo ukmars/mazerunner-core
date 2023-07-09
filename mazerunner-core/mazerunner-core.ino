@@ -15,6 +15,7 @@
  ******************************************************************************/
 
 #include "adc.h"
+#include "battery.h"
 #include "cli.h"
 #include "config.h"
 #include "encoders.h"
@@ -33,6 +34,7 @@
 // Global objects
 Systick systick;
 AnalogueConverter adc;
+Battery battery(BATTERY_CHANNEL);
 Switches switches(SWITCHES_CHANNEL);
 Encoders encoders;
 Sensors sensors;
@@ -87,16 +89,6 @@ void setup() {
 }
 
 void loop() {
-  for (int i = 0; i < 4; i++) {
-    print_justified(adc.get_lit(i), 5);
-    Serial.print(' ');
-  }
-  for (int i = 6; i < 8; i++) {
-    print_justified(adc.get_dark(i), 5);
-    Serial.print(' ');
-  }
-  Serial.println();
-  delay(50);
   if (cli.read_serial() > 0) {
     cli.interpret_line();
   }

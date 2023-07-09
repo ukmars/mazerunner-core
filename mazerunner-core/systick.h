@@ -74,7 +74,8 @@ public:
     forward.update();
     rotation.update();
     sensors.update();
-    motors.set_battery_compensation(sensors.get_battery_comp());
+    battery.update();
+
     motors.update_controllers(sensors.get_steering_feedback());
     adc.start_conversion_cycle();
     // NOTE: no code should follow this line;
