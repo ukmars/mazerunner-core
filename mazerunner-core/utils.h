@@ -13,7 +13,6 @@
 #define UTILS_H
 
 #include "Arduino.h"
-#include "serial.h"
 
 const int MAX_ARGC = 16;
 #define MAX_DIGITS 8
@@ -26,9 +25,9 @@ struct Args {
 // simple formatting functions for printing maze costs
 inline void print_hex_2(unsigned char value) {
   if (value < 16) {
-    console.print('0');
+    Serial.print('0');
   }
-  console.print(value, HEX);
+  Serial.print(value, HEX);
 }
 
 inline void print_justified(int32_t value, int width) {
@@ -42,10 +41,10 @@ inline void print_justified(int32_t value, int width) {
     w--;
   }
   while (w > 0) {
-    console.write(' ');
+    Serial.write(' ');
     --w;
   }
-  console.print(value);
+  Serial.print(value);
 }
 
 inline void print_justified(int value, int width) {

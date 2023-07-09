@@ -13,7 +13,6 @@
 #define MAZE_H
 
 #include "queue.h"
-#include "serial.h"
 #include "utils.h"
 #include <stdint.h>
 

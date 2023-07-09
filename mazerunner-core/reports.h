@@ -17,7 +17,6 @@
 #include "profile.h"
 #include "reports.h"
 #include "sensors.h"
-#include "serial.h"
 #include "utils.h"
 #include <Arduino.h>
 
@@ -33,7 +32,7 @@ class Reporter {
   uint32_t s_report_interval = REPORTING_INTERVAL;
 
 public:
-  // note that the console device has a 64 character buffer and, at 115200 baud
+  // note that the Serial device has a 64 character buffer and, at 115200 baud
   // 64 characters will take about 6ms to go out over the wire.
 
   /**
@@ -57,7 +56,7 @@ public:
    *
    */
   void report_profile_header() {
-    console.println(F("time robotPos robotAngle fwdPos  fwdSpeed rotpos rotSpeed fwdmVolts rotmVolts"));
+    Serial.println(F("time robotPos robotAngle fwdPos  fwdSpeed rotpos rotSpeed fwdmVolts rotmVolts"));
     s_start_time = millis();
     s_report_time = s_start_time;
   }
@@ -74,7 +73,7 @@ public:
       print_justified(int(rotation.speed()), 6);
       print_justified(motors.get_fwd_millivolts(), 6);
       print_justified(motors.get_rot_millivolts(), 6);
-      console.println();
+      Serial.println();
     }
   }
 
@@ -92,7 +91,7 @@ public:
    *
    */
   void report_sensor_track_header() {
-    console.println(F("time pos angle left right front error adjustment"));
+    Serial.println(F("time pos angle left right front error adjustment"));
     s_start_time = millis();
     s_report_time = s_start_time;
   }
@@ -114,11 +113,11 @@ public:
         print_justified(sensors.rss.value, 6);
         print_justified(sensors.rfs.value, 6);
       }
-      console.print(' ');
-      console.print(sensors.get_cross_track_error());
-      console.print(' ');
-      console.print(sensors.get_steering_feedback());
-      console.println();
+      Serial.print(' ');
+      Serial.print(sensors.get_cross_track_error());
+      Serial.print(' ');
+      Serial.print(sensors.get_steering_feedback());
+      Serial.println();
     }
   }
 
@@ -137,7 +136,7 @@ public:
    *
    */
   void front_sensor_track_header() {
-    console.println(F("dist front_sum front_diff"));
+    Serial.println(F("dist front_sum front_diff"));
   }
 
   void front_sensor_track() {
@@ -145,7 +144,7 @@ public:
       print_justified(int(encoders.robot_distance()), 7);
       print_justified(sensors.get_front_sum(), 7);
       print_justified(sensors.get_front_diff(), 7);
-      console.println();
+      Serial.println();
     }
   }
 
@@ -164,64 +163,64 @@ public:
    *
    */
   void wall_sensor_header() {
-    console.println(F("|           RAW            |          NORMALISED       |             |            |"));
-    console.println(F("|   lf_   ls_   rs_   rf_  |    lfs   lss   rss   rfs  |   sum diff  | front_dist |"));
+    Serial.println(F("|           RAW            |          NORMALISED       |             |            |"));
+    Serial.println(F("|   lf_   ls_   rs_   rf_  |    lfs   lss   rss   rfs  |   sum diff  | front_dist |"));
   }
 
   void show_wall_sensors() {
-    console.print(F("|"));
+    Serial.print(F("|"));
     print_justified(sensors.lfs.raw, 6);
     print_justified(sensors.lss.raw, 6);
     print_justified(sensors.rss.raw, 6);
     print_justified(sensors.rfs.raw, 6);
-    console.print(F("  | "));
+    Serial.print(F("  | "));
     print_justified(sensors.lfs.value, 6);
     print_justified(sensors.lss.value, 6);
     print_justified(sensors.rss.value, 6);
     print_justified(sensors.rfs.value, 6);
-    console.print(F("  | "));
+    Serial.print(F("  | "));
     print_justified(sensors.get_front_sum(), 5);
     print_justified(sensors.get_front_diff(), 5);
-    console.print(F("  | "));
+    Serial.print(F("  | "));
     print_justified((int)sensors.get_distance(sensors.get_front_sum(), FRONT_LINEAR_CONSTANT), 6);
-    console.print(F("     | "));
-    console.print('\r');
+    Serial.print(F("     | "));
+    Serial.print('\r');
   }
 
   //***************************************************************************//
   void print_walls() {
     if (sensors.see_left_wall) {
-      console.print('L');
+      Serial.print('L');
     } else {
-      console.print('-');
+      Serial.print('-');
     }
     if (sensors.see_front_wall) {
-      console.print('F');
+      Serial.print('F');
     } else {
-      console.print('-');
+      Serial.print('-');
     }
     if (sensors.see_right_wall) {
-      console.print('R');
+      Serial.print('R');
     } else {
-      console.print('-');
+      Serial.print('-');
     }
   }
 
   //***************************************************************************//
   void log_status(char action, uint8_t location, uint8_t heading) {
-    console.print('{');
-    console.print(action);
-    console.print(' ');
+    Serial.print('{');
+    Serial.print(action);
+    Serial.print(' ');
     print_hex_2(location);
-    console.print(' ');
-    console.print(dirLetters[heading]);
+    Serial.print(' ');
+    Serial.print(dirLetters[heading]);
     print_justified(sensors.get_front_sum(), 4);
-    console.print('@');
+    Serial.print('@');
     print_justified((int)forward.position(), 4);
-    console.print(' ');
+    Serial.print(' ');
     // print_walls();
-    console.print('}');
-    console.print(' ');
+    Serial.print('}');
+    Serial.print(' ');
   }
   //***************************************************************************//
   void show_adc() {

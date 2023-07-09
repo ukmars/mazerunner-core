@@ -21,7 +21,6 @@
 #include "mouse.h"
 #include "reports.h"
 #include "sensors.h"
-#include "serial.h"
 #include "switches.h"
 #include "systick.h"
 #include <Arduino.h>
@@ -41,8 +40,6 @@ Maze maze PERSISTENT;
 Mouse mouse;
 CommandLineInterface cli;
 Reporter reporter;
-FILE serial_stdout;
-HardwareSerial &console = Serial;
 
 ISR(ADC_vect) {
   adc.isr();
@@ -56,8 +53,8 @@ ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
 
 void setup() {
 
-  console.begin(BAUDRATE);
-  // redirectPrintf(); // send printf output to console (uses 20 bytes RAM)
+  Serial.begin(BAUDRATE);
+  // redirectPrintf(); // send printf output to Serial (uses 20 bytes RAM)
   adc.begin();
   pinMode(LED_USER, OUTPUT);
   digitalWrite(LED_USER, 0);
@@ -74,13 +71,13 @@ void setup() {
       digitalWrite(LED_BUILTIN, 0);
       delay(50);
     }
-    console.println(F("Maze cleared"));
+    Serial.println(F("Maze cleared"));
     switches.wait_for_button_release();
   }
 
   sensors.disable();
   sensors.enable();
-  console.println(F("\n\nRDY"));
+  Serial.println(F("\n\nRDY"));
 }
 
 void loop() {

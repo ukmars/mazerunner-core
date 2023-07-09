@@ -15,7 +15,6 @@
 #include "motors.h"
 #include "profile.h"
 #include "sensors.h"
-#include "serial.h"
 #include <Arduino.h>
 class Motion {
 public:
@@ -105,7 +104,7 @@ public:
    */
   void stop_at(float position) {
     float remaining = position - forward.position();
-    console.print(F("STOP AT"));
+    Serial.print(F("STOP AT"));
     forward.start(remaining, forward.speed(), 0, forward.acceleration());
     forward.wait_until_finished();
   }
@@ -124,7 +123,7 @@ public:
    * @brief bring the robot to a halt after a specific distance
    */
   void stop_after(float distance) {
-    console.print(F("STOP AFTER"));
+    Serial.print(F("STOP AFTER"));
     forward.start(distance, forward.speed(), 0, forward.acceleration());
     forward.wait_until_finished();
   }

@@ -17,7 +17,6 @@
 #include "mouse.h"
 #include "reports.h"
 #include "sensors.h"
-#include "serial.h"
 #include "utils.h"
 #include <Arduino.h>
 #include <stdint.h>
@@ -49,22 +48,22 @@ public:
    */
   const char BACKSPACE = 0x08;
   int read_serial() {
-    while (console.available()) {
-      char c = console.read();
+    while (Serial.available()) {
+      char c = Serial.read();
       if (c == '\r') {
-        console.println();
+        Serial.println();
         return 1;
       } else if (c == BACKSPACE) {
         if (m_index > 0) {
           m_buffer[m_index] = 0;
           m_index--;
-          console.print(c); // backspace only moves the cursor
-          console.print(' ');
-          console.print(c);
+          Serial.print(c); // backspace only moves the cursor
+          Serial.print(' ');
+          Serial.print(c);
         }
       } else if (isPrintable(c)) {
         c = toupper(c);
-        console.print(c);
+        Serial.print(c);
         if (m_index < INPUT_BUFFER_SIZE - 1) {
           m_buffer[m_index++] = c;
           m_buffer[m_index] = 0;
@@ -139,7 +138,7 @@ public:
    * would just use the code:
    *
    *      for (int i = 0; i < args.argc; i++) {
-   *        console.println(args.argv[i]);
+   *        Serial.println(args.argv[i]);
    *      }
    *
    */
@@ -154,7 +153,7 @@ public:
         break;
     }
     // for (int i = 0; i < args.argc; i++) {
-    //   console.println(args.argv[i]);
+    //   Serial.println(args.argv[i]);
     // }
     return args;
   }
@@ -193,24 +192,24 @@ public:
         break;
       case 'W':
         // MazePrinter::print_maze(maze, PLAIN);
-        maze.print(console, PLAIN);
+        maze.print(Serial, PLAIN);
         break;
       case 'X':
-        console.println(F("Reset Maze"));
+        Serial.println(F("Reset Maze"));
         maze.initialise_maze();
         break;
       case 'C':
         // MazePrinter::print_maze(maze, COSTS);
-        maze.print(console, COSTS);
+        maze.print(Serial, COSTS);
         break;
       case 'R':
         // MazePrinter::print_maze(maze, DIRS);
-        maze.print(console, DIRS);
+        maze.print(Serial, DIRS);
         break;
       case 'B':
-        console.print(F("Battery: "));
-        console.print(battery.voltage(), 2);
-        console.print(F(" Volts\n"));
+        Serial.print(F("Battery: "));
+        Serial.print(battery.voltage(), 2);
+        Serial.print(F(" Volts\n"));
         break;
       case 'S':
         sensors.enable();
@@ -229,9 +228,9 @@ public:
   }
 
   void prompt() {
-    console.print('\n');
-    console.print('>');
-    console.print(' ');
+    Serial.print('\n');
+    Serial.print('>');
+    Serial.print(' ');
   }
 
   /***
@@ -240,28 +239,28 @@ public:
    *
    */
   void help() {
-    console.println(F("W   : display maze walls"));
-    console.println(F("X   : reset maze"));
-    console.println(F("R   : display maze with directions"));
-    console.println(F("B   : show battery voltage"));
-    console.println(F("S   : show sensor readings"));
-    console.println(F("F n : Run user function n"));
-    console.println(F("       0 = ---"));
-    console.println(F("       1 = Sensor Calibration"));
-    console.println(F("       2 = Search to the goal and back"));
-    console.println(F("       3 = Follow a wall to the goal"));
-    console.println(F("       4 = "));
-    console.println(F("       5 = "));
-    console.println(F("       6 = "));
-    console.println(F("       7 = "));
-    console.println(F("       8 = "));
-    console.println(F("       9 = "));
-    console.println(F("      10 = "));
-    console.println(F("      11 = "));
-    console.println(F("      12 = "));
-    console.println(F("      13 = "));
-    console.println(F("      14 = "));
-    console.println(F("      15 = "));
+    Serial.println(F("W   : display maze walls"));
+    Serial.println(F("X   : reset maze"));
+    Serial.println(F("R   : display maze with directions"));
+    Serial.println(F("B   : show battery voltage"));
+    Serial.println(F("S   : show sensor readings"));
+    Serial.println(F("F n : Run user function n"));
+    Serial.println(F("       0 = ---"));
+    Serial.println(F("       1 = Sensor Calibration"));
+    Serial.println(F("       2 = Search to the goal and back"));
+    Serial.println(F("       3 = Follow a wall to the goal"));
+    Serial.println(F("       4 = "));
+    Serial.println(F("       5 = "));
+    Serial.println(F("       6 = "));
+    Serial.println(F("       7 = "));
+    Serial.println(F("       8 = "));
+    Serial.println(F("       9 = "));
+    Serial.println(F("      10 = "));
+    Serial.println(F("      11 = "));
+    Serial.println(F("      12 = "));
+    Serial.println(F("      13 = "));
+    Serial.println(F("      14 = "));
+    Serial.println(F("      15 = "));
   }
 
 private:

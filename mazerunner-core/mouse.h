@@ -20,7 +20,6 @@
 #include "profile.h"
 #include "reports.h"
 #include "sensors.h"
-#include "serial.h"
 #include "switches.h"
 #include "utils.h"
 
@@ -266,7 +265,7 @@ public:
    * cell.
    */
   void follow_to(unsigned char target) {
-    console.println(F("Follow TO"));
+    Serial.println(F("Follow TO"));
     handStart = true;
     location = 0;
     heading = NORTH;
@@ -279,14 +278,14 @@ public:
     forward.start(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     forward.wait_until_finished();
     forward.set_position(HALF_CELL);
-    console.println(F("Off we go..."));
+    Serial.println(F("Off we go..."));
     motion.wait_until_position(FULL_CELL - 10);
     // at the start of this loop we are always at the sensing point
     while (location != target) {
       if (switches.button_pressed()) {
         break;
       }
-      console.println();
+      Serial.println();
       reporter.log_status('-', location, heading);
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);
@@ -295,10 +294,10 @@ public:
       maze.flood_maze(maze.maze_goal());
       unsigned char newHeading = maze.direction_to_smallest(location, heading);
       unsigned char hdgChange = (newHeading - heading) & 0x3;
-      console.print(hdgChange);
-      console.write(' ');
-      console.write('|');
-      console.write(' ');
+      Serial.print(hdgChange);
+      Serial.write(' ');
+      Serial.write('|');
+      Serial.write(' ');
       reporter.log_status('.', location, heading);
       if (location == target) {
         end_run();
@@ -321,8 +320,8 @@ public:
         reporter.log_status('x', location, heading);
       }
     }
-    console.println();
-    console.println(F("Arrived!  "));
+    Serial.println();
+    Serial.println(F("Arrived!  "));
     delay(250);
     sensors.disable();
 
@@ -364,14 +363,14 @@ public:
     forward.start(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     forward.wait_until_finished();
     forward.set_position(HALF_CELL);
-    console.println(F("Off we go..."));
+    Serial.println(F("Off we go..."));
     motion.wait_until_position(SENSING_POSITION);
     // TODO. the robot needs to start each iteration at the sensing point
     while (location != target) {
       if (switches.button_pressed()) {
         break;
       }
-      console.println();
+      Serial.println();
       reporter.log_status('-', location, heading);
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading); // the cell we are about to enter
@@ -380,8 +379,8 @@ public:
       maze.flood_maze(target);
       unsigned char newHeading = maze.direction_to_smallest(location, heading);
       unsigned char hdgChange = (newHeading - heading) & 0x3;
-      console.print(hdg_letters[hdgChange]);
-      console.write(' ');
+      Serial.print(hdg_letters[hdgChange]);
+      Serial.write(' ');
       if (location == target) {
         end_run();
         heading = (heading + 2) & 0x03;
@@ -412,8 +411,8 @@ public:
       }
     }
     sensors.disable();
-    console.println();
-    console.println(F("Arrived!  "));
+    Serial.println();
+    Serial.println(F("Arrived!  "));
     delay(250);
 
     motion.reset_drive_system();
@@ -489,7 +488,7 @@ public:
    */
   int search_maze() {
     sensors.wait_for_user_start();
-    console.println(F("Search TO"));
+    Serial.println(F("Search TO"));
     handStart = true;
     location = START;
     heading = NORTH;
@@ -607,7 +606,7 @@ public:
     delay(100);
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
-    console.println(F("Edge positions:"));
+    Serial.println(F("Edge positions:"));
     forward.start(FULL_CELL - 30.0, 100, 0, 1000);
     while (not forward.is_finished()) {
       if (sensors.lss.value > left_max) {
@@ -632,20 +631,20 @@ public:
       }
       delay(5);
     }
-    console.print(F("Left: "));
+    Serial.print(F("Left: "));
     if (left_edge_found) {
-      console.print(BACK_WALL_TO_CENTER + left_edge_position);
+      Serial.print(BACK_WALL_TO_CENTER + left_edge_position);
     } else {
-      console.print('-');
+      Serial.print('-');
     }
 
-    console.print(F("  Right: "));
+    Serial.print(F("  Right: "));
     if (right_edge_found) {
-      console.print(BACK_WALL_TO_CENTER + right_edge_position);
+      Serial.print(BACK_WALL_TO_CENTER + right_edge_position);
     } else {
-      console.print('-');
+      Serial.print('-');
     }
-    console.println();
+    Serial.println();
 
     motion.reset_drive_system();
     sensors.disable();
@@ -712,7 +711,7 @@ public:
       reporter.show_wall_sensors();
     }
     switches.wait_for_button_release();
-    console.println();
+    Serial.println();
     delay(200);
     sensors.disable();
   }
