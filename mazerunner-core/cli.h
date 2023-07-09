@@ -56,7 +56,7 @@ public:
   int read_serial() {
     while (console.available()) {
       char c = console.read();
-      if (c == '\n') {
+      if (c == '\r') {
         console.println();
         return 1;
       } else if (c == BACKSPACE) {
