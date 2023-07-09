@@ -24,6 +24,51 @@
 #include <util/atomic.h>
 #include <wiring_private.h>
 
+/**
+ *
+ * The Sensors class uses the data gathered by the AnalogueConverter to
+ * provide basic sensor functions for UKMARSBOT.
+ *
+ * You must call begin() before using the sensors.
+ * You must call update() in every control cycle. From systick() normally.
+ *
+ * Normally, each of the four sensors (two side and two front) would get
+ * values for the corresponding channel by calling the AnalogueConverter's
+ * get_raw() method. That will return the difference between the lit and
+ * dark readings for the channel. Thus a close wall will give a larger
+ * value and a distant wall will give a small value. The get_raw()
+ * method will always return a value that is at least 1.
+ *
+ * The sensor are used in many tasks so look in the code for the various
+ * convenience methods provided.
+ *
+ * TODO: it is not clear to me that all these methods should be in this class
+ *
+ * The normal response of the sensor is very non-linear and the gain - that is
+ * the change in value for a small shange in distance - will vary greatly
+ * as the distance changes.
+ *
+ * A linearisation function is provided in the get_distance() method. This
+ * uses an approximation that is based on the inverse square root of the
+ * sensor reading. You will need to supply a scaling constant that is
+ * typically in the range 500-1500 and will be dependent on the
+ * characteristics of the sensors you use. Do your own calibration and
+ * define a constant in the robot config file. This method is not tied
+ * to any sensor in particular. Just give it the calibration constant and
+ * the sensor value. You can, for example, use it to linearise the fron
+ * sum.
+ *
+ * The linearised value is limited to 200mm because the signal to noise of
+ * small sensor readings is poor and you are unlikely to be able to reliably
+ * measure distance out that far with the standard sensors.
+ *
+ * The linearity is pretty good for most sensors until you get to within
+ * about 20mm. It is, however, almost always monotonic within 5mm or a target
+ * so it is always possible to use the value to adjust, for example, forward
+ * distance from a wall ahead.
+ *
+ */
+
 enum {
   STEER_NORMAL,
   STEER_LEFT_WALL,
@@ -87,6 +132,9 @@ public:
    * @brief Calculate the steering adjustment from the cross-track error.
    * @param error calculated from wall sensors, Negative if too far right
    * @return steering adjustment in degrees
+   *
+   * TODO: It is not clear that this belongs here rather tham fo example,
+   *       in a Robot class.
    */
   float calculate_steering_adjustment() {
     // always calculate the adjustment for testing. It may not get used.
@@ -107,18 +155,24 @@ public:
   }
 
   //***************************************************************************//
+  // These just turn on or off the emitters. Conversions happen anyway.
 
   void enable() {
     adc.enable_emitters();
-    m_enabled = true;
+    m_active = true;
   }
 
   void disable() {
     adc.disable_emitters();
-    m_enabled = false;
+    m_active = false;
   }
 
   //***************************************************************************//
+  // square roots and divisions are pretty slow. Don't call this from systick()
+  float get_distance(float sensor_value, float k) {
+    float distance = k / sqrtf(sensor_value);
+    return min(200, distance);
+  }
 
   /*********************************** Wall tracking **************************/
   // calculate the alignment errors - too far left is negative
@@ -131,14 +185,14 @@ public:
   void update() {
     // digitalWriteFast(LED_USER, 1);
 
-    if (not m_enabled) {
+    if (not m_active) {
       // NOTE: No values will be updated although the ADC is working
       m_cross_track_error = 0;
       m_steering_adjustment = 0;
       return;
     }
 
-    // this should be the only place that the aactual ADC channels are referenced
+    // This should be the only place that the actual ADC channels are referenced
     // if there is only a single front sensor (Basic sensor board) then the value is
     // just used twice
     // keep these values for calibration assistance
@@ -189,6 +243,9 @@ public:
 
   //***************************************************************************//
 
+  // Convenience functions for the sensors when used as UI components
+  // such as when starting the robot by putting your hand in front
+
   bool occluded_left() {
     return lfs.raw > 100 && sensors.rfs.raw < 100;
   }
@@ -197,8 +254,20 @@ public:
     return lfs.raw < 100 && sensors.rfs.raw > 100;
   }
 
+  /**
+   * The sensors will be enabled and this function will return
+   * values indicating which of the two front sensors was occluded by the
+   * user. While waiting, the user LED is flashing rapidly to show that it
+   * expects some action. The LED will go out when the user is detected.
+   *
+   * There is no timeout - the method will wait forever if necessary.
+   *
+   * There is a 250ms delay before returning to let the user get clear.
+   *
+   * Leaves the sensors disabled.
+   */
   uint8_t wait_for_user_start() {
-    digitalWrite(LED_LEFT, 1);
+    digitalWrite(LED_USER, 1);
     enable();
     uint8_t choice = NO_START;
     while (choice == NO_START) {
@@ -220,16 +289,18 @@ public:
         choice = RIGHT_START;
         break;
       }
+      digitalToggleFast(LED_USER);
+      delay(25);
     }
     disable();
-    digitalWrite(LED_LEFT, 0);
+    digitalWrite(LED_USER, 0);
     delay(250);
     return choice;
   }
 
 private:
   float last_steering_error = 0;
-  volatile bool m_enabled = false;
+  volatile bool m_active = false;
   volatile float m_cross_track_error;
   volatile float m_steering_adjustment;
 };
