@@ -12,6 +12,20 @@
 #ifndef MAZE_H
 #define MAZE_H
 
+/***
+ * The Maze class holds the map of the maze as the state of all four
+ * walls in each cell.
+ *
+ * When looking for exits, you can set a view mask. The mask is:
+ *      MASK_OPEN => unseen walls are treated as exits
+ *    MASK_CLOSED => unseen walls are treated as walls
+ *
+ * Set the mask to OPEN while searching and CLOSED when calculating a speed run
+ *
+ * A cell is considered to have been visited if all of its walls have been seen.
+ *
+ */
+
 #include "queue.h"
 #include "utils.h"
 #include <stdint.h>
@@ -120,6 +134,7 @@ public:
     return result;
   }
 
+  // unconditionally set a wall state
   void set_wall_state(uint8_t cell, uint8_t direction, t_wall_state state) {
     switch (direction) {
       case NORTH:
@@ -142,6 +157,36 @@ public:
         // ignore any other direction (blocked)
         break;
     }
+  }
+
+  // only change a wall if it is unknown
+  void update_wall_state(uint8_t cell, uint8_t direction, t_wall_state state) {
+    switch (direction) {
+      case NORTH:
+        if ((m_walls[cell].north & UNKNOWN) != UNKNOWN) {
+          return;
+        }
+        break;
+      case EAST:
+        if ((m_walls[cell].east & UNKNOWN) != UNKNOWN) {
+          return;
+        }
+        break;
+      case WEST:
+        if ((m_walls[cell].west & UNKNOWN) != UNKNOWN) {
+          return;
+        }
+        break;
+      case SOUTH:
+        if ((m_walls[cell].south & UNKNOWN) != UNKNOWN) {
+          return;
+        }
+        break;
+      default:
+        // ignore any other direction (blocked)
+        break;
+    }
+    set_wall_state(cell, direction, state);
   }
 
   /***
