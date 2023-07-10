@@ -8,7 +8,7 @@
 #define __digitalWriteFast_h_ 1
 #include <Arduino.h>
 
-//#define SANGUINO_PINOUT //define for Sanguino pinout
+// #define SANGUINO_PINOUT //define for Sanguino pinout
 
 // general macros/defines
 #ifndef BIT_READ
@@ -105,7 +105,7 @@
 #endif
 
 // digital functions
-//#ifndef digitalPinToPortReg
+// #ifndef digitalPinToPortReg
 #define SPI_SW_SS_PIN (10)   // SS on Uno (for software SPI)
 #define SPI_SW_MOSI_PIN (11) // MOSI on Uno (for software SPI)
 #define SPI_SW_MISO_PIN (12) // MISO on Uno (for software SPI)
@@ -406,7 +406,7 @@
 #define SPI_HW_SCK_PIN SCK
 
 #endif
-//#endif  //#ifndef digitalPinToPortReg
+// #endif  //#ifndef digitalPinToPortReg
 
 #ifndef digitalWriteFast
 #if (defined(__AVR__) || defined(ARDUINO_ARCH_AVR))
