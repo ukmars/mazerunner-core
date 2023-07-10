@@ -2,7 +2,7 @@
 
 The original ukmarsbot-mazerunner software is a broad, multi-purpose set of routines that lets you set up your robot and run it in a maze-based contest. As such, it was full of useful but possibly misleading code fragments as it tried to do everything in one place.
 
-This **mazerunner-core** repository does just the contest part of the job. To characterise and configure many of the options like controller constants and so on, you will need other software. That can be the origininal maezrunner code, your own code or the ukmarsbot-config repository (not yet available at Sep 1 2022)
+This **mazerunner-core** repository does just the contest part of the job. To characterise and configure many of the options like controller constants and so on, you will need other software. That can be the origininal mazerunner code, your own code or the ukmarsbot-config repository (not yet available at Sep 1 2022)
 
 Most of the code and the operation of the robot itself is explained in the ukmarsbot-mazerunner repository though there are some minor differences in implementation here.
 
@@ -32,4 +32,4 @@ When the code is loaded onto the robot, operation is primarily governed by the f
 
 Some builtin functions have a secondary start that is triggered by briefly occluding the front sensors. For example, in maze running mode, the user button starts the function. The bult-in LED blinks to indicate that it is ready and you can place the robot in the maze. The robot will not actually start a run until triggered by occluding the front sensors. This is my preference for a start that does not disturb the robot. You may choose whatever technique suits you.
 
-A separate document describes how to use the Serial link to control the robot
+~~A separate document describes how to use the Serial link to control the robot~~
