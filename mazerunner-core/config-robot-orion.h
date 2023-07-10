@@ -12,7 +12,16 @@
 
 #include <Arduino.h>
 
-/*************************************************************************/
+/*****************************************************************************
+ *
+ * ORION is a specific implementation of UKMARSBOT
+ *
+ * It uses a wall sensor board with four emitter-detector pairs. gearmotors
+ * with 11:1 ratio gearboxes and custom encoder discs with 18 magnets in each.
+ *
+ * The sensors consist of SFH4550 emitters and SFH309FA detectors.
+ *
+ *****************************************************************************/
 
 //***** SENSOR CALIBRATION **************************************************//
 

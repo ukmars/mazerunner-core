@@ -12,7 +12,19 @@
 
 #include <Arduino.h>
 
-/*************************************************************************/
+/*****************************************************************************
+ *
+ * FRANK is a specific implementation of UKMARSBOT
+ *
+ * It uses a wall sensor board with four emitter-detector pairs. Gearmotors
+ * with 20:1 ratio gearboxes and custom encoder discs with 6 magnets in each.
+ *
+ * The sensors consist of SFH4550 emitters and SFH309FA detectors.
+ *
+ * FRANK was scavenged for parts so this file is a placeholder for you own
+ * custom UKMARSBOT configuration
+ *
+ *****************************************************************************/
 
 //***** SENSOR CALIBRATION **************************************************//
 
