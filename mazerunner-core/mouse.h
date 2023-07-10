@@ -226,24 +226,7 @@ public:
     // Be sure robot has come to a halt.
     forward.stop();
   }
-  /**
-   * As with all the search turns, this command will be called after the robot has
-   * reached the search decision point and decided its next move. It is not known
-   * how long that takes or what the exact position will be.
-   *
-   * Turning around is always going to be an in-place operation so it is important
-   * that the robot is stationary and as well centred as possible.
-   *
-   * It only takes 27mm of travel to come to a halt from normal search speed.
-   */
-  void turn_back() {
-    stop_at_center();
-    motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
 
-    forward.start(SENSING_POSITION - HALF_CELL, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
-    forward.wait_until_finished();
-    forward.set_position(SENSING_POSITION);
-  }
   /***
    * Called at the end of a run when the mouse is about to enter
    * the target cell. The target is just where the mouse is
@@ -268,6 +251,48 @@ public:
     frontWall = (sensors.see_front_wall);
   }
 
+  //***************************************************************************//
+  void move_forward() {
+    forward.adjust_position(-FULL_CELL);
+    reporter.log_status('F', location, heading);
+    motion.wait_until_position(FULL_CELL - 10);
+  }
+
+  //***************************************************************************//
+  void turn_left() {
+    turn_smooth(SS90EL);
+    reporter.log_status('L', location, heading);
+    heading = (heading + 3) & 0x03;
+  }
+
+  //***************************************************************************//
+  void turn_right() {
+    turn_smooth(SS90ER);
+    reporter.log_status('R', location, heading);
+    heading = (heading + 1) & 0x03;
+  }
+
+  //***************************************************************************//
+  /**
+   * As with all the search turns, this command will be called after the robot has
+   * reached the search decision point and decided its next move. It is not known
+   * how long that takes or what the exact position will be.
+   *
+   * Turning around is always going to be an in-place operation so it is important
+   * that the robot is stationary and as well centred as possible.
+   *
+   * It only takes 27mm of travel to come to a halt from normal search speed.
+   */
+  void turn_around() {
+    stop_at_center();
+    motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
+    forward.start(SENSING_POSITION - HALF_CELL, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
+    forward.wait_until_finished();
+    forward.set_position(SENSING_POSITION);
+    reporter.log_status('B', location, heading);
+    heading = (heading + 2) & 0x03;
+  }
+
   /***
    * A simple wall follower that knows where it is
    * It will follow the left wall until it reaches the supplied taget
@@ -279,7 +304,6 @@ public:
     location = 0;
     heading = NORTH;
     maze.initialise_maze();
-    maze.flood_maze(maze.maze_goal());
     // wait_for_user_start();
     delay(1000);
     sensors.enable();
@@ -300,10 +324,6 @@ public:
       location = maze.neighbour(location, heading);
       check_the_walls();
       update_map();
-      maze.flood_maze(maze.maze_goal());
-      unsigned char newHeading = maze.direction_to_smallest(location, heading);
-      unsigned char hdgChange = (newHeading - heading) & 0x3;
-      Serial.print(hdgChange);
       Serial.write(' ');
       Serial.write('|');
       Serial.write(' ');
@@ -315,18 +335,11 @@ public:
         heading = (heading + 3) & 0x03;
         reporter.log_status('x', location, heading);
       } else if (!frontWall) {
-        forward.adjust_position(-FULL_CELL);
-        reporter.log_status('F', location, heading);
-        motion.wait_until_position(FULL_CELL - 10.0);
-        reporter.log_status('x', location, heading);
+        move_forward();
       } else if (!rightWall) {
-        turn_smooth(SS90ER);
-        heading = (heading + 1) & 0x03;
-        reporter.log_status('x', location, heading);
+        turn_right();
       } else {
-        turn_back();
-        heading = (heading + 2) & 0x03;
-        reporter.log_status('x', location, heading);
+        turn_around();
       }
     }
     Serial.println();
@@ -397,24 +410,16 @@ public:
 
         switch (hdgChange) {
           case AHEAD:
-            forward.adjust_position(-FULL_CELL);
-            reporter.log_status('x', location, heading);
-            motion.wait_until_position(FULL_CELL - 10);
+            move_forward();
             break;
           case RIGHT:
-            turn_smooth(SS90ER);
-            reporter.log_status('x', location, heading);
-            heading = (heading + 1) & 0x03;
+            turn_right();
             break;
           case BACK:
-            turn_back();
-            reporter.log_status('x', location, heading);
-            heading = (heading + 2) & 0x03;
+            turn_around();
             break;
           case LEFT:
-            turn_smooth(SS90EL);
-            reporter.log_status('x', location, heading);
-            heading = (heading + 3) & 0x03;
+            turn_left();
             break;
         }
       }
@@ -519,13 +524,13 @@ public:
    */
   void panic() {
     while (!switches.button_pressed()) {
-      digitalWriteFast(LED_BUILTIN, 1);
+      digitalWrite(LED_BUILTIN, 1);
       delay(100);
-      digitalWriteFast(LED_BUILTIN, 0);
+      digitalWrite(LED_BUILTIN, 0);
       delay(100);
     }
     switches.wait_for_button_release();
-    digitalWriteFast(LED_BUILTIN, 0);
+    digitalWrite(LED_BUILTIN, 0);
   }
 
   /***
