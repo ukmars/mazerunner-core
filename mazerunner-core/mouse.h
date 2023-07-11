@@ -199,10 +199,8 @@ public:
     } else {
       reporter.log_status('D', location, heading); // the position triggered the turn
     }
-    rotation.start(params.angle, params.omega, 0, params.alpha);
-    rotation.wait_until_finished();
-    forward.start(params.run_out, forward.speed(), SEARCH_SPEED, SEARCH_ACCELERATION);
-    forward.wait_until_finished();
+    rotation.move(params.angle, params.omega, 0, params.alpha);
+    forward.move(params.run_out, forward.speed(), SEARCH_SPEED, SEARCH_ACCELERATION);
     forward.set_position(SENSING_POSITION);
   }
 
@@ -286,10 +284,9 @@ public:
   void turn_around() {
     stop_at_center();
     motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
-    forward.start(SENSING_POSITION - HALF_CELL, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
-    forward.wait_until_finished();
+    forward.move(SENSING_POSITION - HALF_CELL, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     forward.set_position(SENSING_POSITION);
-    reporter.log_status('B', location, heading);
+    // reporter.log_status('B', location, heading);
     heading = (heading + 2) & 0x03;
   }
 
@@ -308,8 +305,7 @@ public:
     delay(1000);
     sensors.enable();
     motion.reset_drive_system();
-    forward.start(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
-    forward.wait_until_finished();
+    forward.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     forward.set_position(HALF_CELL);
     Serial.println(F("Off we go..."));
     motion.wait_until_position(FULL_CELL - 10);
@@ -379,11 +375,9 @@ public:
     motion.reset_drive_system();
     if (not handStart) {
       // back up to the wall behind
-      forward.start(-60, 120, 0, 1000);
-      forward.wait_until_finished();
+      forward.move(-60, 120, 0, 1000); //// magic numbers
     }
-    forward.start(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
-    forward.wait_until_finished();
+    forward.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     forward.set_position(HALF_CELL);
     Serial.println(F("Off we go..."));
     motion.wait_until_position(SENSING_POSITION);
@@ -686,8 +680,7 @@ public:
     sensors.set_steering_mode(STEERING_OFF);
     // move to the boundary with the next cell
     float distance = BACK_WALL_TO_CENTER + HALF_CELL;
-    forward.start(distance, SEARCH_TURN_SPEED, SEARCH_TURN_SPEED, SEARCH_ACCELERATION);
-    forward.wait_until_finished();
+    forward.move(distance, SEARCH_TURN_SPEED, SEARCH_TURN_SPEED, SEARCH_ACCELERATION);
     forward.set_position(FULL_CELL);
 
     if (side == RIGHT_START) {
@@ -701,8 +694,7 @@ public:
     int sensor_right = sensors.rss.value;
     // move two cells. The resting position of the mouse have the
     // same offset as the turn ending
-    forward.start(2 * FULL_CELL, SEARCH_TURN_SPEED, 0, SEARCH_ACCELERATION);
-    forward.wait_until_finished();
+    forward.move(2 * FULL_CELL, SEARCH_TURN_SPEED, 0, SEARCH_ACCELERATION);
     sensor_left -= sensors.lss.value;
     sensor_right -= sensors.rss.value;
     print_justified(sensor_left, 5);

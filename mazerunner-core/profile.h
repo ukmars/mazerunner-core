@@ -67,6 +67,11 @@ public:
     m_state = PS_ACCELERATING;
   }
 
+  void move(float distance, float top_speed, float final_speed, float acceleration) {
+    start(distance, top_speed, final_speed, acceleration);
+    wait_until_finished();
+  }
+
   void stop() {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       m_target_speed = 0;

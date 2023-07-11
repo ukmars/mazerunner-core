@@ -70,8 +70,7 @@ public:
   void turn(float angle, float omega, float alpha) {
     // get ready to turn
     rotation.reset();
-    rotation.start(angle, omega, 0, alpha);
-    rotation.wait_until_finished();
+    rotation.move(angle, omega, 0, alpha);
   }
 
   /**
@@ -105,8 +104,7 @@ public:
   void stop_at(float position) {
     float remaining = position - forward.position();
     Serial.print(F("STOP AT"));
-    forward.start(remaining, forward.speed(), 0, forward.acceleration());
-    forward.wait_until_finished();
+    forward.move(remaining, forward.speed(), 0, forward.acceleration());
   }
 
   /**
@@ -124,8 +122,7 @@ public:
    */
   void stop_after(float distance) {
     Serial.print(F("STOP AFTER"));
-    forward.start(distance, forward.speed(), 0, forward.acceleration());
-    forward.wait_until_finished();
+    forward.move(distance, forward.speed(), 0, forward.acceleration());
   }
 
   /**
