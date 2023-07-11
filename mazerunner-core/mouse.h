@@ -68,28 +68,21 @@ public:
         show_sensor_calibration();
         break;
       case 2:
-        sensors.wait_for_user_start(); // cover front sensor with hand to start
         search_maze();
         break;
       case 3:
-        sensors.wait_for_user_start(); // cover front sensor with hand to start
         follow_to(maze.maze_goal());
         break;
       case 4:
-        sensors.wait_for_user_start(); // cover front sensor with hand to start
         test_SS90E();
         break;
       case 5:
-        sensors.wait_for_user_start(); // cover front sensor with hand to start
         // test_SS90F();
         break;
-
       case 6:
-        sensors.wait_for_user_start(); // cover front sensor with hand to start
         test_edge_detection();
         break;
       case 7:
-        sensors.wait_for_user_start(); // cover front sensor with hand to start
         test_sensor_spin_calibrate();
         break;
       default:
@@ -301,8 +294,7 @@ public:
     location = 0;
     heading = NORTH;
     maze.initialise_maze();
-    // wait_for_user_start();
-    delay(1000);
+    sensors.wait_for_user_start();
     sensors.enable();
     motion.reset_drive_system();
     forward.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
@@ -327,9 +319,7 @@ public:
       if (location == target) {
         end_run();
       } else if (!leftWall) {
-        turn_smooth(SS90EL);
-        heading = (heading + 3) & 0x03;
-        reporter.log_status('x', location, heading);
+        turn_left();
       } else if (!frontWall) {
         move_forward();
       } else if (!rightWall) {
@@ -566,8 +556,8 @@ public:
    */
 
   void test_sensor_spin_calibrate() {
+    sensors.wait_for_user_start(); // cover front sensor with hand to start
     sensors.enable();
-    delay(100);
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
     reporter.report_sensor_track_header();
@@ -610,6 +600,7 @@ public:
     int right_edge_position = 0;
     int left_max = 0;
     int right_max = 0;
+    sensors.wait_for_user_start(); // cover front sensor with hand to start
     sensors.enable();
     delay(100);
     motion.reset_drive_system();
