@@ -254,14 +254,16 @@ const int FRONT_REFERENCE = 850; // reading when mouse centered with wall ahead
 const int left_edge_pos = 90;
 const int right_edge_pos = 90;
 
+// clang-format off
 // These take no storage - the compiler uses the values directly
-// speed, runin, runout, angle, omega, alpha, threshold
 const TurnParameters turn_params[4] = {
-    {SEARCH_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90EL
-    {SEARCH_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90ER
-    {SEARCH_TURN_SPEED, 20, 10, 90, 280, 4000, TURN_THRESHOLD_SS90E},  // 0 => SS90L
-    {SEARCH_TURN_SPEED, 20, 10, -90, 280, 4000, TURN_THRESHOLD_SS90E}, // 0 => SS90R
+//               speed, runin, runout, angle, omega, alpha, sensor threshold
+    {SEARCH_TURN_SPEED,    20,     10,    90,   280,  4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
+    {SEARCH_TURN_SPEED,    20,     10,   -90,   280,  4000, TURN_THRESHOLD_SS90E}, // 0 => SS90ER
+    {SEARCH_TURN_SPEED,    20,     10,    90,   280,  4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
+    {SEARCH_TURN_SPEED,    20,     10,   -90,   280,  4000, TURN_THRESHOLD_SS90E}, // 0 => SS90R
 };
+// clang-format on
 
 //***************************************************************************//
 // Battery resistor bridge //Derek Hall//
