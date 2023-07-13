@@ -287,13 +287,15 @@ public:
    */
   void turn_around() {
     stop_at_center();
-    motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
-    motion.move(SENSING_POSITION - HALF_CELL, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
+    turn_IP180();
+    float distance = SENSING_POSITION - HALF_CELL;
+    motion.move(distance, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(SENSING_POSITION);
-    // reporter.log_status('B', location, heading);
+    reporter.log_status('B', location, heading);
     heading = (heading + 2) & 0x03;
   }
 
+  //***************************************************************************//
   /***
    * A simple wall follower that knows where it is
    * It will follow the left wall until it reaches the supplied taget
