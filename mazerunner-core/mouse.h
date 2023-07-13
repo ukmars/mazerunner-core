@@ -163,7 +163,6 @@ public:
    * TODO: There is only just enough space to get down to turn speed. Increase turn speed to 350?
    *
    */
-  // TODO: tihs should be in motion.h
   void turn_smooth(int turn_id) {
     bool triggered = false;
     sensors.set_steering_mode(STEERING_OFF);
@@ -191,6 +190,7 @@ public:
     } else {
       reporter.log_status('D', location, heading); // the position triggered the turn
     }
+    // finally we get to actually turn
     motion.turn(params.angle, params.omega, 0, params.alpha);
     motion.move(params.run_out, motion.velocity(), SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(SENSING_POSITION);
