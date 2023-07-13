@@ -206,6 +206,7 @@ public:
     sensors.set_steering_mode(STEERING_OFF);
     reporter.log_status('T', location, heading);
     float remaining = (FULL_CELL + HALF_CELL) - motion.position();
+    // finish at very low speed so we can adjust from the wall ahead if present
     motion.start_move(remaining, motion.velocity(), 30, motion.acceleration());
     if (has_wall) {
       while (sensors.get_front_sum() < FRONT_REFERENCE) {
