@@ -67,10 +67,10 @@ public:
       print_justified(int(millis() - s_start_time), 6);
       print_justified(int(encoders.robot_distance()), 6);
       print_justified(int(encoders.robot_angle()), 6);
-      print_justified(int(forward.position()), 6);
-      print_justified(int(forward.speed()), 6);
-      print_justified(int(rotation.position()), 6);
-      print_justified(int(rotation.speed()), 6);
+      print_justified(int(motion.position()), 6);
+      print_justified(int(motion.velocity()), 6);
+      print_justified(int(motion.angle()), 6);
+      print_justified(int(motion.omega()), 6);
       print_justified(motors.get_fwd_millivolts(), 6);
       print_justified(motors.get_rot_millivolts(), 6);
       Serial.println();
@@ -218,7 +218,7 @@ public:
     Serial.print(dirLetters[heading]);
     print_justified(sensors.get_front_sum(), 4);
     Serial.print('@');
-    print_justified((int)forward.position(), 4);
+    print_justified((int)motion.position(), 4);
     Serial.print(' ');
     // print_walls();
     Serial.print('}');

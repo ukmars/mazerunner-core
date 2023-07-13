@@ -16,7 +16,6 @@
 #include "encoders.h"
 #include "maze.h"
 #include "motion.h"
-#include "motors.h"
 #include "profile.h"
 #include "reports.h"
 #include "sensors.h"
@@ -113,10 +112,10 @@ public:
    * TODO: need a function just to adjust forward position
    */
   static void stopAndAdjust() {
-    float remaining = (FULL_CELL + HALF_CELL) - forward.position();
+    float remaining = (FULL_CELL + HALF_CELL) - motion.position();
     sensors.set_steering_mode(STEERING_OFF);
-    forward.start(remaining, forward.speed(), 0, forward.acceleration());
-    while (not forward.is_finished()) {
+    motion.start_move(remaining, motion.velocity(), 0, motion.acceleration());
+    while (not motion.move_finished()) {
       if (sensors.get_front_sum() > (FRONT_REFERENCE - 150)) {
         break;
       }
@@ -124,7 +123,7 @@ public:
     }
     if (sensors.see_front_wall) {
       while (sensors.get_front_sum() < FRONT_REFERENCE) {
-        forward.start(10, 50, 0, 1000);
+        motion.start_move(10, 50, 0, 1000);
         delay(2);
       }
     }
@@ -164,11 +163,11 @@ public:
    * TODO: There is only just enough space to get down to turn speed. Increase turn speed to 350?
    *
    */
-
+  // TODO: tihs should be in motion.h
   void turn_smooth(int turn_id) {
     bool triggered = false;
     sensors.set_steering_mode(STEERING_OFF);
-    forward.set_target_speed(SEARCH_TURN_SPEED);
+    motion.set_target_velocity(SEARCH_TURN_SPEED);
     TurnParameters params = turn_params[turn_id];
 
     float trigger = params.trigger;
@@ -180,9 +179,9 @@ public:
     }
 
     float turn_point = FULL_CELL + params.run_in;
-    while (forward.position() < turn_point) {
+    while (motion.position() < turn_point) {
       if (sensors.get_front_sum() > trigger) {
-        forward.set_state(PS_FINISHED);
+        motion.set_target_velocity(motion.velocity());
         triggered = true;
         break;
       }
@@ -192,9 +191,9 @@ public:
     } else {
       reporter.log_status('D', location, heading); // the position triggered the turn
     }
-    rotation.move(params.angle, params.omega, 0, params.alpha);
-    forward.move(params.run_out, forward.speed(), SEARCH_SPEED, SEARCH_ACCELERATION);
-    forward.set_position(SENSING_POSITION);
+    motion.turn(params.angle, params.omega, 0, params.alpha);
+    motion.move(params.run_out, motion.velocity(), SEARCH_SPEED, SEARCH_ACCELERATION);
+    motion.set_position(SENSING_POSITION);
   }
 
   //***************************************************************************//
@@ -206,17 +205,19 @@ public:
     bool has_wall = frontWall;
     sensors.set_steering_mode(STEERING_OFF);
     reporter.log_status('T', location, heading);
-    float remaining = (FULL_CELL + HALF_CELL) - forward.position();
-    forward.start(remaining, forward.speed(), 30, forward.acceleration());
+    float remaining = (FULL_CELL + HALF_CELL) - motion.position();
+    motion.start_move(remaining, motion.velocity(), 30, motion.acceleration());
     if (has_wall) {
       while (sensors.get_front_sum() < FRONT_REFERENCE) {
         delay(2);
       }
     } else {
-      forward.wait_until_finished();
+      while (not motion.move_finished()) {
+        delay(2);
+      };
     }
     // Be sure robot has come to a halt.
-    forward.stop();
+    motion.stop();
   }
 
   //***************************************************************************//
@@ -252,8 +253,8 @@ public:
    * control into thinking it is at (or just before) the start of a new cell.
    * Then it just waits until it gets to the next sensing position.
    */
-  void move_forward() {
-    forward.adjust_position(-FULL_CELL);
+  void move_ahead() {
+    motion.adjust_forward_position(-FULL_CELL);
     reporter.log_status('F', location, heading);
     motion.wait_until_position(SENSING_POSITION);
   }
@@ -286,8 +287,8 @@ public:
   void turn_around() {
     stop_at_center();
     motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
-    forward.move(SENSING_POSITION - HALF_CELL, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
-    forward.set_position(SENSING_POSITION);
+    motion.move(SENSING_POSITION - HALF_CELL, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
+    motion.set_position(SENSING_POSITION);
     // reporter.log_status('B', location, heading);
     heading = (heading + 2) & 0x03;
   }
@@ -306,10 +307,10 @@ public:
     sensors.wait_for_user_start();
     sensors.enable();
     motion.reset_drive_system();
-    forward.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
-    forward.set_position(HALF_CELL);
+    motion.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
+    motion.set_position(HALF_CELL);
     Serial.println(F("Off we go..."));
-    motion.wait_until_position(FULL_CELL - 10);
+    motion.wait_until_position(SENSING_POSITION);
     // at the start of this loop we are always at the sensing point
     while (location != target) {
       if (switches.button_pressed()) {
@@ -330,7 +331,7 @@ public:
       } else if (!leftWall) {
         turn_left();
       } else if (!frontWall) {
-        move_forward();
+        move_ahead();
       } else if (!rightWall) {
         turn_right();
       } else {
@@ -341,7 +342,6 @@ public:
     Serial.println(F("Arrived!  "));
     delay(250);
     sensors.disable();
-
     motion.reset_drive_system();
   }
 
@@ -374,10 +374,10 @@ public:
     motion.reset_drive_system();
     if (not handStart) {
       // back up to the wall behind
-      forward.move(-60, 120, 0, 1000); //// magic numbers
+      motion.move(-60, 120, 0, 1000); //// magic numbers
     }
-    forward.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
-    forward.set_position(HALF_CELL);
+    motion.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
+    motion.set_position(HALF_CELL);
     Serial.println(F("Off we go..."));
     motion.wait_until_position(SENSING_POSITION);
     // TODO. the robot needs to start each iteration at the sensing point
@@ -403,7 +403,7 @@ public:
 
         switch (hdgChange) {
           case AHEAD:
-            move_forward();
+            move_ahead();
             break;
           case RIGHT:
             turn_right();
@@ -502,7 +502,7 @@ public:
     search_to(maze.maze_goal());
     handStart = false;
     search_to(START);
-    motors.stop();
+    motion.stop();
     return 0;
   }
 
@@ -537,8 +537,8 @@ public:
     sensors.enable();
     motion.reset_drive_system();
     reporter.front_sensor_track_header();
-    forward.start(-200, 100, 0, 500);
-    while (not forward.is_finished()) {
+    motion.start_move(-200, 100, 0, 500);
+    while (not motion.move_finished()) {
       reporter.front_sensor_track();
     }
     motion.reset_drive_system();
@@ -570,8 +570,8 @@ public:
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
     reporter.report_sensor_track_header();
-    rotation.start(360, 180, 0, 1800);
-    while (not rotation.is_finished()) {
+    motion.start_turn(360, 180, 0, 1800);
+    while (not motion.turn_finished()) {
       // reporter.report_sensor_track(true);
       reporter.print_wall_sensors();
     }
@@ -615,8 +615,8 @@ public:
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
     Serial.println(F("Edge positions:"));
-    forward.start(FULL_CELL - 30.0, 100, 0, 1000);
-    while (not forward.is_finished()) {
+    motion.start_move(FULL_CELL - 30.0, 100, 0, 1000);
+    while (not motion.move_finished()) {
       if (sensors.lss.value > left_max) {
         left_max = sensors.lss.value;
       }
@@ -627,13 +627,13 @@ public:
 
       if (not left_edge_found) {
         if (sensors.lss.value < left_max / 2) {
-          left_edge_position = int(0.5 + forward.position());
+          left_edge_position = int(0.5 + motion.position());
           left_edge_found = true;
         }
       }
       if (not right_edge_found) {
         if (sensors.rss.value < right_max / 2) {
-          right_edge_position = int(0.5 + forward.position());
+          right_edge_position = int(0.5 + motion.position());
           right_edge_found = true;
         }
       }
@@ -680,8 +680,8 @@ public:
     sensors.set_steering_mode(STEERING_OFF);
     // move to the boundary with the next cell
     float distance = BACK_WALL_TO_CENTER + HALF_CELL;
-    forward.move(distance, SEARCH_TURN_SPEED, SEARCH_TURN_SPEED, SEARCH_ACCELERATION);
-    forward.set_position(FULL_CELL);
+    motion.move(distance, SEARCH_TURN_SPEED, SEARCH_TURN_SPEED, SEARCH_ACCELERATION);
+    motion.set_position(FULL_CELL);
 
     if (side == RIGHT_START) {
       turn_smooth(SS90ER);
@@ -694,7 +694,7 @@ public:
     int sensor_right = sensors.rss.value;
     // move two cells. The resting position of the mouse have the
     // same offset as the turn ending
-    forward.move(2 * FULL_CELL, SEARCH_TURN_SPEED, 0, SEARCH_ACCELERATION);
+    motion.move(2 * FULL_CELL, SEARCH_TURN_SPEED, 0, SEARCH_ACCELERATION);
     sensor_left -= sensors.lss.value;
     sensor_right -= sensors.rss.value;
     print_justified(sensor_left, 5);

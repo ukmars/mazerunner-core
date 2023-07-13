@@ -14,6 +14,7 @@
 
 #include "adc.h"
 #include "config.h"
+#include "motion.h"
 #include "motors.h"
 #include "sensors.h"
 #include "switches.h"
@@ -66,8 +67,9 @@ public:
     // TODO: make sure all variables are interrupt-safe if they are used outside IRQs
     // grab the encoder values first because they will continue to change
     encoders.update();
-    forward.update();
-    rotation.update();
+    // forward.update();
+    // rotation.update();
+    motion.update();
     sensors.update();
     battery.update();
 

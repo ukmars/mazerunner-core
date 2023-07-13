@@ -13,7 +13,7 @@
 #define MOTION_H
 
 #include "motors.h"
-#include "profile.h"
+// #include "profile.h"
 #include "sensors.h"
 #include <Arduino.h>
 class Motion {
@@ -33,6 +33,75 @@ public:
     rotation.reset();
     motors.reset_controllers();
     motors.enable_controllers();
+  }
+
+  void stop() {
+    motors.stop();
+  }
+
+  float position() {
+    return forward.position();
+  }
+
+  float velocity() {
+    return forward.speed();
+  }
+
+  float acceleration() {
+    return forward.acceleration();
+  }
+
+  void set_target_velocity(float velocity) {
+    forward.set_target_speed(velocity);
+  }
+
+  float angle() {
+    return rotation.position();
+  }
+
+  float omega() {
+    return rotation.speed();
+  }
+
+  float alpha() {
+    return rotation.acceleration();
+  }
+
+  void start_move(float distance, float top_speed, float final_speed, float acceleration) {
+    forward.start(distance, top_speed, final_speed, acceleration);
+  }
+
+  bool move_finished() {
+    return forward.is_finished();
+  }
+
+  void move(float distance, float top_speed, float final_speed, float acceleration) {
+    forward.move(distance, top_speed, final_speed, acceleration);
+  }
+
+  void start_turn(float distance, float top_speed, float final_speed, float acceleration) {
+    rotation.start(distance, top_speed, final_speed, acceleration);
+  }
+
+  bool turn_finished() {
+    return rotation.is_finished();
+  }
+
+  void turn(float distance, float top_speed, float final_speed, float acceleration) {
+    rotation.move(distance, top_speed, final_speed, acceleration);
+  }
+
+  void update() {
+    forward.update();
+    rotation.update();
+  }
+
+  void set_position(float pos) {
+    forward.set_position(pos);
+  }
+
+  void adjust_forward_position(float delta) {
+    forward.adjust_position(delta);
   }
 
   //***************************************************************************//

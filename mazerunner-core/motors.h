@@ -24,6 +24,10 @@ enum { PWM_488_HZ,
        PWM_3906_HZ,
        PWM_31250_HZ };
 
+class Motors;
+
+extern Motors motors;
+
 class Motors {
 public:
   /***
@@ -303,7 +307,5 @@ private:
   float m_left_motor_volts;
   float m_right_motor_volts;
 };
-
-extern Motors motors;
 
 #endif
