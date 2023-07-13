@@ -171,10 +171,10 @@ public:
 
     float trigger = params.trigger;
     if (sensors.see_left_wall) {
-      trigger += 10; // MAGIC number
+      trigger += EXTRA_WALL_ADJUST;
     }
     if (sensors.see_right_wall) {
-      trigger += 6; // MAGIC number
+      trigger += EXTRA_WALL_ADJUST;
     }
 
     float turn_point = FULL_CELL + params.run_in;
