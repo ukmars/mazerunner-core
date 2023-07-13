@@ -197,6 +197,7 @@ public:
     forward.set_position(SENSING_POSITION);
   }
 
+  //***************************************************************************//
   /***
    * bring the mouse to a halt in the center of the current cell. That is,
    * the cell it is entering.
@@ -218,6 +219,7 @@ public:
     forward.stop();
   }
 
+  //***************************************************************************//
   /***
    * Called at the end of a run when the mouse is about to enter
    * the target cell. The target is just where the mouse is
@@ -243,10 +245,17 @@ public:
   }
 
   //***************************************************************************//
+  /**
+   * The robot is already moving so it is enough to let it carry on until
+   * the next sensing position is reached.
+   * Subtracting one full cell from the current position tricks the motion
+   * control into thinking it is at (or just before) the start of a new cell.
+   * Then it just waits until it gets to the next sensing position.
+   */
   void move_forward() {
     forward.adjust_position(-FULL_CELL);
     reporter.log_status('F', location, heading);
-    motion.wait_until_position(FULL_CELL - 10);
+    motion.wait_until_position(SENSING_POSITION);
   }
 
   //***************************************************************************//
