@@ -88,6 +88,7 @@ public:
         // just to be safe...
         sensors.disable();
         motion.reset_drive_system();
+        sensors.set_steering_mode(STEERING_OFF);
         break;
     }
   }
@@ -310,6 +311,7 @@ public:
     sensors.wait_for_user_start();
     sensors.enable();
     motion.reset_drive_system();
+    sensors.set_steering_mode(STEERING_OFF);
     motion.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(HALF_CELL);
     Serial.println(F("Off we go..."));
@@ -346,6 +348,7 @@ public:
     delay(250);
     sensors.disable();
     motion.reset_drive_system();
+    sensors.set_steering_mode(STEERING_OFF);
   }
 
   /***
@@ -375,6 +378,7 @@ public:
     delay(1000);
     sensors.enable();
     motion.reset_drive_system();
+    sensors.set_steering_mode(STEERING_OFF);
     if (not handStart) {
       // back up to the wall behind
       motion.move(-60, 120, 0, 1000); //// magic numbers
@@ -426,6 +430,7 @@ public:
     delay(250);
 
     motion.reset_drive_system();
+    sensors.set_steering_mode(STEERING_OFF);
     return 0;
   }
 
@@ -545,6 +550,7 @@ public:
       reporter.front_sensor_track();
     }
     motion.reset_drive_system();
+    sensors.set_steering_mode(STEERING_OFF);
     sensors.disable();
   }
 
@@ -658,6 +664,7 @@ public:
     Serial.println();
 
     motion.reset_drive_system();
+    sensors.set_steering_mode(STEERING_OFF);
     sensors.disable();
     delay(100);
   }
@@ -703,6 +710,7 @@ public:
     print_justified(sensor_left, 5);
     print_justified(sensor_right, 5);
     motion.reset_drive_system();
+    sensors.set_steering_mode(STEERING_OFF);
   }
 
   /***

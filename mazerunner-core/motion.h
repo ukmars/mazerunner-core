@@ -14,8 +14,12 @@
 
 #include "motors.h"
 // #include "profile.h"
-#include "sensors.h"
 #include <Arduino.h>
+
+/***
+ * TODO: Motion should have be given the profilers
+ * TODO: should it also be given the motors?
+ */
 class Motion {
 public:
   /**
@@ -27,7 +31,6 @@ public:
   void reset_drive_system() {
     motors.stop();
     motors.disable_controllers();
-    sensors.set_steering_mode(STEERING_OFF);
     encoders.reset();
     forward.reset();
     rotation.reset();
