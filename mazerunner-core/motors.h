@@ -16,7 +16,6 @@
 #include "config.h"
 #include "digitalWriteFast.h"
 #include "encoders.h"
-#include "profile.h"
 #include <Arduino.h>
 
 enum { PWM_488_HZ,
@@ -86,7 +85,8 @@ public:
    * loop frequency to save a little time.
    */
   float position_controller() {
-    m_fwd_error += forward.increment() - encoders.robot_fwd_change();
+    float increment = m_velocity * LOOP_INTERVAL;
+    m_fwd_error += increment - encoders.robot_fwd_change();
     float diff = m_fwd_error - m_previous_fwd_error;
     m_previous_fwd_error = m_fwd_error;
     float output = FWD_KP * m_fwd_error + FWD_KD * diff;
@@ -107,7 +107,8 @@ public:
    * A separate controller calculates the steering adjustment term.
    */
   float angle_controller(float steering_adjustment) {
-    m_rot_error += rotation.increment() - encoders.robot_rot_change();
+    float increment = m_omega * LOOP_INTERVAL;
+    m_rot_error += increment - encoders.robot_rot_change();
     m_rot_error += steering_adjustment;
     float diff = m_rot_error - m_previous_rot_error;
     m_previous_rot_error = m_rot_error;
@@ -152,7 +153,9 @@ public:
    * for both forward and rotation, and combine them to obtain drive
    * voltages for the left and right motors.
    */
-  void update_controllers(float steering_adjustment) {
+  void update_controllers(float velocity, float omega, float steering_adjustment) {
+    m_velocity = velocity;
+    m_omega = omega;
     float pos_output = position_controller();
     float rot_output = angle_controller(steering_adjustment);
     float left_output = 0;
@@ -160,9 +163,9 @@ public:
     left_output = pos_output - rot_output;
     right_output = pos_output + rot_output;
 
-    float tangent_speed = rotation.speed() * MOUSE_RADIUS * (1 / 57.29);
-    float left_speed = forward.speed() - tangent_speed;
-    float right_speed = forward.speed() + tangent_speed;
+    float tangent_speed = m_omega * MOUSE_RADIUS * (1 / 57.29);
+    float left_speed = m_velocity - tangent_speed;
+    float right_speed = m_velocity + tangent_speed;
     float left_ff = leftFeedForward(left_speed);
     float right_ff = rightFeedForward(right_speed);
     if (m_feedforward_enabled) {
@@ -296,6 +299,13 @@ public:
     return volts;
   }
 
+  void set_speeds(float velocity, float omega) {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      m_velocity = velocity;
+      m_omega = omega;
+    }
+  }
+
 private:
   bool m_controller_output_enabled;
   bool m_feedforward_enabled = true;
@@ -303,6 +313,8 @@ private:
   float m_previous_rot_error;
   float m_fwd_error;
   float m_rot_error;
+  float m_velocity;
+  float m_omega;
   // these are maintained only for logging
   float m_left_motor_volts;
   float m_right_motor_volts;

@@ -13,7 +13,7 @@
 #define MOTION_H
 
 #include "motors.h"
-// #include "profile.h"
+#include "profile.h"
 #include <Arduino.h>
 
 /***

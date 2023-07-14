@@ -114,14 +114,6 @@ public:
     return speed;
   }
 
-  float increment() {
-    float inc;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      inc = m_speed * LOOP_INTERVAL;
-    }
-    return inc;
-  }
-
   float acceleration() {
     float acc;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {

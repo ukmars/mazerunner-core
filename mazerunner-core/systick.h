@@ -67,16 +67,13 @@ public:
     // TODO: make sure all variables are interrupt-safe if they are used outside IRQs
     // grab the encoder values first because they will continue to change
     encoders.update();
-    // forward.update();
-    // rotation.update();
     motion.update();
     sensors.update();
     battery.update();
 
-    motors.update_controllers(sensors.get_steering_feedback());
+    motors.update_controllers(motion.velocity(), motion.omega(), sensors.get_steering_feedback());
     adc.start_conversion_cycle();
     // NOTE: no code should follow this line;
-    // digitalWriteFast(LED_BUILTIN, 0);
   }
 };
 
