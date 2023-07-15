@@ -125,19 +125,19 @@ const int EMITTER_DIAGONAL = EMITTER_B;
 // hardware ADC channel numbers
 
 // ADVANCED SENSOR
-const int RFS_CHANNEL = 0;
-const int RSS_CHANNEL = 1;
-const int LSS_CHANNEL = 2;
-const int LFS_CHANNEL = 3;
+const int RFS_ADC_CHANNEL = 0;
+const int RSS_ADC_CHANNEL = 1;
+const int LSS_ADC_CHANNEL = 2;
+const int LFS_ADC_CHANNEL = 3;
 
 // BASIC SENSOR - just repeat the front sensor to make the code cleaner
-// #define RFS_CHANNEL 1
-// #define RSS_CHANNEL 0
-// #define LSS_CHANNEL 2
-// #define LFS_CHANNEL 1
+// #define RFS_ADC_CHANNEL 1
+// #define RSS_ADC_CHANNEL 0
+// #define LSS_ADC_CHANNEL 2
+// #define LFS_ADC_CHANNEL 1
 // there are two other ADC channels used by the robot
-const int SWITCHES_CHANNEL = 6;
-const int BATTERY_CHANNEL = 7;
+const int SWITCHES_ADC_CHANNEL = 6;
+const int BATTERY_ADC_CHANNEL = 7;
 //***************************************************************************//
 const uint32_t BAUDRATE = 115200;
 
@@ -152,6 +152,11 @@ const int REPORTING_INTERVAL = 10;
 
 //***************************************************************************//
 // We need to know about the drive mechanics.
+// The encoder pulse counts should be obvious from the encoder itself.
+// Work out the gear ratio by rotating the wheel a number of turns and counting
+// the pulses.
+// Finally, move the mouse in a straight line through 1000mm of travel to work
+// out the wheel diameter.
 const float WHEEL_DIAMETER = 32.240;
 const float ENCODER_PULSES = 36.0;
 const float GEAR_RATIO = 10.7917;
@@ -159,23 +164,29 @@ const float GEAR_RATIO = 10.7917;
 // Mouse radius is the distance between the contact patches of the drive wheels.
 // A good starting approximation is half the distance between the wheel centres.
 // After testing, you may find the working value to be larger or smaller by some
-// small amount.
+// small amount. AFTER you have the wheel diameter and gear ratio calibrated,
+// have the mouse turn in place and adjust the MOUSE_RADIUS until these turns are
+// as accurate as you can get them
 const float MOUSE_RADIUS = 38.070; // 39.50; // Adjust on test
 
-// The robot is likely to have wheels of different diameters and that must be
-// compensated for if the robot is to reliably drive in a straight line
+// The robot is likely to have wheels of different diameters or motors of slightly
+// different characteristics and that must be compensated for if the robot is to
+// reliably drive in a straight line.
 // This number is a fraction of the applied motor voltage to be added to the left
 // and subtracted from the right motor.
 const float ROTATION_BIAS = -0.005; // Negative makes robot curve to left
 
+// Now we can pre-calculate the key constats for the motion control
 const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO); // 0.2607
 const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * MM_PER_COUNT;
 const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * MM_PER_COUNT;
-const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI)); // 0.7525
+const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 
-//*** MOTION CONTROL CONSTANTS **********************************************//
+//*** MOTION CONTROLLER CONSTANTS **********************************************//
 
 // Dynamic performance constants
+// There is a video describing how to get these numbers and calculate the feedforward
+// constnats here: https://youtu.be/BrabDeHGsa0
 const float FWD_KM = 475.0; // mm/s/Volt
 const float FWD_TM = 0.190; // forward time constant
 const float ROT_KM = 775.0; // deg/s/Volt

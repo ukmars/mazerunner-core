@@ -28,8 +28,8 @@
 // Global objects
 Systick systick;
 AnalogueConverter adc;
-Battery battery(BATTERY_CHANNEL);
-Switches switches(SWITCHES_CHANNEL);
+Battery battery(BATTERY_ADC_CHANNEL);
+Switches switches(SWITCHES_ADC_CHANNEL);
 Encoders encoders;
 Sensors sensors;
 Motion motion;
@@ -40,6 +40,9 @@ Maze maze PERSISTENT;
 Mouse mouse;
 CommandLineInterface cli;
 Reporter reporter;
+
+// The encoder ISR routines do not need to be explicitly defined
+// because the callbacks are assigned though the Arduino API
 
 ISR(ADC_vect) {
   adc.isr();

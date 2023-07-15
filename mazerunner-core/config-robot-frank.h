@@ -117,10 +117,10 @@ const int EMITTER_DIAGONAL = EMITTER_B;
 #define LSS_CHANNEL 2
 #define LFS_CHANNEL 3
 // BASIC SENSOR - just repeat the front sensor to make the code cleaner
-// #define RFS_CHANNEL 1
-// #define RSS_CHANNEL 0
-// #define LSS_CHANNEL 2
-// #define LFS_CHANNEL 1
+// #define RFS_ADC_CHANNEL 1
+// #define RSS_ADC_CHANNEL 0
+// #define LSS_ADC_CHANNEL 2
+// #define LFS_ADC_CHANNEL 1
 
 //***************************************************************************//
 const uint32_t BAUDRATE = 115200;

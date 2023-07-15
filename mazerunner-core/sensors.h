@@ -192,10 +192,10 @@ public:
     // just used twice
     // keep these values for calibration assistance
     // they should never be negative
-    rfs.raw = adc.get_raw(RFS_CHANNEL);
-    rss.raw = adc.get_raw(RSS_CHANNEL);
-    lss.raw = adc.get_raw(LSS_CHANNEL);
-    lfs.raw = adc.get_raw(LFS_CHANNEL);
+    rfs.raw = adc.get_raw(RFS_ADC_CHANNEL);
+    rss.raw = adc.get_raw(RSS_ADC_CHANNEL);
+    lss.raw = adc.get_raw(LSS_ADC_CHANNEL);
+    lfs.raw = adc.get_raw(LFS_ADC_CHANNEL);
 
     lfs.value = FRONT_LEFT_SCALE * lfs.raw;
     lss.value = LEFT_SCALE * lss.raw;
