@@ -26,6 +26,13 @@ const int MAX_ARGC = 16;
 struct Args {
   char *argv[MAX_ARGC];
   int argc;
+  void print() const {
+    for (int i = 0; i < argc; i++) {
+      Serial.print(argv[i]);
+      Serial.print(' ');
+    }
+    Serial.println();
+  }
 };
 
 /***
@@ -239,7 +246,7 @@ public:
    *
    */
   Args get_tokens() {
-    Args args = {0};
+    Args args;
     char *line = m_buffer;
     char *token;
     for (token = strtok(line, " ,="); token != NULL; token = strtok(NULL, " ,=")) {
@@ -248,9 +255,7 @@ public:
       if (args.argc == MAX_ARGC)
         break;
     }
-    // for (int i = 0; i < args.argc; i++) {
-    //   Serial.println(args.argv[i]);
-    // }
+
     return args;
   }
 
@@ -319,7 +324,8 @@ public:
   }
 
   void execute_cmd(int cmd) {
-    execute_cmd(cmd, Args{0});
+    Args args;
+    execute_cmd(cmd, args);
   }
 
   void execute_cmd(int cmd, const Args &args) {
@@ -353,6 +359,7 @@ public:
         sensors.disable();
         motion.reset_drive_system();
         sensors.set_steering_mode(STEERING_OFF);
+        args.print();
         break;
     }
   }

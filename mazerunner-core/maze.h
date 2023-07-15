@@ -436,8 +436,8 @@ public:
 private:
   mask_t m_mask = MASK_OPEN;
   uint8_t m_goal = 0x077;
-  uint8_t m_cost[256] = {0};
-  wall_info_t m_walls[256] = {0};
+  uint8_t m_cost[256];
+  wall_info_t m_walls[256];
 };
 
 extern Maze maze;

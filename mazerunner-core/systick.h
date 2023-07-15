@@ -11,7 +11,7 @@
 
 #ifndef SYSTICK_H
 #define SYSTICK_H
-
+#include "Arduino.h"
 #include "adc.h"
 #include "config.h"
 #include "motion.h"
