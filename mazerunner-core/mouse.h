@@ -15,7 +15,7 @@
 #include "config.h"
 #include "maze.h"
 #include "motion.h"
-#include "reports.h"
+#include "reporting.h"
 #include "sensors.h"
 #include "switches.h"
 

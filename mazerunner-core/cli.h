@@ -15,7 +15,7 @@
 #include "config.h"
 #include "maze.h"
 #include "mouse.h"
-#include "reports.h"
+#include "reporting.h"
 #include "sensors.h"
 #include <Arduino.h>
 #include <stdint.h>

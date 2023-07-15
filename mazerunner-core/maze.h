@@ -27,7 +27,7 @@
  */
 
 #include "queue.h"
-#include "reports.h"
+#include "reporting.h"
 #include <stdint.h>
 
 #define GOAL 0x22

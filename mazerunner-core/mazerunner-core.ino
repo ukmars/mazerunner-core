@@ -18,7 +18,7 @@
 #include "motion.h"
 #include "motors.h"
 #include "mouse.h"
-#include "reports.h"
+#include "reporting.h"
 #include "sensors.h"
 #include "switches.h"
 #include "systick.h"
