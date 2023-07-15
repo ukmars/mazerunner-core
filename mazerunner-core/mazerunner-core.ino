@@ -14,7 +14,6 @@
 #include "cli.h"
 #include "config.h"
 #include "encoders.h"
-#include "list.h"
 #include "maze.h"
 #include "motion.h"
 #include "motors.h"

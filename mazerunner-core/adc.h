@@ -14,7 +14,6 @@
 
 #include "config.h"
 #include "digitalWriteFast.h"
-#include "list.h"
 #include <Arduino.h>
 #include <util/atomic.h>
 #include <wiring_private.h>
