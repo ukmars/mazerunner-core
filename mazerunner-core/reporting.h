@@ -16,7 +16,6 @@
 #include "motion.h"
 #include "motors.h"
 #include "profile.h"
-#include "reporting.h"
 #include "sensors.h"
 #include <Arduino.h>
 
