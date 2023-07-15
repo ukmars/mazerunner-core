@@ -58,7 +58,7 @@ struct TurnParameters {
 #define HARDWARE HARDWARE_UKMARSBOT_1_3A
 
 #if HARDWARE == HARDWARE_UKMARSBOT_1_3A
-#include "config-hardware-ukmarsbot.h"
+#include "config-ukmarsbot.h"
 #else
 #error "NO HARDWARE DEFINED"
 #endif
