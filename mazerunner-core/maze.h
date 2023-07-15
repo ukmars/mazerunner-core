@@ -78,9 +78,11 @@ enum { AHEAD = 0,
 #define H_WALL F("---")
 #define H_EXIT F("   ")
 #define H_UNKN F("···")
+#define H_VIRT F("###")
 #define V_WALL '|'
 #define V_EXIT ' '
 #define V_UNKN ':'
+#define V_VIRT '#'
 enum { PLAIN,
        COSTS,
        DIRS };
@@ -364,18 +366,22 @@ public:
    *
    */
 
+  void print_h_wall(uint8_t state) {
+    if (state == EXIT) {
+      Serial.print(H_EXIT);
+    } else if (state == WALL) {
+      Serial.print(H_WALL);
+    } else if (state == VIRTUAL) {
+      Serial.print(H_VIRT);
+    } else {
+      Serial.print(H_UNKN);
+    }
+  }
   void printNorthWalls(int row) {
     for (int col = 0; col < 16; col++) {
       unsigned char cell = row + 16 * col;
       Serial.print('o');
-      uint8_t state = m_walls[cell].north & m_mask;
-      if (state == EXIT) {
-        Serial.print(H_EXIT);
-      } else if (state == WALL) {
-        Serial.print(H_WALL);
-      } else {
-        Serial.print(H_UNKN);
-      }
+      print_h_wall(m_walls[cell].north & m_mask);
     }
     Serial.println(POST);
   }
@@ -384,14 +390,7 @@ public:
     for (int col = 0; col < 16; col++) {
       unsigned char cell = row + 16 * col;
       Serial.print(POST);
-      uint8_t state = m_walls[cell].south & m_mask;
-      if (state == EXIT) {
-        Serial.print(H_EXIT);
-      } else if (state == WALL) {
-        Serial.print(H_WALL);
-      } else {
-        Serial.print(H_UNKN);
-      }
+      print_h_wall(m_walls[cell].south & m_mask);
     }
     Serial.println(POST);
   }
@@ -409,6 +408,8 @@ public:
           Serial.print(V_EXIT);
         } else if (state == WALL) {
           Serial.print(V_WALL);
+        } else if (state == VIRTUAL) {
+          Serial.print(V_VIRT);
         } else {
           Serial.print(V_UNKN);
         }
