@@ -18,7 +18,6 @@
 #include "reports.h"
 #include "sensors.h"
 #include "switches.h"
-#include "utils.h"
 
 class Mouse;
 extern Mouse mouse;
