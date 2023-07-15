@@ -13,10 +13,8 @@
 #define MOUSE_H
 #include "Arduino.h"
 #include "config.h"
-#include "encoders.h"
 #include "maze.h"
 #include "motion.h"
-#include "profile.h"
 #include "reports.h"
 #include "sensors.h"
 #include "switches.h"
