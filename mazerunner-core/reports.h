@@ -91,7 +91,7 @@ public:
    *
    */
   void report_sensor_track_header() {
-    Serial.println(F("time pos angle left right front error adjustment"));
+    Serial.println(F(" time pos angle lfs lss rss rfs cte steer"));
     s_start_time = millis();
     s_report_time = s_start_time;
   }
@@ -184,7 +184,7 @@ public:
     Serial.print(F("  | "));
     print_justified((int)sensors.get_distance(sensors.get_front_sum(), FRONT_LINEAR_CONSTANT), 6);
     Serial.print(F("     | "));
-    Serial.print('\r');
+    Serial.println();
   }
 
   // void
