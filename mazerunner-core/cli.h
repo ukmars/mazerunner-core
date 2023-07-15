@@ -175,7 +175,7 @@ public:
     int function = -1;
     int digits = read_integer(args.argv[1], function);
     if (digits > 0) {
-      mouse.execute_cmd(function, args);
+      execute_cmd(function, args);
     }
   }
 
@@ -218,6 +218,45 @@ public:
         sensors.disable();
         break;
       default:
+        break;
+    }
+  }
+
+  void execute_cmd(int cmd) {
+    execute_cmd(cmd, Args{0});
+  }
+
+  void execute_cmd(int cmd, const Args &args) {
+    if (cmd == 0) {
+      return;
+    }
+    switch (cmd) {
+      case 1:
+        mouse.show_sensor_calibration();
+        break;
+      case 2:
+        mouse.search_maze();
+        break;
+      case 3:
+        mouse.follow_to(maze.maze_goal());
+        break;
+      case 4:
+        mouse.test_SS90E();
+        break;
+      case 5:
+        // test_SS90F();
+        break;
+      case 6:
+        mouse.test_edge_detection();
+        break;
+      case 7:
+        mouse.test_sensor_spin_calibrate();
+        break;
+      default:
+        // just to be safe...
+        sensors.disable();
+        motion.reset_drive_system();
+        sensors.set_steering_mode(STEERING_OFF);
         break;
     }
   }

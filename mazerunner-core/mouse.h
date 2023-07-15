@@ -52,45 +52,6 @@ public:
     heading = NORTH;
   }
 
-  void execute_cmd(int cmd) {
-    execute_cmd(cmd, Args{0});
-  }
-
-  void execute_cmd(int cmd, const Args &args) {
-    if (cmd == 0) {
-      return;
-    }
-    switch (cmd) {
-      case 1:
-        show_sensor_calibration();
-        break;
-      case 2:
-        search_maze();
-        break;
-      case 3:
-        follow_to(maze.maze_goal());
-        break;
-      case 4:
-        test_SS90E();
-        break;
-      case 5:
-        // test_SS90F();
-        break;
-      case 6:
-        test_edge_detection();
-        break;
-      case 7:
-        test_sensor_spin_calibrate();
-        break;
-      default:
-        // just to be safe...
-        sensors.disable();
-        motion.reset_drive_system();
-        sensors.set_steering_mode(STEERING_OFF);
-        break;
-    }
-  }
-
   /**
    * change the mouse heading but do not physically turn
    */
@@ -579,8 +540,8 @@ public:
     reporter.report_sensor_track_header();
     motion.start_turn(360, 180, 0, 1800);
     while (not motion.turn_finished()) {
-      // reporter.report_sensor_track(true);
-      reporter.print_wall_sensors();
+      reporter.report_sensor_track(true);
+      // reporter.print_wall_sensors();
     }
     motion.reset_drive_system();
     sensors.disable();
