@@ -354,6 +354,9 @@ public:
       case 7:
         mouse.test_sensor_spin_calibrate();
         break;
+      case 8:
+        mouse.user_log_front_sensor();
+        break;
       default:
         // just to be safe...
         sensors.disable();
