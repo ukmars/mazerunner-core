@@ -508,7 +508,7 @@ public:
       reporter.front_sensor_track();
     }
     motion.reset_drive_system();
-    motors.disable_controllers();
+    motion.disable_drive();
     sensors.set_steering_mode(STEERING_OFF);
     sensors.disable();
   }
@@ -545,8 +545,7 @@ public:
       // reporter.print_wall_sensors();
     }
     motion.reset_drive_system();
-    sensors.disable();
-    motors.disable_controllers();
+    motion.disable_drive();
     delay(100);
   }
 

@@ -42,6 +42,10 @@ public:
     motors.stop();
   }
 
+  void disable_drive() {
+    motors.disable_controllers();
+  }
+
   float position() {
     return forward.position();
   }
