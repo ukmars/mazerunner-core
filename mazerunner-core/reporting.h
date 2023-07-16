@@ -149,6 +149,36 @@ public:
     }
   }
 
+  void report_radial_track_header() {
+    Serial.println(F(" angle lfs lss rss rfs cte steer"));
+    s_start_time = millis();
+    s_report_time = s_start_time;
+  }
+  void report_radial_track(bool use_raw = false) {
+    static int recorded_angle = INT16_MAX;
+    int this_angle = (int)encoders.robot_angle();
+    if (recorded_angle != this_angle) {
+      recorded_angle = this_angle;
+      print_justified(recorded_angle, 6);
+      if (use_raw) {
+        print_justified(sensors.lfs.raw, 6);
+        print_justified(sensors.lss.raw, 6);
+        print_justified(sensors.rss.raw, 6);
+        print_justified(sensors.rfs.raw, 6);
+      } else {
+        print_justified(sensors.lfs.value, 6);
+        print_justified(sensors.lss.value, 6);
+        print_justified(sensors.rss.value, 6);
+        print_justified(sensors.rfs.value, 6);
+      }
+      Serial.print(' ');
+      Serial.print(sensors.get_cross_track_error());
+      Serial.print(' ');
+      Serial.print(sensors.get_steering_feedback());
+      Serial.println();
+    }
+  }
+
   //***************************************************************************//
 
   /***
