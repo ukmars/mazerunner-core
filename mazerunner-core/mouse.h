@@ -533,18 +533,20 @@ public:
    */
 
   void test_sensor_spin_calibrate() {
-    sensors.wait_for_user_start(); // cover front sensor with hand to start
+    int side = sensors.wait_for_user_start(); // cover front sensor with hand to start
+    bool use_raw = (side == LEFT_START) ? true : false;
     sensors.enable();
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
     reporter.report_sensor_track_header();
     motion.start_turn(360, 180, 0, 1800);
     while (not motion.turn_finished()) {
-      reporter.report_sensor_track(true);
+      reporter.report_radial_track(use_raw);
       // reporter.print_wall_sensors();
     }
     motion.reset_drive_system();
     sensors.disable();
+    motors.disable_controllers();
     delay(100);
   }
 
