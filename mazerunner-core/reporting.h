@@ -193,15 +193,19 @@ public:
    * In normal operation, UKMARSBOT has its front edge 22 mm from the wall ahead.
    *
    */
+
   void front_sensor_track_header() {
-    Serial.println(F("dist front_sum front_diff"));
+    Serial.println(F(" dist front_sum front_diff, distance"));
   }
 
   void front_sensor_track() {
-    if (millis() >= s_report_time) {
-      print_justified(int(encoders.robot_distance()), 7);
+    static int position = INT16_MAX;
+    if (position != (int)encoders.robot_distance()) {
+      position = encoders.robot_distance();
+      print_justified(position, 7);
       print_justified(sensors.get_front_sum(), 7);
       print_justified(sensors.get_front_diff(), 7);
+      print_justified((int)sensors.get_distance(sensors.get_front_sum(), FRONT_LINEAR_CONSTANT), 7);
       Serial.println();
     }
   }
