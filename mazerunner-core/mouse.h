@@ -508,6 +508,7 @@ public:
       reporter.front_sensor_track();
     }
     motion.reset_drive_system();
+    motors.disable_controllers();
     sensors.set_steering_mode(STEERING_OFF);
     sensors.disable();
   }
