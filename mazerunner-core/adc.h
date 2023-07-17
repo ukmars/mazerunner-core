@@ -50,7 +50,7 @@
  * Although the code exists almost entirely in this header file, C++ requires the actual
  * instance of the class and its interrupt service routine to be somewhere in a .cpp file.
  * I have placed the instances in the main project file.
- * 
+ *
  * TODO: some space and time could be saved by only storing the difference between the
  * lit and dark values but it complicates matters elsewhere if code tries to read the
  * values in the middle of the interrupt sequence. If you have all the channels read
