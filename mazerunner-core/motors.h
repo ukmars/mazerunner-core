@@ -18,6 +18,24 @@
 #include "encoders.h"
 #include <Arduino.h>
 
+/***
+ * The Motors class is provided with two main control signals - the forward
+ * and rotary speeds. A third input come from the steering correction mechanism
+ * used normally when the robot is tracking a wall or line. That input could also
+ * come from a trajectory tracker or a target seeker.
+ *
+ * UKMARSBOT uses DC motors and, to get best performance with least user effort,
+ * a combination of feedforward and feedbackcontrollers is used. While this can
+ * seem complex, the user need not be aware of all the details so long as the
+ * appropriate system characterisation is done to provide suitable values for the
+ * various system constants.
+ *
+ * Under the hood, there are a pair of position controllers which have their set
+ * points continuously updated by the desired speeds. Odometry provides feedback
+ * for these controllers. greater reliability and precision would be possible if
+ * the odometry had better resolution and if an IMU were available. But, you can
+ * get remarkably good results with the limited resources available.
+ */
 enum { PWM_488_HZ,
        PWM_977_HZ,
        PWM_3906_HZ,

@@ -17,6 +17,29 @@
 #include <Arduino.h>
 
 /***
+ *
+ * The motion class handles all the higher level Locomotion tasks. It is responsible
+ * for converting instructions from a path planner into actual movement of the
+ * robot.
+ *
+ * Motion control needs to know about the dynamics and kinematics of the robot
+ * and may need environmental data as well. In particular, the battery voltage and
+ * characteristics of the motors will be important.
+ *
+ * The output from the motion controller should be suitable control signals for
+ * the actuators that make the robot move. In UKMARSBOT, that will simply be
+ * voltages for each of the two drive motors. Other robots may have more motors,
+ * an independent steering system or other kinds of effectors such as grippers or
+ * weapons. Remember that the motors may be stepper motors which will need a
+ * slightly modified approach.
+ *
+ * Here, the motion control makes use of simple trapezoidal profiles to calculate
+ * continuously varying speeds for linear and rotary motion components.
+ *
+ * How these speeds are converted into individual control signals for the drive
+ * system is the job of the Motors class. Thus is should be relatively easy to
+ * change that class to suit different drive systems.
+ *
  * TODO: Motion should have be given the profilers
  * TODO: should it also be given the motors?
  */

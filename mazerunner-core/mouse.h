@@ -19,6 +19,18 @@
 #include "sensors.h"
 #include "switches.h"
 
+/***
+ * The Mouse class is really a subclass of a more generic robot. It should
+ * add functionality to a robot class by providing specific mapping and
+ * planning features that are more closely aligned with its purpose.
+ *
+ * In the same way, a ine follower and a sumo robot are also subclasses
+ * of Robot.
+ *
+ * This code combines Robot with Mouse. If you are writing for several
+ * different events, consider creating a Robot class for all the basic
+ * functionality and then extending it for the individual contest events.
+ */
 class Mouse;
 extern Mouse mouse;
 

@@ -22,7 +22,12 @@
 /**
  *
  * The Sensors class uses the data gathered by the AnalogueConverter to
- * provide basic sensor functions for UKMARSBOT.
+ * provide basic sensor functions for UKMARSBOT. The sensors class tells
+ * the robot about its environment both external and internal. In the
+ * case of a micromouse the wall sensors are the primary means of
+ * perception. For a line follower, there will be line and marker sensors.
+ *
+ * Internally, the sensors monitor battery voltage
  *
  * You must call begin() before using the sensors.
  * You must call update() in every control cycle. From systick() normally.

@@ -17,6 +17,20 @@
 #include <stdint.h>
 #include <util/atomic.h>
 
+/***
+ *
+ * The encoders provide data for loaclisation of the robot. That is, the encoder
+ * data is used to determine the position and orientation of the robot in its
+ * environment. If it had one, the robot might also combine encoder data with
+ * information form an IMU (gyroscope and accelerometer) to get a more accurate
+ * and stable measure of pose (position + orientation).
+ *
+ * Encoders are subject to various errors and are not reliable when used alone.
+ * In particular, simple robots like UKMARSBOt are likely to have low resolution
+ * encoders and considerable backlash in the geartrain.
+ *
+ */
+
 // TODO: consider a single Encoder class and an Odometry class
 // that has two Encoder instances
 

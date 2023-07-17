@@ -19,6 +19,27 @@
 #include "sensors.h"
 #include <Arduino.h>
 
+/***
+ * While there is no absolute requirement for reporting in a micromouse or
+ * similar robot, it can be of enormous help when setting up and debugging
+ * the behaviour of the robot.
+ *
+ * The Reporter class and its supporting functions provide a number of pre-
+ * written reports over the Serial device that let you observe things like
+ * controller state and sensor readings. Many of these will be used a lot
+ * during development and you can use any of them as a template for custom
+ * reports.
+ *
+ * Although the Serial device on an Arduino normally requires the USB connection
+ * UKMARSBOT has a connector specially intended for a cheap Bluetooth
+ * module like the HC-05. This can be left plugged in all the time so that
+ * reporting can be done while running. You could also connect a serial
+ * logger to this port and record data throughout a contest run.
+ *
+ * The BT connector also makes it possible to use the interactive Command
+ * Line Interface while the robot is running.
+ *
+ */
 const char hdg_letters[] = "FRAL";
 const char dirLetters[] = "NESW";
 
@@ -50,6 +71,8 @@ inline void print_justified(int32_t value, int width) {
 inline void print_justified(int value, int width) {
   print_justified(int32_t(value), width);
 }
+
+//***************************************************************************//
 
 class Reporter;
 extern Reporter reporter;
