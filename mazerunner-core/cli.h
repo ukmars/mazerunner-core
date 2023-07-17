@@ -53,12 +53,12 @@ struct Args {
 
 /***
  * Scan a character array for an integer.
- * Begin scn at line[pos]
+ * Begin scan at line[pos]
  * Assumes no leading spaces.
  * Stops at first non-digit.
  * MODIFIES pos so that it points to the first non-digit
  * MODIFIES value ONLY IF a valid integer is converted
- * RETURNS  boolean status indicating success or error
+ * RETURNS  the number of digits found and converted
  *
  * optimisations are possible but may not be worth the effort
  */
@@ -95,7 +95,7 @@ inline uint8_t read_integer(const char *line, int &value) {
  * Stops at first non-digit, or decimal point.
  * MODIFIES pos so that it points to the first character after the number
  * MODIFIES value ONLY IF a valid float is converted
- * RETURNS  boolean status indicating success or error
+ * RETURNS  the number of digits found an converted
  *
  * optimisations are possible but may not be worth the effort
  */
@@ -146,7 +146,7 @@ class CommandLineInterface {
  public:
   /***
    * Read characters from the serial port into the buffer.
-   * return 1 if there is a complete line avaialble
+   * return 1 if there is a complete line available
    * return 0 if not.
    *
    * Input is echoed back through the serial port and can be
@@ -196,9 +196,6 @@ class CommandLineInterface {
    * Input lines are parsed into a number of space-separated
    * tokens which are stored in an argument structure, Args.
    *
-   * This structure has an integer count of the number of tokens
-   * and an array of the token values as strings.
-   *
    * After tokenising, the arguments are examined and processed.
    *
    * Single character commands are handled separately for simplicity.
@@ -208,20 +205,22 @@ class CommandLineInterface {
    * the list of tokens as an argument.
    *
    * Once a command line has been dealt with, the input buffer is
-   * cleared, that means that new characters that arrive while a
+   * cleared. That means that new characters that arrive while a
    * function is executing will be lost. A side effect of that
    * is that commands cannot be aborted over the serial link.
    *
    * NOTES:
    *    - serial input is dealt with by polling so you must
    *      frequently check for new input in the main program loop.
-   *    - tokenising uses the input buffer so no extra storage space
+   *    - tokenising modifies the input buffer so no extra storage space
    *      is used.
    *
    */
   void interpret_line() {
-    Args args = get_tokens();
-    run_command(args);
+    Args args;
+    if (get_tokens(args) > 0) {
+      run_command(args);
+    }
     clear_input();
     prompt();
   }
@@ -240,26 +239,25 @@ class CommandLineInterface {
    * aan array of strings. The argc element keeps count of how
    * many tokens were found.
    *
-   * If you wanted to list all the tokens after processing, you
-   * would just use the code:
+   * TODO: this creates an Args instance on the stack then
+   * copies it back to the caller which seems wasteful as the stack
+   * will grow by two times the size of Args. There should be a
+   * better way. Perhaps the caller could create the instance and
+   * pass a reference to it.
    *
-   *      for (int i = 0; i < args.argc; i++) {
-   *        Serial.println(args.argv[i]);
-   *      }
    *
    */
-  Args get_tokens() {
-    Args args;
+  int get_tokens(Args &args) {
     char *line = m_buffer;
     char *token;
+    args.argc = 0;  // just to be safe
     for (token = strtok(line, " ,="); token != NULL; token = strtok(NULL, " ,=")) {
       args.argv[args.argc] = token;
       args.argc++;
-      if (args.argc == MAX_ARGC)
+      if (args.argc >= MAX_ARGC)
         break;
     }
-
-    return args;
+    return args.argc;
   }
 
   void run_command(const Args &args) {
