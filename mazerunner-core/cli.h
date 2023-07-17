@@ -207,18 +207,7 @@ public:
    */
   void interpret_line() {
     Args args = get_tokens();
-    switch (args.argc) {
-      case 0:
-        break;
-      case 1:
-        if (strlen(args.argv[0]) == 1) {
-          run_short_cmd(args);
-        }
-        break;
-      default:
-        run_long_cmd(args);
-        break;
-    }
+    run_command(args);
     clear_input();
     prompt();
   }
@@ -259,24 +248,37 @@ public:
     return args;
   }
 
+  void run_command(const Args &args) {
+    if (args.argc == 0) {
+      return;
+    }
+    if (strlen(args.argv[0]) == 1) {
+      run_short_cmd(args);
+    } else {
+      run_long_cmd(args);
+    }
+  }
+
   /***
-   * Run a complex command. These all start with a string and have
-   * arguments. The command string can be a single letter.
+   * Run a complex command. These all start with a string with more than
+   * one character in ti and have optional arguments.
    *
    * The arguments will be passed on to the robot.
    *
-   * e.g. 'F 4 500 1000 3000' might mean:
-   *  - Run function 4 (as if the function switches had been set)
+   * e.g. 'TURN 4 500 1000 3000' might mean:
+   *  - perform a turn test
    *  - pass integer arguments 500,1000,3000
-   *
-   * Most simply, just send 'F n' where n is the function switch value
    *
    */
   void run_long_cmd(const Args args) {
-    int function = -1;
-    int digits = read_integer(args.argv[1], function);
-    if (digits > 0) {
-      execute_cmd(function, args);
+    if (strcmp("HELP", args.argv[0]) == 0) {
+      help();
+    } else if (strcmp("SEARCH", args.argv[0]) == 0) {
+      int target = -1;
+      int is_number = read_integer(args.argv[1], target);
+      if (is_number) {
+        mouse.search_to(target);
+      }
     }
   }
 
@@ -285,7 +287,6 @@ public:
    *
    */
   void run_short_cmd(const Args &args) {
-    // These are all the single-character commands
     char c = args.argv[0][0];
     switch (c) {
       case '?':
@@ -318,17 +319,33 @@ public:
         reporter.print_wall_sensors();
         sensors.disable();
         break;
+      case 'F': {
+        // simulate the function switches
+        int function = -1;
+        int digits = read_integer(args.argv[1], function);
+        if (digits) {
+          run_function(function);
+        }
+      }
       default:
         break;
     }
   }
 
-  void execute_cmd(int cmd) {
-    Args args;
-    execute_cmd(cmd, args);
-  }
-
-  void execute_cmd(int cmd, const Args &args) {
+  /**
+   * These are the actions associated with the function switches on UKMARSBOT
+   *
+   * The switches are set to one of 16 combinations. Combination 0 (zero) is
+   * ignored so that there is a 'safe' state where the robot will not do anything
+   * unexpected.
+   *
+   * The function can handle any numer of additional functions if called as a
+   * result of a command line input like 'F 45'. Otherwise, a command like 'F 1'
+   * is equivalent to selecting 1 on te function switches and then pressing
+   * the 'start' button.
+   *
+   */
+  void run_function(int cmd) {
     if (cmd == 0) {
       return;
     }
@@ -362,7 +379,6 @@ public:
         sensors.disable();
         motion.reset_drive_system();
         sensors.set_steering_mode(STEERING_OFF);
-        args.print();
         break;
     }
   }

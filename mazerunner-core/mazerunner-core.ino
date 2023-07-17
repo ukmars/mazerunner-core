@@ -91,6 +91,6 @@ void loop() {
   }
   if (switches.button_pressed()) {
     switches.wait_for_button_release();
-    cli.execute_cmd(switches.read());
+    cli.run_function(switches.read());
   }
 }
