@@ -19,16 +19,16 @@
 #include "digitalWriteFast.h"
 
 /***
- * The AnalogueConverter class samples a fixed number of ADC from 0 to MAX_CHANNELS and
- * makes the readings available to the resto of the program.
+ * The AnalogueConverter class samples a fixed number of ADC channels from 0 to
+ * MAX_CHANNELS and makes the readings available to the rest of the program.
  *
- * Each channel is samples once with the sensor emitters off and once with the emitters on.
+ * Each channel is sampled once with the sensor emitters off and once with the emitters on.
  *
  * The first set of samples is stored in the array m_adc_dark[].
  *
  * The second set, with the emitter on, is stored in m_adc_lit[].
  *
- * for wall sensors, you should use the get_raw() method to read the lit-dark values.
+ * for wall sensors, you should use the get_raw() method to read the (lit-dark) values.
  *
  * The class does not care what is connected to the adc channel. It just gathers readings.
  *
@@ -50,21 +50,30 @@
  * Although the code exists almost entirely in this header file, C++ requires the actual
  * instance of the class and its interrupt service routine to be somewhere in a .cpp file.
  * I have placed the instances in the main project file.
+ * 
+ * TODO: some space and time could be saved by only storing the difference between the
+ * lit and dark values but it complicates matters elsewhere if code tries to read the
+ * values in the middle of the interrupt sequence. If you have all the channels read
+ * in one go in a single interrupt service routine - or in systick - then that will not
+ * be a problem.
  *
  * TODO: The inclusion in the class of information about the emitters is unfortunate but this
  * is the simplest scheme I could envisage. If there are two emitters, both are turned on
- * together in this version. It would be better to use different enitters for each sensor type.
+ * together in this version. It would be better to use different emitters for each sensor type.
  * that is left as an exercise for the reader.
  *
- * The code assumes the use of the avanced wall sensor board where there are two emitters. It
+ * The code assumes the use of the advanced wall sensor board where there are two emitters. It
  * will work just as well with the basic wall sensor if you simply use the same pin name for
  * both emitter entries.
  *
  * TODO: The A4 and A5 channels get converted in the sequence. If you are expecting to use
- * these for an I2C device, they may need to be skipped.
+ * these for an I2C device, they will need to be skipped.
  *
  * TODO: If only four sensor channels are used, there are opportunities to optimise this
  * code if you are so inclined.
+ *
+ * PORTING: A simulator may provide fake values as it sees fit and without the delays
+ * or interrupts
  *
  *
  */
@@ -188,15 +197,16 @@ class AnalogueConverter {
   void isr() {
     switch (m_phase) {
       case 1:
+        // cycle through all 8 channels with emitters off
         m_adc_dark[m_channel] = get_adc_result();
         m_channel++;
         start_conversion(m_channel);
-        if (m_channel > 7) {
+        if (m_channel >= MAX_CHANNELS) {
           m_phase = 2;
         }
         break;
       case 2:
-        get_adc_result();  // dummy read to clear flag
+        get_adc_result();  // dummy read to clear interrupt flag
         if (m_emitters_enabled) {
           digitalWriteFast(emitter_diagonal(), 1);
           digitalWriteFast(emitter_front(), 1);
@@ -207,34 +217,34 @@ class AnalogueConverter {
         break;
       case 3:
         // skip one cycle for the detectors to respond
-        get_adc_result();
+        get_adc_result();  // dummy read clears the interrupt flag
         start_conversion(m_channel);
         m_phase = 4;
         break;
       case 4:
+        // cycle through the channels again with the emitters on
         // avoid zero result so we know it is working
         m_adc_lit[m_channel] = max(1, get_adc_result());
         m_channel++;
         start_conversion(m_channel);
-        if (m_channel > 7) {
+        if (m_channel >= MAX_CHANNELS) {
           m_phase = 13;
         }
         break;
       case 13:
       default:
-        get_adc_result();  // dummy read clears the flag
-        // uncoditionally turn off emitters for safety
+        get_adc_result();  // dummy read clears the interrupt flag
+        // unconditionally turn off emitters for safety
         digitalWriteFast(emitter_diagonal(), 0);
         digitalWriteFast(emitter_front(), 0);
         bitClear(ADCSRA, ADIE);  // turn off the interrupt
-        // digitalWriteFast(LED_USER, 0);
         break;
     }
   }
 
  private:
-  volatile int m_adc_dark[MAX_CHANNELS] = {0};
-  volatile int m_adc_lit[MAX_CHANNELS] = {0};
+  volatile int m_adc_dark[MAX_CHANNELS];
+  volatile int m_adc_lit[MAX_CHANNELS];
   uint8_t m_emitter_front_pin = -1;
   uint8_t m_emitter_diagonal_pin = -1;
   uint8_t m_index = 0;
