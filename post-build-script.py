@@ -48,7 +48,7 @@ env.AddPostAction(
 env.AddPostAction(
     "$BUILD_DIR/${PROGNAME}.elf",
     env.VerboseAction(" ".join([
-        "clang-format -i ",
+        "clang-format -i -style=file",
         # " --verbose ",
         "${PROJECT_SRC_DIR}/*.cpp",
         "${PROJECT_SRC_DIR}/*.h",
