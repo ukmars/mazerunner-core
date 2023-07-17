@@ -31,18 +31,19 @@
  *
  */
 
-// TODO: consider a single Encoder class and an Odometry class
-// that has two Encoder instances
+// TODO: consider a single Encoder class with objects for each wheel.
+//       Then a Localisation class would get two of these (and possibly
+//       an IMU) to do the actual localisation.
 
 class Encoders;
-// TODO: where should we really define  these global singletons?
-extern Encoders encoders; // defined in main file to keep it all together
+
+extern Encoders encoders; // defined in main file to keep them all together
 
 // Forward declaration of the callbacks ...
 // ... which cannot be defined until the Encoder class is complete.
 // tacky!
-void callback_left();
-void callback_right();
+void callback_left_encoder_isr();
+void callback_right_encoder_isr();
 
 class Encoders {
 public:
@@ -51,8 +52,10 @@ public:
     pinMode(ENCODER_LEFT_B, INPUT);
     pinMode(ENCODER_RIGHT_CLK, INPUT);
     pinMode(ENCODER_RIGHT_B, INPUT);
-    attachInterrupt(digitalPinToInterrupt(ENCODER_LEFT_CLK), callback_left, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(ENCODER_RIGHT_CLK), callback_right, CHANGE);
+    // TODO. if these interrupts are attached in a begin method, the addresses will aready be known
+    // and we can cut out the indirection?
+    attachInterrupt(digitalPinToInterrupt(ENCODER_LEFT_CLK), callback_left_encoder_isr, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(ENCODER_RIGHT_CLK), callback_right_encoder_isr, CHANGE);
     reset();
   }
 
@@ -72,6 +75,9 @@ public:
    *   The ISR will respond to the XOR-ed pulse train from the encoder
    *   Runs in constant time of around 3us per interrupt.
    *   Would be faster with direct port access
+   * 
+   * A more generic solution where the pin names are not constants would be slower
+   * unless we can make their definition known at compile time.
    */
   void left_input_change() {
     static bool oldA = false;
@@ -165,10 +171,10 @@ private:
 // A bit of indirection for convenience because the encoder instance is
 // unknown until the linker has done its thing
 // This is ugly
-inline void callback_left() {
+inline void callback_left_encoder_isr() {
   encoders.left_input_change();
 }
 
-inline void callback_right() {
+inline void callback_right_encoder_isr() {
   encoders.right_input_change();
 }
