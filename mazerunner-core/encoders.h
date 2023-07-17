@@ -75,7 +75,7 @@ public:
    *   The ISR will respond to the XOR-ed pulse train from the encoder
    *   Runs in constant time of around 3us per interrupt.
    *   Would be faster with direct port access
-   * 
+   *
    * A more generic solution where the pin names are not constants would be slower
    * unless we can make their definition known at compile time.
    */
