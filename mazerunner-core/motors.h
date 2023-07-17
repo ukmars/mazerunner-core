@@ -12,11 +12,11 @@
 #ifndef MOTORS_H
 #define MOTORS_H
 
+#include <Arduino.h>
 #include "battery.h"
 #include "config.h"
 #include "digitalWriteFast.h"
 #include "encoders.h"
-#include <Arduino.h>
 
 /***
  * The Motors class is provided with two main control signals - the forward
@@ -36,28 +36,21 @@
  * the odometry had better resolution and if an IMU were available. But, you can
  * get remarkably good results with the limited resources available.
  */
-enum { PWM_488_HZ,
-       PWM_977_HZ,
-       PWM_3906_HZ,
-       PWM_31250_HZ };
+enum { PWM_488_HZ, PWM_977_HZ, PWM_3906_HZ, PWM_31250_HZ };
 
 class Motors;
 
 extern Motors motors;
 
 class Motors {
-public:
+ public:
   /***
    * TODO: the constructor should really get at least the hardware pins
    * to do a safe setup.
    */
-  void enable_controllers() {
-    m_controller_output_enabled = true;
-  }
+  void enable_controllers() { m_controller_output_enabled = true; }
 
-  void disable_controllers() {
-    m_controller_output_enabled = false;
-  }
+  void disable_controllers() { m_controller_output_enabled = false; }
 
   void reset_controllers() {
     m_fwd_error = 0;
@@ -293,13 +286,9 @@ public:
   /**
    * These getters are used for logging and debugging.
    */
-  int get_fwd_millivolts() {
-    return 1000 * (get_right_motor_volts() + get_left_motor_volts());
-  }
+  int get_fwd_millivolts() { return 1000 * (get_right_motor_volts() + get_left_motor_volts()); }
 
-  int get_rot_millivolts() {
-    return 1000 * (get_right_motor_volts() - get_left_motor_volts());
-  }
+  int get_rot_millivolts() { return 1000 * (get_right_motor_volts() - get_left_motor_volts()); }
 
   float get_left_motor_volts() {
     float volts = 0;
@@ -324,7 +313,7 @@ public:
     }
   }
 
-private:
+ private:
   bool m_controller_output_enabled;
   bool m_feedforward_enabled = true;
   float m_previous_fwd_error;

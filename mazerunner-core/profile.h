@@ -12,9 +12,9 @@
 #ifndef PROFILE_H
 #define PROFILE_H
 
-#include "config.h"
 #include <Arduino.h>
 #include <util/atomic.h>
+#include "config.h"
 //***************************************************************************//
 class Profile;
 
@@ -29,7 +29,7 @@ enum ProfileState : uint8_t {
 };
 
 class Profile {
-public:
+ public:
   void reset() {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       m_position = 0;
@@ -94,9 +94,7 @@ public:
 
   void set_state(ProfileState state) { m_state = state; }
 
-  float get_braking_distance() {
-    return fabsf(m_speed * m_speed - m_final_speed * m_final_speed) * 0.5 * m_one_over_acc;
-  }
+  float get_braking_distance() { return fabsf(m_speed * m_speed - m_final_speed * m_final_speed) * 0.5 * m_one_over_acc; }
 
   float position() {
     float pos;
@@ -135,11 +133,15 @@ public:
 
   // normally only used to alter position for forward error correction
   void adjust_position(float adjustment) {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { m_position += adjustment; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      m_position += adjustment;
+    }
   }
 
   void set_position(float position) {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { m_position = position; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      m_position = position;
+    }
   }
 
   // update is called from within systick and should be safe from interrupts
@@ -153,7 +155,7 @@ public:
       if (remaining < get_braking_distance()) {
         m_state = PS_BRAKING;
         if (m_final_speed == 0) {
-          m_target_speed = m_sign * 5.0f; // magic number to make sure we reach zero
+          m_target_speed = m_sign * 5.0f;  // magic number to make sure we reach zero
         } else {
           m_target_speed = m_final_speed;
         };
@@ -180,7 +182,7 @@ public:
     }
   }
 
-private:
+ private:
   volatile uint8_t m_state = PS_IDLE;
   volatile float m_speed = 0;
   volatile float m_position = 0;

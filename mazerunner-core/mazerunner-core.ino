@@ -9,6 +9,7 @@
  *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
 
+#include <Arduino.h>
 #include "adc.h"
 #include "battery.h"
 #include "cli.h"
@@ -22,7 +23,6 @@
 #include "sensors.h"
 #include "switches.h"
 #include "systick.h"
-#include <Arduino.h>
 
 // Global objects
 Systick systick;
@@ -54,7 +54,6 @@ ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
 }
 
 void setup() {
-
   Serial.begin(BAUDRATE);
   // redirectPrintf(); // send printf output to Serial (uses 20 bytes RAM)
   adc.begin();

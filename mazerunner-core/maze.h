@@ -26,9 +26,9 @@
  *
  */
 
+#include <stdint.h>
 #include "queue.h"
 #include "reporting.h"
-#include <stdint.h>
 
 #define GOAL 0x22
 #define START 0x00
@@ -36,8 +36,8 @@
 #define VISITED 0xF0
 
 typedef enum {
-  MASK_OPEN = 0x01,   // open maze for search
-  MASK_CLOSED = 0x03, // closed maze for fast run
+  MASK_OPEN = 0x01,    // open maze for search
+  MASK_CLOSED = 0x03,  // closed maze for fast run
 } mask_t;
 
 typedef enum {
@@ -56,16 +56,9 @@ typedef struct {
 
 typedef int direction_t;
 
-enum { NORTH = 0,
-       EAST = 1,
-       SOUTH = 2,
-       WEST = 3,
-       BLOCKED = 4 };
+enum { NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, BLOCKED = 4 };
 
-enum { AHEAD = 0,
-       RIGHT = 1,
-       BACK = 2,
-       LEFT = 3 };
+enum { AHEAD = 0, RIGHT = 1, BACK = 2, LEFT = 3 };
 
 #define MAX_COST 255
 #define MAZE_WIDTH 16
@@ -83,23 +76,15 @@ enum { AHEAD = 0,
 #define V_EXIT ' '
 #define V_UNKN ':'
 #define V_VIRT '#'
-enum { PLAIN,
-       COSTS,
-       DIRS };
+enum { PLAIN, COSTS, DIRS };
 
 class Maze {
+ public:
+  Maze() {}
 
-public:
-  Maze() {
-  }
+  void set_maze_goal(uint8_t goal_cell) { m_goal = goal_cell; }
 
-  void set_maze_goal(uint8_t goal_cell) {
-    m_goal = goal_cell;
-  }
-
-  uint8_t maze_goal() {
-    return m_goal;
-  }
+  uint8_t maze_goal() { return m_goal; }
 
   bool has_unknown_walls(int cell) {
     wall_info_t walls_here = m_walls[cell];
@@ -110,9 +95,7 @@ public:
     }
   }
 
-  bool cell_is_visited(uint8_t cell) {
-    return not has_unknown_walls(cell);
-  }
+  bool cell_is_visited(uint8_t cell) { return not has_unknown_walls(cell); }
 
   bool is_exit(uint8_t cell, uint8_t direction) {
     bool result = false;
@@ -433,7 +416,7 @@ public:
     Serial.println();
   }
 
-private:
+ private:
   mask_t m_mask = MASK_OPEN;
   uint8_t m_goal = 0x077;
   uint8_t m_cost[256];
@@ -442,4 +425,4 @@ private:
 
 extern Maze maze;
 
-#endif // MAZE_H
+#endif  // MAZE_H

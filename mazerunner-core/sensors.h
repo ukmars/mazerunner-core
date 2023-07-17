@@ -12,12 +12,12 @@
 #ifndef SENSORS_H
 #define SENSORS_H
 
-#include "adc.h"
-#include "config.h"
-#include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <util/atomic.h>
 #include <wiring_private.h>
+#include "adc.h"
+#include "config.h"
+#include "digitalWriteFast.h"
 
 /**
  *
@@ -83,16 +83,15 @@ const uint8_t RIGHT_START = 2;
 
 //***************************************************************************//
 struct SensorChannel {
-  int raw;   // whatever the ADC gives us
-  int value; // normalised to 100 at reference position
+  int raw;    // whatever the ADC gives us
+  int value;  // normalised to 100 at reference position
 };
 
 class Sensors;
 extern Sensors sensors;
 
 class Sensors {
-
-public:
+ public:
   /*** wall sensor variables ***/
 
   volatile SensorChannel lfs;
@@ -246,13 +245,9 @@ public:
   // Convenience functions for the sensors when used as UI components
   // such as when starting the robot by putting your hand in front
 
-  bool occluded_left() {
-    return lfs.raw > 100 && sensors.rfs.raw < 100;
-  }
+  bool occluded_left() { return lfs.raw > 100 && sensors.rfs.raw < 100; }
 
-  bool occluded_right() {
-    return lfs.raw < 100 && sensors.rfs.raw > 100;
-  }
+  bool occluded_right() { return lfs.raw < 100 && sensors.rfs.raw > 100; }
 
   /**
    * The sensors will be enabled and this function will return
@@ -298,7 +293,7 @@ public:
     return choice;
   }
 
-private:
+ private:
   float last_steering_error = 0;
   volatile bool m_active = false;
   volatile float m_cross_track_error;

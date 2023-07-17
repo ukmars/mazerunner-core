@@ -11,9 +11,9 @@
 
 #pragma once
 
+#include <Arduino.h>
 #include "adc.h"
 #include "config.h"
-#include <Arduino.h>
 
 class Battery;
 
@@ -32,7 +32,7 @@ extern Battery battery;
  *
  */
 class Battery {
-public:
+ public:
   explicit Battery(uint8_t channel) : m_adc_channel(channel){};
 
   void update() {
@@ -40,12 +40,10 @@ public:
     m_battery_volts = BATTERY_MULTIPLIER * m_adc_value;
   }
 
-  float voltage() {
-    return m_battery_volts;
-  }
+  float voltage() { return m_battery_volts; }
 
-private:
-  Battery(); // no instantiation without an adc channel
+ private:
+  Battery();  // no instantiation without an adc channel
   int m_adc_value;
   int m_adc_channel;
   float m_battery_volts;

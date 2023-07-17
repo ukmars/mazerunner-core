@@ -12,12 +12,12 @@
 #ifndef SWITCHES_H
 #define SWITCHES_H
 
-#include "adc.h"
-#include "config.h"
-#include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <util/atomic.h>
 #include <wiring_private.h>
+#include "adc.h"
+#include "config.h"
+#include "digitalWriteFast.h"
 
 /***
  * The Switches class looks after the multifunction analogue input on UKMARSBOT.
@@ -41,12 +41,10 @@
  *       systick event.
  */
 class Switches {
-public:
+ public:
   explicit Switches(uint8_t channel) : m_channel(channel){};
 
-  void update() {
-    m_switches_adc = adc.get_dark(m_channel);
-  }
+  void update() { m_switches_adc = adc.get_dark(m_channel); }
 
   /**
    * The adc_thresholds may need adjusting for non-standard resistors.
@@ -69,9 +67,7 @@ public:
     return -1;
   }
 
-  inline bool button_pressed() {
-    return read() == 16;
-  }
+  inline bool button_pressed() { return read() == 16; }
 
   void wait_for_button_press() {
     while (not(button_pressed())) {
@@ -97,7 +93,7 @@ public:
     return m_switches_adc;
   }
 
-private:
+ private:
   uint8_t m_channel = 255;
   int m_switches_adc = 0;
 };

@@ -36,13 +36,13 @@
  * Robot specific instances and values are in the robot config file.
  */
 struct TurnParameters {
-  int speed;   // mm/s
-  int run_in;  // mm
-  int run_out; // mm
-  int angle;   // deg
-  int omega;   // deg/s
-  int alpha;   // deg/s/s
-  int trigger; // sensor value
+  int speed;    // mm/s
+  int run_in;   // mm
+  int run_out;  // mm
+  int angle;    // deg
+  int omega;    // deg/s
+  int alpha;    // deg/s/s
+  int trigger;  // sensor value
 };
 
 /*************************************************************************/

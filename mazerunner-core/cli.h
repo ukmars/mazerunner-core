@@ -12,13 +12,13 @@
 #ifndef CLI_H_
 #define CLI_H_
 
+#include <Arduino.h>
+#include <stdint.h>
 #include "config.h"
 #include "maze.h"
 #include "mouse.h"
 #include "reporting.h"
 #include "sensors.h"
-#include <Arduino.h>
-#include <stdint.h>
 
 const int MAX_ARGC = 16;
 #define MAX_DIGITS 8
@@ -84,7 +84,6 @@ inline uint8_t read_integer(const char *line, int &value) {
  * optimisations are possible but may not be worth the effort
  */
 uint8_t read_float(const char *line, float &value) {
-
   char *ptr = (char *)line;
   char c = *ptr++;
   uint8_t digits = 0;
@@ -128,8 +127,7 @@ uint8_t read_float(const char *line, float &value) {
 const int INPUT_BUFFER_SIZE = 32;
 
 class CommandLineInterface {
-
-public:
+ public:
   /***
    * Read characters from the serial port into the buffer.
    * return 1 if there is a complete line avaialble
@@ -160,7 +158,7 @@ public:
         if (m_index > 0) {
           m_buffer[m_index] = 0;
           m_index--;
-          Serial.print(c); // backspace only moves the cursor
+          Serial.print(c);  // backspace only moves the cursor
           Serial.print(' ');
           Serial.print(c);
         }
@@ -424,7 +422,7 @@ public:
     Serial.println(F("      15 = "));
   }
 
-private:
+ private:
   char m_buffer[INPUT_BUFFER_SIZE];
   uint8_t m_index = 0;
 };

@@ -12,11 +12,11 @@
 #ifndef ADC_H
 #define ADC_H
 
-#include "config.h"
-#include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <util/atomic.h>
 #include <wiring_private.h>
+#include "config.h"
+#include "digitalWriteFast.h"
 
 /***
  * The AnalogueConverter class samples a fixed number of ADC from 0 to MAX_CHANNELS and
@@ -73,18 +73,14 @@ class AnalogueConverter;
 
 extern AnalogueConverter adc;
 class AnalogueConverter {
-public:
+ public:
   enum {
     MAX_CHANNELS = 8,
   };
 
-  void enable_emitters() {
-    m_emitters_enabled = true;
-  }
+  void enable_emitters() { m_emitters_enabled = true; }
 
-  void disable_emitters() {
-    m_emitters_enabled = false;
-  }
+  void disable_emitters() { m_emitters_enabled = false; }
 
   // call this or nothing will work
   virtual void begin() {
@@ -122,32 +118,26 @@ public:
       return;
     }
 
-    m_phase = 1; // sync up the start of the sensor sequence
+    m_phase = 1;  // sync up the start of the sensor sequence
     m_channel = 0;
-    bitSet(ADCSRA, ADIE);        // enable the ADC interrupt
-    start_conversion(m_channel); // begin a conversion to get things started
+    bitSet(ADCSRA, ADIE);         // enable the ADC interrupt
+    start_conversion(m_channel);  // begin a conversion to get things started
   }
 
   void end_conversion_cycle() {
-    bitClear(ADCSRA, ADIE); // disable the ADC interrupt
+    bitClear(ADCSRA, ADIE);  // disable the ADC interrupt
   }
 
   void start_conversion(uint8_t channel) {
-    ADMUX = (ADMUX & 0xF0) | (channel & 0x0F); // select the channel
-    sbi(ADCSRA, ADSC);                         // start the conversion
+    ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);  // select the channel
+    sbi(ADCSRA, ADSC);                          // start the conversion
   }
 
-  int get_adc_result() {
-    return ADC;
-  }
+  int get_adc_result() { return ADC; }
 
-  int get_lit(const int i) const {
-    return m_adc_lit[i];
-  }
+  int get_lit(const int i) const { return m_adc_lit[i]; }
 
-  int get_dark(const int i) const {
-    return m_adc_dark[i];
-  }
+  int get_dark(const int i) const { return m_adc_dark[i]; }
 
   int get_raw(const int i) const {
     int diff;
@@ -192,13 +182,13 @@ public:
         }
         break;
       case 2:
-        get_adc_result(); // dummy read to clear flag
+        get_adc_result();  // dummy read to clear flag
         if (m_emitters_enabled) {
           digitalWriteFast(emitter_diagonal(), 1);
           digitalWriteFast(emitter_front(), 1);
         }
         m_channel = 0;
-        start_conversion(m_channel); // Start a conversion to generate the interrupt
+        start_conversion(m_channel);  // Start a conversion to generate the interrupt
         m_phase = 3;
         break;
       case 3:
@@ -218,17 +208,17 @@ public:
         break;
       case 13:
       default:
-        get_adc_result(); // dummy read clears the flag
+        get_adc_result();  // dummy read clears the flag
         // uncoditionally turn off emitters for safety
         digitalWriteFast(emitter_diagonal(), 0);
         digitalWriteFast(emitter_front(), 0);
-        bitClear(ADCSRA, ADIE); // turn off the interrupt
+        bitClear(ADCSRA, ADIE);  // turn off the interrupt
         // digitalWriteFast(LED_USER, 0);
         break;
     }
   }
 
-private:
+ private:
   volatile int m_adc_dark[MAX_CHANNELS] = {0};
   volatile int m_adc_lit[MAX_CHANNELS] = {0};
   uint8_t m_emitter_front_pin = -1;
@@ -236,7 +226,7 @@ private:
   uint8_t m_index = 0;
   bool m_emitters_enabled = false;
   bool m_configured = false;
-  uint8_t m_phase = 0; // used in the isr
+  uint8_t m_phase = 0;  // used in the isr
   uint8_t m_channel = 0;
 };
 

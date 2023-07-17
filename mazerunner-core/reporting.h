@@ -12,12 +12,12 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#include <Arduino.h>
 #include "encoders.h"
 #include "motion.h"
 #include "motors.h"
 #include "profile.h"
 #include "sensors.h"
-#include <Arduino.h>
 
 /***
  * While there is no absolute requirement for reporting in a micromouse or
@@ -77,12 +77,11 @@ inline void print_justified(int value, int width) {
 class Reporter;
 extern Reporter reporter;
 class Reporter {
-
   uint32_t s_start_time;
   uint32_t s_report_time;
   uint32_t s_report_interval = REPORTING_INTERVAL;
 
-public:
+ public:
   // note that the Serial device has a 64 character buffer and, at 115200 baud
   // 64 characters will take about 6ms to go out over the wire.
 
@@ -217,9 +216,7 @@ public:
    *
    */
 
-  void front_sensor_track_header() {
-    Serial.println(F(" dist front_sum front_diff, distance"));
-  }
+  void front_sensor_track_header() { Serial.println(F(" dist front_sum front_diff, distance")); }
 
   void front_sensor_track() {
     static int position = INT16_MAX;

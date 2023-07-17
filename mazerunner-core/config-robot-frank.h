@@ -144,24 +144,24 @@ const float GEAR_RATIO = 19.54;
 // A good starting approximation is half the distance between the wheel centres.
 // After testing, you may find the working value to be larger or smaller by some
 // small amount.
-const float MOUSE_RADIUS = 38.070; // 39.50; // Adjust on test
+const float MOUSE_RADIUS = 38.070;  // 39.50; // Adjust on test
 
 // The robot is likely to have wheels of different diameters and that must be
 // compensated for if the robot is to reliably drive in a straight line
-const float ROTATION_BIAS = 0.0025; // Negative makes robot curve to left
+const float ROTATION_BIAS = 0.0025;  // Negative makes robot curve to left
 
-const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO); // 0.429
+const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);  // 0.429
 const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * MM_PER_COUNT;
 const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * MM_PER_COUNT;
-const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI)); // 0.7525
+const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));  // 0.7525
 
 //*** MOTION CONTROL CONSTANTS **********************************************//
 
 // Dynamic performance constants RETEST FOR FRANK
-const float FWD_KM = 475.0; // mm/s/Volt
-const float FWD_TM = 0.190; // forward time constant
-const float ROT_KM = 775.0; // deg/s/Volt
-const float ROT_TM = 0.210; // rotation time constant
+const float FWD_KM = 475.0;  // mm/s/Volt
+const float FWD_TM = 0.190;  // forward time constant
+const float ROT_KM = 775.0;  // deg/s/Volt
+const float ROT_TM = 0.210;  // rotation time constant
 
 // Motor Feedforward
 /***
@@ -206,7 +206,7 @@ const float ROT_KD = 1.2;
 // controller constants for the steering controller
 const float STEERING_KP = 0.25;
 const float STEERING_KD = 0.00;
-const float STEERING_ADJUST_LIMIT = 10.0; // deg/s
+const float STEERING_ADJUST_LIMIT = 10.0;  // deg/s
 
 // encoder polarity is either 1 or -1 and is used to account for reversal of the encoder phases
 #define ENCODER_LEFT_POLARITY (-1)
@@ -246,10 +246,10 @@ const float LEFT_SCALE = (float)SIDE_NOMINAL / LEFT_CALIBRATION;
 const float RIGHT_SCALE = (float)SIDE_NOMINAL / RIGHT_CALIBRATION;
 
 // the values above which, a wall is seen
-const int LEFT_THRESHOLD = 40;   // minimum value to register a wall
-const int RIGHT_THRESHOLD = 40;  // minimum value to register a wall
-const int FRONT_THRESHOLD = 20;  // minimum value to register a wall
-const int FRONT_REFERENCE = 850; // reading when mouse centered with wall ahead
+const int LEFT_THRESHOLD = 40;    // minimum value to register a wall
+const int RIGHT_THRESHOLD = 40;   // minimum value to register a wall
+const int FRONT_THRESHOLD = 20;   // minimum value to register a wall
+const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
 
 const int left_edge_pos = 90;
 const int right_edge_pos = 90;
@@ -289,11 +289,11 @@ const TurnParameters turn_params[4] = {
 // battery voltage calulation is done as efficiently as possible.
 // The compiler will do all these calculations so your program does not have to.
 
-const float BATTERY_R1 = 10000.0; // resistor to battery +
-const float BATTERY_R2 = 10000.0; // resistor to Gnd
+const float BATTERY_R1 = 10000.0;  // resistor to battery +
+const float BATTERY_R2 = 10000.0;  // resistor to Gnd
 const float BATTERY_DIVIDER_RATIO = BATTERY_R2 / (BATTERY_R1 + BATTERY_R2);
-const float ADC_FSR = 1023.0;    // The maximum reading for the ADC
-const float ADC_REF_VOLTS = 5.0; // Reference voltage of ADC
+const float ADC_FSR = 1023.0;     // The maximum reading for the ADC
+const float ADC_REF_VOLTS = 5.0;  // Reference voltage of ADC
 
 const float BATTERY_MULTIPLIER = (ADC_REF_VOLTS / ADC_FSR / BATTERY_DIVIDER_RATIO);
 const int MOTOR_MAX_PWM = 255;

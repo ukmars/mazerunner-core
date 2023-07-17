@@ -19,7 +19,7 @@
 #include "sensors.h"
 #include "switches.h"
 class Systick {
-public:
+ public:
   // don't let this start firing up before we are ready.
   // call the begin method explicitly.
   void begin() {
@@ -31,9 +31,9 @@ public:
     bitSet(TCCR2B, CS22);
     bitClear(TCCR2B, CS21);
     bitSet(TCCR2B, CS20);
-    OCR2A = 249; // (16000000/128/500)-1 => 500Hz
+    OCR2A = 249;  // (16000000/128/500)-1 => 500Hz
     bitSet(TIMSK2, OCIE2A);
-    delay(10); // make sure it runs for a few cycles before we continue
+    delay(10);  // make sure it runs for a few cycles before we continue
   }
   /***
    * This is the SYSTICK ISR. It runs at 500Hz by default and is

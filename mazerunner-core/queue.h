@@ -16,14 +16,10 @@
  */
 template <class item_t, int num_items = 64>
 class Queue {
-public:
-  Queue() {
-    clear();
-  }
+ public:
+  Queue() { clear(); }
 
-  int size() {
-    return mItemCount;
-  }
+  int size() { return mItemCount; }
 
   void clear() {
     mHead = 0;
@@ -50,13 +46,13 @@ public:
     return result;
   }
 
-protected:
+ protected:
   item_t mData[num_items + 1];
   int mHead = 0;
   int mTail = 0;
   int mItemCount = 0;
 
-private:
+ private:
   // while this is probably correct, prevent use of the copy constructor
   Queue(const Queue<item_t> &rhs) {}
 };

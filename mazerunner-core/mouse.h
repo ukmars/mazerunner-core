@@ -35,15 +35,8 @@ class Mouse;
 extern Mouse mouse;
 
 class Mouse {
-
-public:
-  enum State {
-    FRESH_START,
-    SEARCHING,
-    INPLACE_RUN,
-    SMOOTH_RUN,
-    FINISHED
-  };
+ public:
+  enum State { FRESH_START, SEARCHING, INPLACE_RUN, SMOOTH_RUN, FINISHED };
 
   enum TurnType {
     SS90EL = 0,
@@ -52,9 +45,7 @@ public:
     SS90R = 3,
   };
 
-  Mouse() {
-    init();
-  }
+  Mouse() { init(); }
 
   void init() {
     handStart = false;
@@ -67,9 +58,7 @@ public:
    * change the mouse heading but do not physically turn
    */
 
-  void set_heading(unsigned char new_heading) {
-    heading = new_heading;
-  }
+  void set_heading(unsigned char new_heading) { heading = new_heading; }
 
   //***************************************************************************//
   /**
@@ -107,17 +96,13 @@ public:
 
   void turn_IP180() {
     static int direction = 1;
-    direction *= -1; // alternate direction each time it is called
+    direction *= -1;  // alternate direction each time it is called
     motion.spin_turn(direction * 180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
-  void turn_IP90R() {
-    motion.spin_turn(-90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
-  }
+  void turn_IP90R() { motion.spin_turn(-90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN); }
 
-  void turn_IP90L() {
-    motion.spin_turn(90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
-  }
+  void turn_IP90L() { motion.spin_turn(90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN); }
 
   //***************************************************************************//
 
@@ -157,9 +142,9 @@ public:
       }
     }
     if (triggered) {
-      reporter.log_status('S', location, heading); // the sensors triggered the turn
+      reporter.log_status('S', location, heading);  // the sensors triggered the turn
     } else {
-      reporter.log_status('D', location, heading); // the position triggered the turn
+      reporter.log_status('D', location, heading);  // the position triggered the turn
     }
     // finally we get to actually turn
     motion.turn(params.angle, params.omega, 0, params.alpha);
@@ -343,7 +328,6 @@ public:
    *         -1 if the maze has no route to the target.
    */
   int search_to(unsigned char target) {
-
     maze.flood_maze(target);
     delay(1000);
     sensors.enable();
@@ -351,7 +335,7 @@ public:
     sensors.set_steering_mode(STEERING_OFF);
     if (not handStart) {
       // back up to the wall behind
-      motion.move(-60, 120, 0, 1000); //// magic numbers
+      motion.move(-60, 120, 0, 1000);  //// magic numbers
     }
     motion.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(HALF_CELL);
@@ -365,7 +349,7 @@ public:
       Serial.println();
       reporter.log_status('-', location, heading);
       sensors.set_steering_mode(STEER_NORMAL);
-      location = maze.neighbour(location, heading); // the cell we are about to enter
+      location = maze.neighbour(location, heading);  // the cell we are about to enter
       check_the_walls();
       update_map();
       maze.flood_maze(target);
@@ -377,7 +361,6 @@ public:
         end_run();
         heading = (heading + 2) & 0x03;
       } else {
-
         switch (hdgChange) {
           case AHEAD:
             move_ahead();
@@ -545,7 +528,7 @@ public:
    */
 
   void test_sensor_spin_calibrate() {
-    int side = sensors.wait_for_user_start(); // cover front sensor with hand to start
+    int side = sensors.wait_for_user_start();  // cover front sensor with hand to start
     bool use_raw = (side == LEFT_START) ? true : false;
     sensors.enable();
     motion.reset_drive_system();
@@ -590,7 +573,7 @@ public:
     int right_edge_position = 0;
     int left_max = 0;
     int right_max = 0;
-    sensors.wait_for_user_start(); // cover front sensor with hand to start
+    sensors.wait_for_user_start();  // cover front sensor with hand to start
     sensors.enable();
     delay(100);
     motion.reset_drive_system();
@@ -705,7 +688,7 @@ public:
     sensors.disable();
   }
 
-private:
+ private:
   unsigned char heading;
   unsigned char location;
   bool leftWall = false;
@@ -714,4 +697,4 @@ private:
   bool handStart = false;
 };
 
-#endif // MOUSE_H
+#endif  // MOUSE_H

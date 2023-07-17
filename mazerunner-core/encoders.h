@@ -11,11 +11,11 @@
 
 #pragma once
 
-#include "config.h"
-#include "digitalWriteFast.h"
 #include <Arduino.h>
 #include <stdint.h>
 #include <util/atomic.h>
+#include "config.h"
+#include "digitalWriteFast.h"
 
 /***
  *
@@ -37,7 +37,7 @@
 
 class Encoders;
 
-extern Encoders encoders; // defined in main file to keep them all together
+extern Encoders encoders;  // defined in main file to keep them all together
 
 // Forward declaration of the callbacks ...
 // ... which cannot be defined until the Encoder class is complete.
@@ -46,7 +46,7 @@ void callback_left_encoder_isr();
 void callback_right_encoder_isr();
 
 class Encoders {
-public:
+ public:
   void setup() {
     pinMode(ENCODER_LEFT_CLK, INPUT);
     pinMode(ENCODER_LEFT_B, INPUT);
@@ -121,43 +121,55 @@ public:
 
   float robot_distance() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = m_robot_distance; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      distance = m_robot_distance;
+    }
     return distance;
   }
 
   float robot_speed() {
     float speed;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { speed = LOOP_FREQUENCY * m_fwd_change; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      speed = LOOP_FREQUENCY * m_fwd_change;
+    }
     return speed;
   }
 
   float robot_omega() {
     float omega;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { omega = LOOP_FREQUENCY * m_rot_change; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      omega = LOOP_FREQUENCY * m_rot_change;
+    }
     return omega;
   }
 
   float robot_fwd_change() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = m_fwd_change; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      distance = m_fwd_change;
+    }
     return distance;
   }
 
   float robot_rot_change() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { distance = m_rot_change; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      distance = m_rot_change;
+    }
     return distance;
   }
 
   float robot_angle() {
     float angle;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { angle = m_robot_angle; }
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      angle = m_robot_angle;
+    }
     return angle;
   }
 
   // None of the variables in this file should be directly available to the rest
   // of the code without a guard to ensure atomic access
-private:
+ private:
   volatile float m_robot_distance;
   volatile float m_robot_angle;
   // the change in distance or angle in the last tick.
