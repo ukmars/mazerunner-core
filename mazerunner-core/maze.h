@@ -35,30 +35,28 @@
 
 #define VISITED 0xF0
 
-typedef enum {
+enum MazeMask {
   MASK_OPEN = 0x01,    // open maze for search
   MASK_CLOSED = 0x03,  // closed maze for fast run
-} mask_t;
+};
 
-typedef enum {
+enum WallState {
   EXIT = 0,
   WALL = 1,
   UNKNOWN = 2,
   VIRTUAL = 3,
-} t_wall_state;
+};
 
-typedef struct {
+struct WallInfo {
   unsigned char north : 2;
   unsigned char east : 2;
   unsigned char south : 2;
   unsigned char west : 2;
-} wall_info_t;
+};
 
-typedef int direction_t;
+enum Heading { NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, BLOCKED = 4 };
 
-enum { NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, BLOCKED = 4 };
-
-enum { AHEAD = 0, RIGHT = 1, BACK = 2, LEFT = 3 };
+enum Direction { AHEAD = 0, RIGHT = 1, BACK = 2, LEFT = 3 };
 
 #define MAX_COST 255
 #define MAZE_WIDTH 16
@@ -76,7 +74,7 @@ enum { AHEAD = 0, RIGHT = 1, BACK = 2, LEFT = 3 };
 #define V_EXIT ' '
 #define V_UNKN ':'
 #define V_VIRT '#'
-enum { PLAIN, COSTS, DIRS };
+enum MazeView { PLAIN, COSTS, DIRS };
 
 class Maze {
  public:
@@ -87,7 +85,7 @@ class Maze {
   uint8_t maze_goal() { return m_goal; }
 
   bool has_unknown_walls(int cell) {
-    wall_info_t walls_here = m_walls[cell];
+    WallInfo walls_here = m_walls[cell];
     if (walls_here.north == UNKNOWN || walls_here.east == UNKNOWN || walls_here.south == UNKNOWN || walls_here.west == UNKNOWN) {
       return true;
     } else {
@@ -120,7 +118,7 @@ class Maze {
   }
 
   // unconditionally set a wall state
-  void set_wall_state(uint8_t cell, uint8_t direction, t_wall_state state) {
+  void set_wall_state(uint8_t cell, uint8_t direction, WallState state) {
     switch (direction) {
       case NORTH:
         m_walls[cell].north = state;
@@ -145,7 +143,7 @@ class Maze {
   }
 
   // only change a wall if it is unknown
-  void update_wall_state(uint8_t cell, uint8_t direction, t_wall_state state) {
+  void update_wall_state(uint8_t cell, uint8_t direction, WallState state) {
     switch (direction) {
       case NORTH:
         if ((m_walls[cell].north & UNKNOWN) != UNKNOWN) {
@@ -203,9 +201,9 @@ class Maze {
     set_mask(MASK_OPEN);
   }
 
-  void set_mask(mask_t mask) { m_mask = mask; }
+  void set_mask(MazeMask mask) { m_mask = mask; }
 
-  mask_t get_mask() { return m_mask; }
+  MazeMask get_mask() { return m_mask; }
 
   uint8_t cell_north(uint8_t cell) {
     uint8_t nextCell = (cell + (1));
@@ -417,10 +415,10 @@ class Maze {
   }
 
  private:
-  mask_t m_mask = MASK_OPEN;
+  MazeMask m_mask = MASK_OPEN;
   uint8_t m_goal = 0x077;
   uint8_t m_cost[256];
-  wall_info_t m_walls[256];
+  WallInfo m_walls[256];
 };
 
 extern Maze maze;
