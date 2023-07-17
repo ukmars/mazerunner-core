@@ -25,7 +25,7 @@ const int MAX_ARGC = 16;
 
 struct Args {
   char *argv[MAX_ARGC];
-  int argc;
+  int argc = 0;
   void print() const {
     for (int i = 0; i < argc; i++) {
       Serial.print(argv[i]);
@@ -206,7 +206,10 @@ public:
    *
    */
   void interpret_line() {
+    Serial.println(m_buffer);
     Args args = get_tokens();
+    // args.print();
+    Serial.println(args.argc);
     run_command(args);
     clear_input();
     prompt();
