@@ -206,10 +206,7 @@ public:
    *
    */
   void interpret_line() {
-    Serial.println(m_buffer);
     Args args = get_tokens();
-    // args.print();
-    Serial.println(args.argc);
     run_command(args);
     clear_input();
     prompt();
