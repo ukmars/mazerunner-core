@@ -40,7 +40,9 @@ class Battery {
     m_battery_volts = BATTERY_MULTIPLIER * m_adc_value;
   }
 
-  float voltage() { return m_battery_volts; }
+  float voltage() {
+    return m_battery_volts;
+  }
 
  private:
   Battery();  // no instantiation without an adc channel

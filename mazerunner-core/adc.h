@@ -78,9 +78,13 @@ class AnalogueConverter {
     MAX_CHANNELS = 8,
   };
 
-  void enable_emitters() { m_emitters_enabled = true; }
+  void enable_emitters() {
+    m_emitters_enabled = true;
+  }
 
-  void disable_emitters() { m_emitters_enabled = false; }
+  void disable_emitters() {
+    m_emitters_enabled = false;
+  }
 
   // call this or nothing will work
   virtual void begin() {
@@ -101,8 +105,12 @@ class AnalogueConverter {
     m_emitter_diagonal_pin = pin;
   };
 
-  uint8_t emitter_front() { return m_emitter_front_pin; };
-  uint8_t emitter_diagonal() { return m_emitter_diagonal_pin; };
+  uint8_t emitter_front() {
+    return m_emitter_front_pin;
+  };
+  uint8_t emitter_diagonal() {
+    return m_emitter_diagonal_pin;
+  };
 
   void converter_init() {
     // Change the clock prescaler from 128 to 32 for a 500kHz clock
@@ -133,11 +141,17 @@ class AnalogueConverter {
     sbi(ADCSRA, ADSC);                          // start the conversion
   }
 
-  int get_adc_result() { return ADC; }
+  int get_adc_result() {
+    return ADC;
+  }
 
-  int get_lit(const int i) const { return m_adc_lit[i]; }
+  int get_lit(const int i) const {
+    return m_adc_lit[i];
+  }
 
-  int get_dark(const int i) const { return m_adc_dark[i]; }
+  int get_dark(const int i) const {
+    return m_adc_dark[i];
+  }
 
   int get_raw(const int i) const {
     int diff;

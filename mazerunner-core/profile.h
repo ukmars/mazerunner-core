@@ -39,7 +39,9 @@ class Profile {
     }
   }
 
-  bool is_finished() { return m_state == PS_FINISHED; }
+  bool is_finished() {
+    return m_state == PS_FINISHED;
+  }
 
   void start(float distance, float top_speed, float final_speed, float acceleration) {
     m_sign = (distance < 0) ? -1 : +1;
@@ -92,9 +94,13 @@ class Profile {
     }
   }
 
-  void set_state(ProfileState state) { m_state = state; }
+  void set_state(ProfileState state) {
+    m_state = state;
+  }
 
-  float get_braking_distance() { return fabsf(m_speed * m_speed - m_final_speed * m_final_speed) * 0.5 * m_one_over_acc; }
+  float get_braking_distance() {
+    return fabsf(m_speed * m_speed - m_final_speed * m_final_speed) * 0.5 * m_one_over_acc;
+  }
 
   float position() {
     float pos;

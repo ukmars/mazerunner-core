@@ -109,10 +109,18 @@ class Sensors {
   /*** steering variables ***/
   uint8_t g_steering_mode = STEER_NORMAL;
 
-  int get_front_sum() { return int(m_front_sum); };
-  int get_front_diff() { return int(m_front_diff); };
-  float get_steering_feedback() { return m_steering_adjustment; }
-  float get_cross_track_error() { return m_cross_track_error; };
+  int get_front_sum() {
+    return int(m_front_sum);
+  };
+  int get_front_diff() {
+    return int(m_front_diff);
+  };
+  float get_steering_feedback() {
+    return m_steering_adjustment;
+  }
+  float get_cross_track_error() {
+    return m_cross_track_error;
+  };
 
   //***************************************************************************//
 
@@ -245,9 +253,13 @@ class Sensors {
   // Convenience functions for the sensors when used as UI components
   // such as when starting the robot by putting your hand in front
 
-  bool occluded_left() { return lfs.raw > 100 && sensors.rfs.raw < 100; }
+  bool occluded_left() {
+    return lfs.raw > 100 && sensors.rfs.raw < 100;
+  }
 
-  bool occluded_right() { return lfs.raw < 100 && sensors.rfs.raw > 100; }
+  bool occluded_right() {
+    return lfs.raw < 100 && sensors.rfs.raw > 100;
+  }
 
   /**
    * The sensors will be enabled and this function will return

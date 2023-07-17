@@ -216,7 +216,9 @@ class Reporter {
    *
    */
 
-  void front_sensor_track_header() { Serial.println(F(" dist front_sum front_diff, distance")); }
+  void front_sensor_track_header() {
+    Serial.println(F(" dist front_sum front_diff, distance"));
+  }
 
   void front_sensor_track() {
     static int position = INT16_MAX;

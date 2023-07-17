@@ -78,11 +78,16 @@ enum MazeView { PLAIN, COSTS, DIRS };
 
 class Maze {
  public:
-  Maze() {}
+  Maze() {
+  }
 
-  void set_maze_goal(uint8_t goal_cell) { m_goal = goal_cell; }
+  void set_maze_goal(uint8_t goal_cell) {
+    m_goal = goal_cell;
+  }
 
-  uint8_t maze_goal() { return m_goal; }
+  uint8_t maze_goal() {
+    return m_goal;
+  }
 
   bool has_unknown_walls(int cell) {
     WallInfo walls_here = m_walls[cell];
@@ -93,7 +98,9 @@ class Maze {
     }
   }
 
-  bool cell_is_visited(uint8_t cell) { return not has_unknown_walls(cell); }
+  bool cell_is_visited(uint8_t cell) {
+    return not has_unknown_walls(cell);
+  }
 
   bool is_exit(uint8_t cell, uint8_t direction) {
     bool result = false;
@@ -201,9 +208,13 @@ class Maze {
     set_mask(MASK_OPEN);
   }
 
-  void set_mask(MazeMask mask) { m_mask = mask; }
+  void set_mask(MazeMask mask) {
+    m_mask = mask;
+  }
 
-  MazeMask get_mask() { return m_mask; }
+  MazeMask get_mask() {
+    return m_mask;
+  }
 
   uint8_t cell_north(uint8_t cell) {
     uint8_t nextCell = (cell + (1));
@@ -225,10 +236,18 @@ class Maze {
     return nextCell;
   }
 
-  static uint8_t ahead_from(uint8_t heading) { return (heading); }
-  static uint8_t right_from(uint8_t heading) { return ((heading + 1) % 4); }
-  static uint8_t behind(uint8_t heading) { return ((heading + 2) % 4); }
-  static uint8_t left_from(uint8_t heading) { return ((heading + 3) % 4); }
+  static uint8_t ahead_from(uint8_t heading) {
+    return (heading);
+  }
+  static uint8_t right_from(uint8_t heading) {
+    return ((heading + 1) % 4);
+  }
+  static uint8_t behind(uint8_t heading) {
+    return ((heading + 2) % 4);
+  }
+  static uint8_t left_from(uint8_t heading) {
+    return ((heading + 3) % 4);
+  }
 
   uint8_t neighbour(uint8_t cell, uint8_t direction) {
     uint16_t next;

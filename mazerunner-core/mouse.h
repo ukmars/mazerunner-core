@@ -45,7 +45,9 @@ class Mouse {
     SS90R = 3,
   };
 
-  Mouse() { init(); }
+  Mouse() {
+    init();
+  }
 
   void init() {
     handStart = false;
@@ -58,7 +60,9 @@ class Mouse {
    * change the mouse heading but do not physically turn
    */
 
-  void set_heading(unsigned char new_heading) { heading = new_heading; }
+  void set_heading(unsigned char new_heading) {
+    heading = new_heading;
+  }
 
   //***************************************************************************//
   /**
@@ -100,9 +104,13 @@ class Mouse {
     motion.spin_turn(direction * 180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
-  void turn_IP90R() { motion.spin_turn(-90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN); }
+  void turn_IP90R() {
+    motion.spin_turn(-90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
+  }
 
-  void turn_IP90L() { motion.spin_turn(90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN); }
+  void turn_IP90L() {
+    motion.spin_turn(90, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
+  }
 
   //***************************************************************************//
 

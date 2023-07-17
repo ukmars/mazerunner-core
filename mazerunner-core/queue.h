@@ -17,9 +17,13 @@
 template <class item_t, int num_items = 64>
 class Queue {
  public:
-  Queue() { clear(); }
+  Queue() {
+    clear();
+  }
 
-  int size() { return mItemCount; }
+  int size() {
+    return mItemCount;
+  }
 
   void clear() {
     mHead = 0;
@@ -54,5 +58,6 @@ class Queue {
 
  private:
   // while this is probably correct, prevent use of the copy constructor
-  Queue(const Queue<item_t> &rhs) {}
+  Queue(const Queue<item_t> &rhs) {
+  }
 };

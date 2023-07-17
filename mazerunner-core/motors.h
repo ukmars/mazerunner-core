@@ -48,9 +48,13 @@ class Motors {
    * TODO: the constructor should really get at least the hardware pins
    * to do a safe setup.
    */
-  void enable_controllers() { m_controller_output_enabled = true; }
+  void enable_controllers() {
+    m_controller_output_enabled = true;
+  }
 
-  void disable_controllers() { m_controller_output_enabled = false; }
+  void disable_controllers() {
+    m_controller_output_enabled = false;
+  }
 
   void reset_controllers() {
     m_fwd_error = 0;
@@ -286,9 +290,13 @@ class Motors {
   /**
    * These getters are used for logging and debugging.
    */
-  int get_fwd_millivolts() { return 1000 * (get_right_motor_volts() + get_left_motor_volts()); }
+  int get_fwd_millivolts() {
+    return 1000 * (get_right_motor_volts() + get_left_motor_volts());
+  }
 
-  int get_rot_millivolts() { return 1000 * (get_right_motor_volts() - get_left_motor_volts()); }
+  int get_rot_millivolts() {
+    return 1000 * (get_right_motor_volts() - get_left_motor_volts());
+  }
 
   float get_left_motor_volts() {
     float volts = 0;

@@ -44,7 +44,9 @@ class Switches {
  public:
   explicit Switches(uint8_t channel) : m_channel(channel){};
 
-  void update() { m_switches_adc = adc.get_dark(m_channel); }
+  void update() {
+    m_switches_adc = adc.get_dark(m_channel);
+  }
 
   /**
    * The adc_thresholds may need adjusting for non-standard resistors.
@@ -67,7 +69,9 @@ class Switches {
     return -1;
   }
 
-  inline bool button_pressed() { return read() == 16; }
+  inline bool button_pressed() {
+    return read() == 16;
+  }
 
   void wait_for_button_press() {
     while (not(button_pressed())) {
