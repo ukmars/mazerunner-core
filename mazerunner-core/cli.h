@@ -23,6 +23,22 @@
 const int MAX_ARGC = 16;
 #define MAX_DIGITS 8
 
+/***
+ * The Args class is little more than an array of pointers to strings and a counter.
+ * Input lines can be parsed into tokens and each token ha its location stored in
+ * the array.
+ *
+ * During command line processing, a temporary instance of Args will be created
+ * on the stack and a reference to that passed around to any methds that may
+ * need to see the contents. Control eventually returns to the function that
+ * created the instance and when that terminates, the information is lost. This
+ * means that memory is only used when needed but bear in mind that the instance
+ * uses an extra 34 bytes on the stack.
+ *
+ * For convenience when debugging, there is a method that displays all the tokens
+ * on one line.
+ *
+ */
 struct Args {
   char *argv[MAX_ARGC];
   int argc = 0;
