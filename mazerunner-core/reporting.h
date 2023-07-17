@@ -291,6 +291,7 @@ class Reporter {
   }
 
   //***************************************************************************//
+  /// @private  don't  show this in doxygen output
   void log_status(char action, uint8_t location, uint8_t heading) {
     Serial.print('{');
     Serial.print(action);
