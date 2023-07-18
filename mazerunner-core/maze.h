@@ -62,7 +62,6 @@ enum Direction { AHEAD = 0, RIGHT = 1, BACK = 2, LEFT = 3 };
 #define MAZE_WIDTH 16
 #define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_WIDTH)
 
-
 // for the print function
 #define POST 'o'
 #define ERR '?'
@@ -125,7 +124,8 @@ class Maze {
     return result;
   }
 
-  // unconditionally set a wall state
+  // Unconditionally set a wall state.
+  // Normally you only use this in settning up te maze at the start
   void set_wall_state(uint8_t cell, uint8_t direction, WallState state) {
     switch (direction) {
       case NORTH:
@@ -151,6 +151,7 @@ class Maze {
   }
 
   // only change a wall if it is unknown
+  // This is what you use when exploring. Once seen, a wall should not be changed.
   void update_wall_state(uint8_t cell, uint8_t direction, WallState state) {
     switch (direction) {
       case NORTH:
