@@ -29,6 +29,8 @@
  */
 
 /*************************************************************************/
+#define STRING2(x) #x
+#define STRING(x) STRING2(x)
 
 /***
  * Structure definitions used in the software. Declared here for lack of a
@@ -90,13 +92,15 @@ struct TurnParameters {
  * include line.
  */
 #define ROBOT_NOT_DEFINED 0
-#define ROBOT_FRANK 1
+#define ROBOT_CORE_OSMIUM 1
 #define ROBOT_ORION 2
 
+#ifndef ROBOT_NAME
 #define ROBOT_NAME ROBOT_ORION
+#endif
 
-#if ROBOT_NAME == ROBOT_FRANK
-#include "config-robot-frank.h"
+#if ROBOT_NAME == ROBOT_CORE_OSMIUM
+#include "config-robot-osmium.h"
 #elif ROBOT_NAME == ROBOT_ORION
 #include "config-robot-orion.h"
 #else
