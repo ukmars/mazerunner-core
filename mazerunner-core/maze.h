@@ -62,6 +62,7 @@ enum Direction { AHEAD = 0, RIGHT = 1, BACK = 2, LEFT = 3 };
 #define MAZE_WIDTH 16
 #define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_WIDTH)
 
+
 // for the print function
 #define POST 'o'
 #define ERR '?'
