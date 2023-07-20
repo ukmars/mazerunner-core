@@ -119,12 +119,12 @@ class Mouse {
    * These turns assume that the robot is crossing the cell boundary but is still
    * short of the start position of the turn.
    *
-   * The turn will be a smooth, coordinated turn that should finish 10mm short of
+   * The turn will be a smooth, coordinated turn that should finish short of
    * the next cell boundary.
    *
-   * Does NOT update the mouse heading but it should
+   * Does NOT update the mouse heading but it possibly should
    *
-   * TODO: There is only just enough space to get down to turn speed. Increase turn speed to 350?
+   * TODO: There is only just enough space to get down to turn speed. Increase turn speed?
    *
    */
   void turn_smooth(int turn_id) {
