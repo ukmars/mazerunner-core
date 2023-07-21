@@ -128,7 +128,6 @@ class Mouse {
    *
    */
   void turn_smooth(int turn_id) {
-    bool triggered = false;
     sensors.set_steering_mode(STEERING_OFF);
     motion.set_target_velocity(SEARCH_TURN_SPEED);
     TurnParameters params = turn_params[turn_id];
@@ -141,18 +140,19 @@ class Mouse {
       trigger += EXTRA_WALL_ADJUST;
     }
 
+    bool triggered_by_sensor = false;
     float turn_point = FULL_CELL + params.run_in;
     while (motion.position() < turn_point) {
       if (sensors.get_front_sum() > trigger) {
         motion.set_target_velocity(motion.velocity());
-        triggered = true;
+        triggered_by_sensor = true;
         break;
       }
     }
-    if (triggered) {
-      reporter.log_status('S', location, heading);  // the sensors triggered the turn
+    if (triggered_by_sensor) {
+      reporter.log_action_status('S', location, heading);  // the sensors triggered the turn
     } else {
-      reporter.log_status('D', location, heading);  // the position triggered the turn
+      reporter.log_action_status('D', location, heading);  // the position triggered the turn
     }
     // finally we get to actually turn
     motion.turn(params.angle, params.omega, 0, params.alpha);
@@ -168,7 +168,6 @@ class Mouse {
   void stop_at_center() {
     bool has_wall = frontWall;
     sensors.set_steering_mode(STEERING_OFF);
-    reporter.log_status('T', location, heading);
     float remaining = (FULL_CELL + HALF_CELL) - motion.position();
     // finish at very low speed so we can adjust from the wall ahead if present
     motion.start_move(remaining, motion.velocity(), 30, motion.acceleration());
@@ -183,23 +182,6 @@ class Mouse {
     }
     // Be sure robot has come to a halt.
     motion.stop();
-  }
-
-  //***************************************************************************//
-  /***
-   * Called at the end of a run when the mouse is about to enter
-   * the target cell. The target is just where the mouse is
-   * going at this stage and may be the goal, the start cell or any
-   * other cell in the maze.
-   *
-   * The aim is to bring the mouse to a halt in the center of the
-   * cell and then do a spin turn of 180 degrees.
-   *
-   */
-  void end_run() {
-    stop_at_center();
-    reporter.log_status('x', location, heading);
-    motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
   }
 
   //***************************************************************************//
@@ -220,21 +202,18 @@ class Mouse {
    */
   void move_ahead() {
     motion.adjust_forward_position(-FULL_CELL);
-    reporter.log_status('F', location, heading);
     motion.wait_until_position(SENSING_POSITION);
   }
 
   //***************************************************************************//
   void turn_left() {
     turn_smooth(SS90EL);
-    reporter.log_status('L', location, heading);
     heading = (heading + 3) & 0x03;
   }
 
   //***************************************************************************//
   void turn_right() {
     turn_smooth(SS90ER);
-    reporter.log_status('R', location, heading);
     heading = (heading + 1) & 0x03;
   }
 
@@ -249,16 +228,31 @@ class Mouse {
    *
    * It only takes 27mm of travel to come to a halt from normal search speed.
    */
-  void turn_around() {
+  void turn_back() {
     stop_at_center();
     turn_IP180();
     float distance = SENSING_POSITION - HALF_CELL;
     motion.move(distance, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(SENSING_POSITION);
-    reporter.log_status('B', location, heading);
     heading = (heading + 2) & 0x03;
   }
 
+  //***************************************************************************//
+  /***
+   * Called at the end of a run when the mouse is about to enter
+   * the target cell. The target is just where the mouse is
+   * going at this stage and may be the goal, the start cell or any
+   * other cell in the maze.
+   *
+   * The aim is to bring the mouse to a halt in the center of the
+   * cell and then do a spin turn of 180 degrees.
+   *
+   */
+  void end_run() {
+    stop_at_center();
+    motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
+    heading = (heading + 2) & 0x03;
+  }
   //***************************************************************************//
   /***
    * A simple wall follower that knows where it is
@@ -285,7 +279,7 @@ class Mouse {
         break;
       }
       Serial.println();
-      reporter.log_status('-', location, heading);
+      reporter.log_action_status('-', location, heading);
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);
       check_the_walls();
@@ -293,18 +287,24 @@ class Mouse {
       Serial.write(' ');
       Serial.write('|');
       Serial.write(' ');
-      reporter.log_status('.', location, heading);
+      char action = '#';
       if (location == target) {
         end_run();
+        action = 'x';
       } else if (!leftWall) {
         turn_left();
+        action = 'L';
       } else if (!frontWall) {
         move_ahead();
+        action = 'F';
       } else if (!rightWall) {
         turn_right();
+        action = 'R';
       } else {
-        turn_around();
+        turn_back();
+        action = 'B';
       }
+      reporter.log_action_status(action, location, heading);
     }
     Serial.println();
     Serial.println(F("Arrived!  "));
@@ -340,22 +340,24 @@ class Mouse {
     delay(1000);
     sensors.enable();
     motion.reset_drive_system();
-    sensors.set_steering_mode(STEERING_OFF);
+    sensors.set_steering_mode(STEERING_OFF);  // never steer from zero speed
     if (not handStart) {
       // back up to the wall behind
-      motion.move(-60, 120, 0, 1000);  //// magic numbers
+      // TODO: what if there is not a wall?
+      // perhaps the caller should decide so this ALWAYS starts at the cell centre?
+      motion.move(-60, 120, 0, 1000);  // TODO: magic numbers
     }
     motion.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(HALF_CELL);
     Serial.println(F("Off we go..."));
     motion.wait_until_position(SENSING_POSITION);
-    // TODO. the robot needs to start each iteration at the sensing point
+    // Each iteration of this loop starts at the sensing point
     while (location != target) {
-      if (switches.button_pressed()) {
+      if (switches.button_pressed()) {  // allow user to abort gracefully
         break;
       }
       Serial.println();
-      reporter.log_status('-', location, heading);
+      reporter.log_action_status('-', location, heading);
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);  // the cell we are about to enter
       check_the_walls();
@@ -363,27 +365,31 @@ class Mouse {
       maze.flood_maze(target);
       unsigned char newHeading = maze.direction_to_smallest(location, heading);
       unsigned char hdgChange = (newHeading - heading) & 0x3;
-      Serial.print(hdg_letters[hdgChange]);
-      Serial.write(' ');
+      char action = '#';
       if (location == target) {
         end_run();
-        heading = (heading + 2) & 0x03;
+        action = 'x';
       } else {
         switch (hdgChange) {
           case AHEAD:
             move_ahead();
+            action = 'F';
             break;
           case RIGHT:
             turn_right();
+            action = 'R';
             break;
           case BACK:
-            turn_around();
+            turn_back();
+            action = 'B';
             break;
           case LEFT:
             turn_left();
+            action = 'L';
             break;
         }
       }
+      reporter.log_action_status(action, location, heading);
     }
     sensors.disable();
     Serial.println();
