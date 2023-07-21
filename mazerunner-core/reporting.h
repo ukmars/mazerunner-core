@@ -293,8 +293,28 @@ class Reporter {
   }
 
   //***************************************************************************//
+  /**
+   * log_action_status outputs a formatted block of test to the serial device.
+   * You could connect the Serial device to a BT radio or datalogger if you want.
+   *
+   * A typical block might look like this:
+   *
+   * {F 23 N  227@ 175 }
+   *  - -- -  ---  ---
+   *  |  | |   |     `---  Robot Position (mm)
+   *  |  | |    `--------  Front Sensor Sum
+   *  |  |  `------------  Heading
+   *  |   `--------------  Current Cell
+   *   `-----------------  Action
+   *
+   * During the search, several such blocks will be generated in each cell
+   *
+   * TODO: consider a structure that can be populated during the search loop
+   *       and displayed in one line without the repetition of multiple blocks
+   */
   /// @private  don't  show this in doxygen output
-  void log_status(char action, uint8_t location, uint8_t heading) {
+  //
+  void log_action_status(char action, uint8_t location, uint8_t heading) {
     Serial.print('{');
     Serial.print(action);
     Serial.print(' ');
@@ -309,6 +329,7 @@ class Reporter {
     Serial.print('}');
     Serial.print(' ');
   }
+
   //***************************************************************************//
   void show_adc() {
     while (true) {
