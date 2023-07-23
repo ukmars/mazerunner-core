@@ -237,22 +237,22 @@ class Mouse {
     heading = (heading + 2) & 0x03;
   }
 
-  //***************************************************************************//
-  /***
-   * Called at the end of a run when the mouse is about to enter
-   * the target cell. The target is just where the mouse is
-   * going at this stage and may be the goal, the start cell or any
-   * other cell in the maze.
-   *
-   * The aim is to bring the mouse to a halt in the center of the
-   * cell and then do a spin turn of 180 degrees.
-   *
-   */
-  void end_run() {
-    stop_at_center();
-    motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
-    heading = (heading + 2) & 0x03;
-  }
+  // //***************************************************************************//
+  // /***
+  //  * Called at the end of a run when the mouse is about to enter
+  //  * the target cell. The target is just where the mouse is
+  //  * going at this stage and may be the goal, the start cell or any
+  //  * other cell in the maze.
+  //  *
+  //  * The aim is to bring the mouse to a halt in the center of the
+  //  * cell and then do a spin turn of 180 degrees.
+  //  *
+  //  */
+  // void end_run() {
+  //   stop_at_center();
+  //   motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
+  //   heading = (heading + 2) & 0x03;
+  // }
   //***************************************************************************//
   /***
    * A simple wall follower that knows where it is
@@ -288,24 +288,27 @@ class Mouse {
       Serial.write('|');
       Serial.write(' ');
       char action = '#';
-      if (location == target) {
-        end_run();
-        action = 'x';
-      } else if (!leftWall) {
-        turn_left();
-        action = 'L';
-      } else if (!frontWall) {
-        move_ahead();
-        action = 'F';
-      } else if (!rightWall) {
-        turn_right();
-        action = 'R';
-      } else {
-        turn_back();
-        action = 'B';
+      if (location != target) {
+        if (!leftWall) {
+          turn_left();
+          action = 'L';
+        } else if (!frontWall) {
+          move_ahead();
+          action = 'F';
+        } else if (!rightWall) {
+          turn_right();
+          action = 'R';
+        } else {
+          turn_back();
+          action = 'B';
+        }
       }
+
       reporter.log_action_status(action, location, heading);
     }
+    // we are entering the target cell so come to an orderly
+    // halt in the middle of that cell
+    stop_at_center();
     Serial.println();
     Serial.println(F("Arrived!  "));
     delay(250);
@@ -315,26 +318,40 @@ class Mouse {
   }
 
   /***
-   * The mouse is assumed to be centrally placed in a cell and may be
-   * stationary. The current location is known and need not be any cell
-   * in particular.
+   * search_to will cause the mouse to move to the given target cell
+   * using safe, exploration speeds and turns.
    *
-   * The walls for the current location are assumed to be correct in
-   * the map.
-   *
-   * On execution, the mouse will search the maze until it reaches the
-   * given target.
-   *
-   * The maze is mapped as each cell is entered. Mapping happens even in
-   * cells that have already been visited. Walls are only ever added, not
-   * removed.
+   * During the search, walls will be mapped but only when first seen.
+   * A wall will not be changed once it has been mapped.
    *
    * It is possible for the mapping process to make the mouse think it
-   * is walled in with no route to the target.
+   * is walled in with no route to the target if wals are falsely
+   * identified as present.
+   *
+   * On entry, the mouse will know its location and heading and
+   * will begin by moving forward. The assumption is that the mouse
+   * is already facing in an appropriate direction.
+   *
+   * All paths will start with a straight.
+   *
+   * If the function is called with handstart set true, you can
+   * assume that the mouse is already backed up to the wall behind.
+   *
+   * Otherwise, the mouse is assumed to be centrally placed in a cell
+   * and may be stationary or moving.
+   *
+   * The walls for the current location are assumed to be correct in
+   * the map since mapping is always done by looking ahead into the
+   * cell that is about to be entered.
+   *
+   * On exit, the mouse will be centered in the target cell still
+   * facing in the direction it entered that cell. This will
+   * always be one of the four cardinal directions NESW
    *
    * Returns  0  if the search is successful
    *         -1 if the maze has no route to the target.
    */
+
   int search_to(unsigned char target) {
     maze.flood_maze(target);
     delay(1000);
@@ -366,11 +383,11 @@ class Mouse {
       unsigned char newHeading = maze.direction_to_smallest(location, heading);
       unsigned char hdgChange = (newHeading - heading) & 0x3;
       char action = '#';
-      if (location == target) {
-        end_run();
-        action = 'x';
-      } else {
+      if (location != target) {
         switch (hdgChange) {
+          // each of the following actions will finish with the
+          // robot moving and at the sensing point ready for the
+          // next loop iteration
           case AHEAD:
             move_ahead();
             action = 'F';
@@ -391,6 +408,9 @@ class Mouse {
       }
       reporter.log_action_status(action, location, heading);
     }
+    // we are entering the target cell so come to an orderly
+    // halt in the middle of that cell
+    stop_at_center();
     sensors.disable();
     Serial.println();
     Serial.println(F("Arrived!  "));
@@ -399,6 +419,31 @@ class Mouse {
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
     return 0;
+  }
+
+  /***
+   * run_to should take the mouse to the target cell by whatever
+   * fast means it has. There is no mapping done, just the motion.
+   *
+   * It should be assumed that the maze is flooded using the CLOSED mask
+   * so that the route is safe.
+   *
+   * run_to must calculate the path itself. This may be either by
+   * pre-calculation to generate a series of operations or the path
+   * may be calculated on-the-fly using the cost map from the flood.
+   *
+   * On entry, the mouse will know its location and heading so the
+   * first operation will be to turn to face the right way for
+   * the initial move. All paths will start with a straight.
+   *
+   * If the function is called with handstart set true, you can
+   * assume that the mouse is already backed up to the wall behind.
+   *
+   * On exit, the mouse will be centered in the target cell still
+   * facing in the direction it entered that cell. This will
+   * always be one of the four cardinal directions NESW
+   */
+  void run_to(unsigned char target) {
   }
 
   void turn_to_face(unsigned char newHeading) {
@@ -475,8 +520,12 @@ class Mouse {
     location = START;
     heading = NORTH;
     search_to(maze.maze_goal());
+    maze.flood_maze(START);
+    uint8_t best_direction = maze.direction_to_smallest(location, heading);
+    turn_to_face(best_direction);
     handStart = false;
     search_to(START);
+    turn_to_face(NORTH);
     motion.stop();
     return 0;
   }
@@ -631,7 +680,6 @@ class Mouse {
       Serial.print('-');
     }
     Serial.println();
-
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
     sensors.disable();
