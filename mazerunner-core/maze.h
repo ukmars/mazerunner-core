@@ -54,9 +54,9 @@ struct WallInfo {
   unsigned char west : 2;
 };
 
-enum Heading { NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, BLOCKED = 4 };
+enum Heading { NORTH, EAST, SOUTH, WEST, HEADING_COUNT, BLOCKED = 99 };
 
-enum Direction { AHEAD = 0, RIGHT = 1, BACK = 2, LEFT = 3 };
+enum Direction { AHEAD, RIGHT, BACK, LEFT, DIRECTION_COUNT };
 
 #define MAX_COST 255
 #define MAZE_WIDTH 16
@@ -224,17 +224,17 @@ class Maze {
   }
 
   uint8_t cell_east(uint8_t cell) {
-    uint8_t nextCell = (cell + (16));
+    uint8_t nextCell = (cell + (MAZE_WIDTH));
     return nextCell;
   }
 
   uint8_t cell_south(uint8_t cell) {
-    uint8_t nextCell = (cell + (255));
+    uint8_t nextCell = (cell + (MAZE_CELL_COUNT - 1));
     return nextCell;
   }
 
   uint8_t cell_west(uint8_t cell) {
-    uint8_t nextCell = (cell + (240));
+    uint8_t nextCell = (cell + (MAZE_CELL_COUNT - MAZE_WIDTH));
     return nextCell;
   }
 
@@ -242,13 +242,13 @@ class Maze {
     return (heading);
   }
   static uint8_t right_from(uint8_t heading) {
-    return ((heading + 1) % 4);
+    return ((heading + 1) % HEADING_COUNT);
   }
   static uint8_t behind(uint8_t heading) {
-    return ((heading + 2) % 4);
+    return ((heading + 2) % HEADING_COUNT);
   }
   static uint8_t left_from(uint8_t heading) {
-    return ((heading + 3) % 4);
+    return ((heading + HEADING_COUNT - 1) % HEADING_COUNT);
   }
 
   uint8_t neighbour(uint8_t cell, uint8_t direction) {
@@ -294,7 +294,7 @@ class Maze {
    * @param target - the cell from which all distances are calculated
    */
   void flood_maze(uint8_t target) {
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MAZE_CELL_COUNT; i++) {
       m_cost[i] = MAX_COST;
     }
     Queue<uint8_t, 64> queue;
@@ -304,7 +304,7 @@ class Maze {
       uint8_t here = queue.head();
       uint16_t newCost = m_cost[here] + 1;
 
-      for (uint8_t direction = 0; direction < 4; direction++) {
+      for (uint8_t direction = 0; direction < DIRECTION_COUNT; direction++) {
         if (is_exit(here, direction)) {
           uint16_t nextCell = neighbour(here, direction);
           if (m_cost[nextCell] > newCost) {
@@ -380,8 +380,8 @@ class Maze {
     }
   }
   void printNorthWalls(int row) {
-    for (int col = 0; col < 16; col++) {
-      unsigned char cell = row + 16 * col;
+    for (int col = 0; col < MAZE_WIDTH; col++) {
+      unsigned char cell = row + MAZE_WIDTH * col;
       Serial.print('o');
       print_h_wall(m_walls[cell].north & m_mask);
     }
@@ -389,8 +389,8 @@ class Maze {
   }
 
   void printSouthWalls(int row) {
-    for (int col = 0; col < 16; col++) {
-      unsigned char cell = row + 16 * col;
+    for (int col = 0; col < MAZE_WIDTH; col++) {
+      unsigned char cell = row + MAZE_WIDTH * col;
       Serial.print(POST);
       print_h_wall(m_walls[cell].south & m_mask);
     }
@@ -403,8 +403,8 @@ class Maze {
     flood_maze(maze_goal());
     for (int row = 15; row >= 0; row--) {
       printNorthWalls(row);
-      for (int col = 0; col < 16; col++) {
-        unsigned char cell = row + 16 * col;
+      for (int col = 0; col < MAZE_WIDTH; col++) {
+        unsigned char cell = row + MAZE_WIDTH * col;
         uint8_t state = m_walls[cell].west & m_mask;
         if (state == EXIT) {
           Serial.print(V_EXIT);
@@ -420,7 +420,7 @@ class Maze {
         } else if (style == DIRS) {
           unsigned char direction = direction_to_smallest(cell, NORTH);
           if (cell == maze_goal()) {
-            direction = 4;
+            direction = DIRECTION_COUNT;
           }
           Serial.print(' ');
           Serial.print(dirChars[direction]);
@@ -438,8 +438,8 @@ class Maze {
  private:
   MazeMask m_mask = MASK_OPEN;
   uint8_t m_goal = 0x077;
-  uint8_t m_cost[256];
-  WallInfo m_walls[256];
+  uint8_t m_cost[MAZE_CELL_COUNT];
+  WallInfo m_walls[MAZE_CELL_COUNT];
 };
 
 extern Maze maze;
