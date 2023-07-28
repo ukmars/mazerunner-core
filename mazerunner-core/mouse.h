@@ -166,7 +166,7 @@ class Mouse {
    * the cell it is entering.
    */
   void stop_at_center() {
-    bool has_wall = frontWall;
+    bool has_wall = sensors.see_front_wall;
     sensors.set_steering_mode(STEERING_OFF);
     float remaining = (FULL_CELL + HALF_CELL) - motion.position();
     // finish at very low speed so we can adjust from the wall ahead if present
@@ -182,14 +182,6 @@ class Mouse {
     }
     // Be sure robot has come to a halt.
     motion.stop();
-  }
-
-  //***************************************************************************//
-
-  void check_the_walls() {
-    rightWall = (sensors.see_right_wall);
-    leftWall = (sensors.see_left_wall);
-    frontWall = (sensors.see_front_wall);
   }
 
   //***************************************************************************//
@@ -282,20 +274,19 @@ class Mouse {
       reporter.log_action_status('-', location, heading);
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);
-      check_the_walls();
       update_map();
       Serial.write(' ');
       Serial.write('|');
       Serial.write(' ');
       char action = '#';
       if (location != target) {
-        if (!leftWall) {
+        if (!sensors.see_left_wall) {
           turn_left();
           action = 'L';
-        } else if (!frontWall) {
+        } else if (!sensors.see_front_wall) {
           move_ahead();
           action = 'F';
-        } else if (!rightWall) {
+        } else if (!sensors.see_right_wall) {
           turn_right();
           action = 'R';
         } else {
@@ -377,7 +368,6 @@ class Mouse {
       reporter.log_action_status('-', location, heading);
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);  // the cell we are about to enter
-      check_the_walls();
       update_map();
       maze.flood_maze(target);
       unsigned char newHeading = maze.direction_to_smallest(location, heading);
@@ -465,6 +455,9 @@ class Mouse {
   }
 
   void update_map() {
+    bool leftWall = sensors.see_left_wall;
+    bool frontWall = sensors.see_front_wall;
+    bool rightWall = sensors.see_right_wall;
     switch (heading) {
       case NORTH:
         maze.update_wall_state(location, NORTH, frontWall ? WALL : EXIT);
@@ -753,9 +746,6 @@ class Mouse {
  private:
   unsigned char heading;
   unsigned char location;
-  bool leftWall = false;
-  bool frontWall = false;
-  bool rightWall = false;
   bool handStart = false;
 };
 
