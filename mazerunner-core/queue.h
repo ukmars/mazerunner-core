@@ -12,25 +12,25 @@
 #pragma once
 
 /**
- * The Queue class is used to speed up flooding of the maze. It is very 
+ * The Queue class is used to speed up flooding of the maze. It is very
  * simple and so not very flexible but shouldbe enough for the flooding.
- * 
+ *
  * On a larger processor, you might create a Queue of operations that
  * constitute the required moves in a fast run. there is not much room on
  * the Arduino Nano.
- * 
+ *
  * In the code, queues are created dynamically on the stack so you should
  * have some confidence that there is always enough space. Do not create
  * large queues if there in any doubt. The results can be unpredictable and
  * without obvious warnings. The default size is 64 elements. It is not clear
  * what the minimum queue size should be to guarantee no errors.
- * 
+ *
  * By only using queues as local variables in this way, there can be no memory
  * leaks or heap fragmentation.
- * 
+ *
  * To define a Queue of 64 bytes use something like:
  *    Queue<uint8_t> q_bytes;
- * 
+ *
  * To define a Queue of 100 integers use something like:
  *    Queue<int,100> g_ints;
  */
