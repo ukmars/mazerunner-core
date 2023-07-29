@@ -21,15 +21,42 @@ class Profile;
 extern Profile forward;
 extern Profile rotation;
 
-enum ProfileState : uint8_t {
-  PS_IDLE = 0,
-  PS_ACCELERATING = 1,
-  PS_BRAKING = 2,
-  PS_FINISHED = 3,
-};
-
+/***
+ * The Profile class manages speed as a function of time or distance. A profile
+ * is trapezoidal in shape and consists of up to three phases.
+ *
+ *  - Acceleration : changing from the initial speed to the maximum speed
+ *  - Coasting     : moving at the maximum speed
+ *  - Braking      : changing to the final speed
+ *
+ * The names are only really relevant to a subset of all possible profiles since
+ * the coasting section may not be possible if the acceleration is low or the
+ * maximum speed is otherwise unreachable. Also, note that the initial speed may
+ * be higher than the maximum speed so the first phase actually needs braking.
+ *
+ * Once started, the profile must be regularly updated from the system control
+ * loop and this must be done before the motor control task since it uses the
+ * current profile speed in its calculation.
+ *
+ * The robot has two instances of a Profile - one for forward motion and one
+ * for rotation. These are completely independent but the combination of the
+ * two allows the robot full freedom of motion within the constraints imposed
+ * by the drive arrangement. That is, any combination of forward and rotary
+ * motion is possible at all times.
+ *
+ * Although the units in the comments are shown as mm, the class is unit
+ * agnostic and you can interpret the units as mm, cm, deg, bananas or anything
+ * else. Just be consistent when using speed and acceleration.
+ */
 class Profile {
  public:
+  enum State : uint8_t {
+    PS_IDLE = 0,
+    PS_ACCELERATING = 1,
+    PS_BRAKING = 2,
+    PS_FINISHED = 3,
+  };
+
   void reset() {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       m_position = 0;
@@ -42,6 +69,14 @@ class Profile {
   bool is_finished() {
     return m_state == PS_FINISHED;
   }
+
+  /// @brief  Begin a profile. Once started, it will automatically run to completion
+  ///         Subsequent calls before completion supercede all the parameters.
+  ///         Called may monitor progress using is_finished() method
+  /// @param distance     (mm)     always positive
+  /// @param top_speed    (mm/s)   negative values move the robot in reverse
+  /// @param final_speed  (mm/s)
+  /// @param acceleration (mm/s/s)
 
   void start(float distance, float top_speed, float final_speed, float acceleration) {
     m_sign = (distance < 0) ? -1 : +1;
@@ -69,11 +104,15 @@ class Profile {
     m_state = PS_ACCELERATING;
   }
 
+  // Start a profile and wait for it to finish. This is a blocking call.
   void move(float distance, float top_speed, float final_speed, float acceleration) {
     start(distance, top_speed, final_speed, acceleration);
     wait_until_finished();
   }
 
+  /// @brief causes the profile to immediately terminate with the speed to zero
+  ///        note that even when the state is PS_FINISHED, the profiler will
+  ///        continue to try and reach the target speed. (zero in this case)
   void stop() {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       m_target_speed = 0;
@@ -81,6 +120,7 @@ class Profile {
     finish();
   }
 
+  /// @brief  Force a profile to finish with the target speed set to the final speed
   void finish() {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       m_speed = m_target_speed;
@@ -94,14 +134,20 @@ class Profile {
     }
   }
 
-  void set_state(ProfileState state) {
+  void set_state(State state) {
     m_state = state;
   }
 
+  /// @brief  Calculate the distance needed to get to the final speed from the
+  ///         current speed using the current acceleration.
+  /// @return distance (mm)
   float get_braking_distance() {
     return fabsf(m_speed * m_speed - m_final_speed * m_final_speed) * 0.5 * m_one_over_acc;
   }
 
+  /// @brief  gets the distance travelled (mm) since the last call to start(). If there
+  ///         was a prior call to set_position() distance is incremented from there.
+  /// @return distance travelled (mm)
   float position() {
     float pos;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
@@ -110,6 +156,8 @@ class Profile {
     return pos;
   }
 
+  /// @brief Get the current speed
+  /// @return
   float speed() {
     float speed;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
