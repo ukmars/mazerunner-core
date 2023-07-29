@@ -22,7 +22,8 @@
 /***
  * The Switches class looks after the multifunction analogue input on UKMARSBOT.
  *
- * A single analogue channel lets you examine four dip switches and a pushbutton.
+ * A single analogue channel lets you examine four dip switches and a pushbutton
+ * using a single ADC line.
  *
  * The dip switches short out combinations of resistors in a potential divider chain
  * and thus cause a different voltage to be presented to the ADC input pin. The
@@ -40,6 +41,18 @@
  * NOTE: The switches class relies upon the ADC being updated regularly in the
  *       systick event.
  */
+
+/***
+ * The adc_thresholds may need adjusting for non-standard resistors.
+ * Use the adc_reading() method to find the ADC values for each switch
+ * combination and enter them in this table
+ */
+const int adc_thesholds[] PROGMEM = {660, 647, 630, 614, 590, 570, 545, 522, 461, 429, 385, 343, 271, 212, 128, 44, 0};
+
+// we need a forward declaration...
+class Switches;
+// so that we can declare the instance
+extern Switches switches;
 class Switches {
  public:
   explicit Switches(uint8_t channel) : m_channel(channel){};
@@ -49,20 +62,20 @@ class Switches {
   }
 
   /**
-   * The adc_thresholds may need adjusting for non-standard resistors.
    *
    * @brief  Convert the switch ADC reading into a switch reading.
    * @return integer in range 0..16 or -1 if there is an error
    */
   int read() {
-    const int adc_thesholds[] = {660, 647, 630, 614, 590, 570, 545, 522, 461, 429, 385, 343, 271, 212, 128, 44, 0};
     update();
 
     if (m_switches_adc > 800) {
       return 16;
     }
     for (int i = 0; i < 16; i++) {
-      if (m_switches_adc > (adc_thesholds[i] + adc_thesholds[i + 1]) / 2) {
+      int low = pgm_read_word_near(adc_thesholds + i);
+      int high = pgm_read_word_near(adc_thesholds + i + 1);
+      if (m_switches_adc > (low + high) / 2) {
         return i;
       }
     }
@@ -102,5 +115,4 @@ class Switches {
   int m_switches_adc = 0;
 };
 
-extern Switches switches;
 #endif
