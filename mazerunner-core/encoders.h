@@ -47,7 +47,7 @@ void callback_right_encoder_isr();
 
 class Encoders {
  public:
-  void setup() {
+  void begin() {
     pinMode(ENCODER_LEFT_CLK, INPUT);
     pinMode(ENCODER_LEFT_B, INPUT);
     pinMode(ENCODER_RIGHT_CLK, INPUT);

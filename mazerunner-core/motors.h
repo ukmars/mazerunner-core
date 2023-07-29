@@ -68,7 +68,7 @@ class Motors {
     set_right_motor_volts(0);
   }
 
-  void setup() {
+  void begin() {
     pinMode(MOTOR_LEFT_DIR, OUTPUT);
     pinMode(MOTOR_RIGHT_DIR, OUTPUT);
     pinMode(MOTOR_LEFT_PWM, OUTPUT);
