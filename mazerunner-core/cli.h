@@ -305,19 +305,16 @@ class CommandLineInterface {
         help();
         break;
       case 'W':
-        // MazePrinter::print_maze(maze, PLAIN);
         maze.print(PLAIN);
         break;
       case 'X':
         Serial.println(F("Reset Maze"));
-        maze.initialise_maze();
+        maze.initialise();
         break;
       case 'C':
-        // MazePrinter::print_maze(maze, COSTS);
         maze.print(COSTS);
         break;
       case 'R':
-        // MazePrinter::print_maze(maze, DIRS);
         maze.print(DIRS);
         break;
       case 'B':
@@ -369,7 +366,7 @@ class CommandLineInterface {
         mouse.search_maze();
         break;
       case 3:
-        mouse.follow_to(maze.maze_goal());
+        mouse.follow_to(maze.goal());
         break;
       case 4:
         mouse.test_SS90E();

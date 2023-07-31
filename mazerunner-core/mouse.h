@@ -256,7 +256,7 @@ class Mouse {
     handStart = true;
     location = 0;
     heading = NORTH;
-    maze.initialise_maze();
+    maze.initialise();
     sensors.wait_for_user_start();
     sensors.enable();
     motion.reset_drive_system();
@@ -344,7 +344,7 @@ class Mouse {
    */
 
   int search_to(unsigned char target) {
-    maze.flood_maze(target);
+    maze.flood(target);
     delay(1000);
     sensors.enable();
     motion.reset_drive_system();
@@ -369,7 +369,7 @@ class Mouse {
       sensors.set_steering_mode(STEER_NORMAL);
       location = maze.neighbour(location, heading);  // the cell we are about to enter
       update_map();
-      maze.flood_maze(target);
+      maze.flood(target);
       unsigned char newHeading = maze.direction_to_smallest(location, heading);
       unsigned char hdgChange = (newHeading - heading) & 0x3;
       char action = '#';
@@ -512,8 +512,8 @@ class Mouse {
     handStart = true;
     location = START;
     heading = NORTH;
-    search_to(maze.maze_goal());
-    maze.flood_maze(START);
+    search_to(maze.goal());
+    maze.flood(START);
     uint8_t best_direction = maze.direction_to_smallest(location, heading);
     turn_to_face(best_direction);
     handStart = false;

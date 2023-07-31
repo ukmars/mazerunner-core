@@ -81,11 +81,11 @@ class Maze {
   Maze() {
   }
 
-  void set_maze_goal(uint8_t goal_cell) {
+  void set_goal(uint8_t goal_cell) {
     m_goal = goal_cell;
   }
 
-  uint8_t maze_goal() {
+  uint8_t goal() {
     return m_goal;
   }
 
@@ -188,7 +188,7 @@ class Maze {
    * No attempt is made to verufy the correctness of a test maze.
    *
    */
-  void initialise_maze() {
+  void initialise() {
     for (int i = 0; i < MAZE_CELL_COUNT; i++) {
       m_cost[i] = 0;
       set_wall_state(i, NORTH, UNKNOWN);
@@ -293,7 +293,7 @@ class Maze {
    *
    * @param target - the cell from which all distances are calculated
    */
-  void flood_maze(uint8_t target) {
+  void flood(uint8_t target) {
     for (int i = 0; i < MAZE_CELL_COUNT; i++) {
       m_cost[i] = MAX_COST;
     }
@@ -400,7 +400,7 @@ class Maze {
   void print(int style = PLAIN) {
     const char dirChars[] = "^>v<*";
     Serial.println();
-    flood_maze(maze_goal());
+    flood(goal());
     for (int row = 15; row >= 0; row--) {
       printNorthWalls(row);
       for (int col = 0; col < MAZE_WIDTH; col++) {
@@ -419,7 +419,7 @@ class Maze {
           print_justified(m_cost[cell], 3);
         } else if (style == DIRS) {
           unsigned char direction = direction_to_smallest(cell, NORTH);
-          if (cell == maze_goal()) {
+          if (cell == goal()) {
             direction = DIRECTION_COUNT;
           }
           Serial.print(' ');
