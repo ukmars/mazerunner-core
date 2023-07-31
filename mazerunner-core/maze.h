@@ -56,6 +56,22 @@ struct WallInfo {
 
 enum Heading { NORTH, EAST, SOUTH, WEST, HEADING_COUNT, BLOCKED = 99 };
 
+inline Heading right_from(const Heading heading) {
+  return static_cast<Heading>((heading + 1) % HEADING_COUNT);
+}
+
+inline Heading left_from(const Heading heading) {
+  return static_cast<Heading>((heading + HEADING_COUNT - 1) % HEADING_COUNT);
+}
+
+inline Heading ahead_from(const Heading heading) {
+  return heading;
+}
+
+inline Heading behind_from(const Heading heading) {
+  return static_cast<Heading>((heading + 2) % HEADING_COUNT);
+}
+
 enum Direction { AHEAD, RIGHT, BACK, LEFT, DIRECTION_COUNT };
 
 #define MAX_COST 255
@@ -346,22 +362,6 @@ class Maze {
         }
       }
     }
-  }
-
-  Heading right_from(const Heading heading) const {
-    return static_cast<Heading>((heading + 1) % HEADING_COUNT);
-  }
-
-  Heading left_from(const Heading heading) const {
-    return static_cast<Heading>((heading + HEADING_COUNT - 1) % HEADING_COUNT);
-  }
-
-  Heading ahead_from(const Heading heading) const {
-    return heading;
-  }
-
-  Heading behind_from(const Heading heading) const {
-    return static_cast<Heading>((heading + 2) % HEADING_COUNT);
   }
 
   /***

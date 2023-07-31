@@ -200,13 +200,13 @@ class Mouse {
   //***************************************************************************//
   void turn_left() {
     turn_smooth(SS90EL);
-    m_heading = maze.left_from(m_heading);
+    m_heading = left_from(m_heading);
   }
 
   //***************************************************************************//
   void turn_right() {
     turn_smooth(SS90ER);
-    m_heading = maze.right_from(m_heading);
+    m_heading = right_from(m_heading);
   }
 
   //***************************************************************************//
@@ -226,7 +226,7 @@ class Mouse {
     float distance = SENSING_POSITION - HALF_CELL;
     motion.move(distance, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(SENSING_POSITION);
-    m_heading = maze.behind_from(m_heading);
+    m_heading = behind_from(m_heading);
   }
 
   // //***************************************************************************//
@@ -275,7 +275,7 @@ class Mouse {
       Serial.println();
       reporter.log_action_status('-', m_location, m_heading);
       sensors.set_steering_mode(STEER_NORMAL);
-      location = location.neighbour(static_cast<Heading>(m_heading));
+      location = location.neighbour(m_heading);
       update_map();
       Serial.write(' ');
       Serial.write('|');
@@ -374,7 +374,7 @@ class Mouse {
       location = location.neighbour(static_cast<Heading>(m_heading));  // the cell we are about to enter
       update_map();
       maze.flood(target);
-      unsigned char newHeading = maze.direction_to_smallest(location, static_cast<Heading>(m_heading));
+      unsigned char newHeading = maze.direction_to_smallest(location, m_heading);
       unsigned char hdgChange = (newHeading - m_heading) & 0x3;
       char action = '#';
       if (location != target_cell) {
@@ -518,7 +518,7 @@ class Mouse {
     m_heading = NORTH;
     search_to(maze.goal().x * MAZE_WIDTH + maze.goal().y);
     maze.flood(Location(0, 0));
-    Heading best_direction = maze.direction_to_smallest(m_location, static_cast<Heading>(m_heading));
+    Heading best_direction = maze.direction_to_smallest(m_location, m_heading);
     turn_to_face(best_direction);
     m_handStart = false;
     search_to(START);
