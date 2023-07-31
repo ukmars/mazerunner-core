@@ -28,7 +28,7 @@
 
 #include <stdint.h>
 #include "queue.h"
-#include "reporting.h"
+// #include "reporting.h"
 
 #define GOAL 0x22
 #define START 0x00
@@ -61,20 +61,6 @@ enum Direction { AHEAD, RIGHT, BACK, LEFT, DIRECTION_COUNT };
 #define MAX_COST 255
 #define MAZE_WIDTH 16
 #define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_WIDTH)
-
-// for the print function
-#define POST 'o'
-#define ERR '?'
-#define GAP "   "
-#define H_WALL F("---")
-#define H_EXIT F("   ")
-#define H_UNKN F("···")
-#define H_VIRT F("###")
-#define V_WALL '|'
-#define V_EXIT ' '
-#define V_UNKN ':'
-#define V_VIRT '#'
-enum MazeView { PLAIN, COSTS, DIRS };
 
 struct Location {
   uint8_t x;
@@ -423,81 +409,6 @@ class Maze {
       smallestDirection = 0;
     }
     return static_cast<Heading>(smallestDirection);
-  }
-
-  /**
-   * Maze printing.
-   *
-   * Included here for want of a better place.
-   *
-   *
-   */
-
-  void print_h_wall(uint8_t state) {
-    if (state == EXIT) {
-      Serial.print(H_EXIT);
-    } else if (state == WALL) {
-      Serial.print(H_WALL);
-    } else if (state == VIRTUAL) {
-      Serial.print(H_VIRT);
-    } else {
-      Serial.print(H_UNKN);
-    }
-  }
-  void printNorthWalls(int row) {
-    // for (int col = 0; col < MAZE_WIDTH; col++) {
-    //   unsigned char cell = row + MAZE_WIDTH * col;
-    //   Serial.print('o');
-    //   // print_h_wall(m_walls[cell].north & m_mask);
-    // }
-    // Serial.println(POST);
-  }
-
-  void printSouthWalls(int row) {
-    // for (int col = 0; col < MAZE_WIDTH; col++) {
-    //   unsigned char cell = row + MAZE_WIDTH * col;
-    //   Serial.print(POST);
-    //   print_h_wall(m_walls[cell].south & m_mask);
-    // }
-    // Serial.println(POST);
-  }
-
-  void print(int style = PLAIN) {
-    // const char dirChars[] = "^>v<*";
-    // Serial.println();
-    // flood_maze(maze_goal());
-    // for (int row = 15; row >= 0; row--) {
-    //   printNorthWalls(row);
-    //   for (int col = 0; col < MAZE_WIDTH; col++) {
-    //     unsigned char cell = row + MAZE_WIDTH * col;
-    //     uint8_t state = m_walls[cell].west & m_mask;
-    //     if (state == EXIT) {
-    //       Serial.print(V_EXIT);
-    //     } else if (state == WALL) {
-    //       Serial.print(V_WALL);
-    //     } else if (state == VIRTUAL) {
-    //       Serial.print(V_VIRT);
-    //     } else {
-    //       Serial.print(V_UNKN);
-    //     }
-    //     if (style == COSTS) {
-    //       print_justified(m_cost[cell], 3);
-    //     } else if (style == DIRS) {
-    //       unsigned char direction = direction_to_smallest(cell, NORTH);
-    //       if (cell == maze_goal()) {
-    //         direction = DIRECTION_COUNT;
-    //       }
-    //       Serial.print(' ');
-    //       Serial.print(dirChars[direction]);
-    //       Serial.print(' ');
-    //     } else {
-    //       Serial.print(GAP);
-    //     }
-    //   }
-    //   Serial.println(V_WALL);
-    // }
-    // printSouthWalls(0);
-    // Serial.println();
   }
 
  private:

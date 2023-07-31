@@ -14,6 +14,7 @@
 
 #include <Arduino.h>
 #include "encoders.h"
+#include "maze.h"
 #include "motion.h"
 #include "motors.h"
 #include "profile.h"
@@ -72,6 +73,20 @@ inline void print_justified(int value, int width) {
   print_justified(int32_t(value), width);
 }
 
+//***************************************************************************//
+// for the print function
+#define POST 'o'
+#define ERR '?'
+#define GAP "   "
+#define H_WALL F("---")
+#define H_EXIT F("   ")
+#define H_UNKN F("···")
+#define H_VIRT F("###")
+#define V_WALL '|'
+#define V_EXIT ' '
+#define V_UNKN ':'
+#define V_VIRT '#'
+enum MazeView { PLAIN, COSTS, DIRS };
 //***************************************************************************//
 
 class Reporter;
@@ -299,13 +314,13 @@ class Reporter {
    *
    * A typical block might look like this:
    *
-   * {F 23 N  227@ 175 }
-   *  - -- -  ---  ---
-   *  |  | |   |     `---  Robot Position (mm)
-   *  |  | |    `--------  Front Sensor Sum
-   *  |  |  `------------  Heading
-   *  |   `--------------  Current Cell
-   *   `-----------------  Action
+   * {F [3,4]  N   227@ 175 }
+   *  - ----- ---  ---  ---
+   *  |   |    |    |     `---  Robot Position (mm)
+   *  |   |    |     `--------  Front Sensor Sum
+   *  |   |     `-------------  Heading
+   *  |    `------------------  Current Cell
+   *   ` ---------------------  Action
    *
    * During the search, several such blocks will be generated in each cell
    *
@@ -314,11 +329,14 @@ class Reporter {
    */
   /// @private  don't  show this in doxygen output
   //
-  void log_action_status(char action, uint8_t location, uint8_t heading) {
+  void log_action_status(char action, Location location, Heading heading) {
     Serial.print('{');
     Serial.print(action);
-    Serial.print(' ');
-    print_hex_2(location);
+    Serial.print('[');
+    Serial.print(location.x);
+    Serial.print(',');
+    Serial.print(location.y);
+    Serial.print(']');
     Serial.print(' ');
     Serial.print(dirLetters[heading]);
     print_justified(sensors.get_front_sum(), 4);
@@ -346,6 +364,81 @@ class Reporter {
       delay(50);
     }
     sensors.disable();
+  }
+
+  //***************************************************************************//
+  /**
+   * Maze printing.
+   *
+   */
+
+  void print_h_wall(uint8_t state) {
+    if (state == EXIT) {
+      Serial.print(H_EXIT);
+    } else if (state == WALL) {
+      Serial.print(H_WALL);
+    } else if (state == VIRTUAL) {
+      Serial.print(H_VIRT);
+    } else {
+      Serial.print(H_UNKN);
+    }
+  }
+  void printNorthWalls(int y) {
+    for (int x = 0; x < MAZE_WIDTH; x++) {
+      Serial.print(POST);
+      WallInfo walls = maze.walls(Location(x, y));
+      print_h_wall(walls.north & maze.get_mask());
+    }
+    Serial.println(POST);
+  }
+
+  void printSouthWalls(int y) {
+    for (int x = 0; x < MAZE_WIDTH; x++) {
+      Serial.print(POST);
+      WallInfo walls = maze.walls(Location(x, y));
+      print_h_wall(walls.south & maze.get_mask());
+    }
+    Serial.println(POST);
+  }
+
+  void print_maze(int style = PLAIN) {
+    const char dirChars[] = "^>v<*";
+
+    Serial.println();
+    maze.flood(maze.goal());
+    for (int y = MAZE_WIDTH - 1; y >= 0; y--) {
+      printNorthWalls(y);
+      for (int x = 0; x < MAZE_WIDTH; x++) {
+        Location location(x, y);
+        WallInfo walls = maze.walls(location);
+        uint8_t state = walls.west & maze.get_mask();
+        if (state == EXIT) {
+          Serial.print(V_EXIT);
+        } else if (state == WALL) {
+          Serial.print(V_WALL);
+        } else if (state == VIRTUAL) {
+          Serial.print(V_VIRT);
+        } else {
+          Serial.print(V_UNKN);
+        }
+        if (style == COSTS) {
+          print_justified((int)maze.cost(location), 3);
+        } else if (style == DIRS) {
+          unsigned char direction = maze.direction_to_smallest(location, NORTH);
+          if (location == maze.goal()) {
+            direction = DIRECTION_COUNT;
+          }
+          Serial.print(' ');
+          Serial.print(dirChars[direction]);
+          Serial.print(' ');
+        } else {
+          Serial.print(GAP);
+        }
+        Serial.println(V_WALL);
+      }
+    }
+    printSouthWalls(0);
+    Serial.println();
   }
 };
 

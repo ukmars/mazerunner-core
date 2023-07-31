@@ -305,20 +305,17 @@ class CommandLineInterface {
         help();
         break;
       case 'W':
-        // MazePrinter::print_maze(maze, PLAIN);
-        maze.print(PLAIN);
+        reporter.print_maze(PLAIN);
         break;
       case 'X':
         Serial.println(F("Reset Maze"));
         maze.initialise();
         break;
       case 'C':
-        // MazePrinter::print_maze(maze, COSTS);
-        maze.print(COSTS);
+        reporter.print_maze(COSTS);
         break;
       case 'R':
-        // MazePrinter::print_maze(maze, DIRS);
-        maze.print(DIRS);
+        reporter.print_maze(DIRS);
         break;
       case 'B':
         Serial.print(F("Battery: "));
