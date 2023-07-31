@@ -28,7 +28,6 @@
 
 #include <stdint.h>
 #include "queue.h"
-// #include "reporting.h"
 
 #define GOAL Location(2, 2)
 #define START Location(0, 0)
@@ -101,18 +100,9 @@ struct Location {
   bool operator!=(const Location &obj) const {
     return x != obj.x || y != obj.y;
   }
-  Location operator+(const Location &obj) const {
-    return Location(x + obj.x, y + obj.y);
-  }
-  Location operator-(const Location &obj) const {
-    return Location(x - obj.x, y - obj.y);
-  }
-  void operator+=(const Location &obj) {
-    x += obj.x;
-    y += obj.y;
-  }
 
   // these operators prevent the user from exceeding the bounds of the maze
+  // by wrapping to the opposite edge
   Location north() const {
     return Location(x, (y + 1) + MAZE_WIDTH);
   }
@@ -150,13 +140,11 @@ struct Location {
   }
 };
 
+//***************************************************************************//
+
 class Maze {
  public:
   Maze() {
-  }
-
-  uint8_t width() const {
-    return m_width;
   }
 
   Location goal() const {
@@ -234,7 +222,7 @@ class Maze {
   }
 
   // only change a wall if it is unknown
-  // This is what you use when exploring. Once seen, a wall should not be changed.
+  // This is what you use when exploring. Once seen, a wall should not be changed again.
   void update_wall_state(const Location loc, const Heading direction, const WallState state) {
     switch (direction) {
       case NORTH:
@@ -265,10 +253,7 @@ class Maze {
   }
 
   /***
-   * Initialise a maze and the costs with border m_walls and the start cell
-   *
-   * If a test maze is provided, the m_walls will all be set up from that
-   * No attempt is made to verufy the correctness of a test maze.
+   * Initialise a maze and the costs with border walls and the start cell
    *
    */
   void initialise() {
@@ -288,10 +273,6 @@ class Maze {
       m_walls[0][y].west = WALL;
       m_walls[MAZE_WIDTH - 1][y].east = WALL;
     }
-    set_wall_state(Location(0, 0), NORTH, EXIT);
-    set_wall_state(Location(0, 0), EAST, WALL);
-    set_wall_state(Location(0, 0), SOUTH, WALL);
-    set_wall_state(Location(0, 0), WEST, WALL);
     m_walls[0][0].north = EXIT;
     m_walls[0][0].east = WALL;
     m_walls[0][0].south = WALL;
@@ -377,7 +358,7 @@ class Maze {
    */
   Heading direction_to_smallest(const Location cell, const Heading startDirection) const {
     Heading nextDirection = startDirection;
-    uint8_t smallestDirection = BLOCKED;
+    Heading smallestDirection = BLOCKED;
     uint16_t nextCost;
     uint16_t smallestCost = cost(cell);
     nextCost = neighbour_cost(cell, nextDirection);
@@ -404,15 +385,13 @@ class Maze {
       smallestDirection = nextDirection;
     };
     if (smallestCost == MAX_COST) {
-      smallestDirection = 0;
+      smallestDirection = BLOCKED;
     }
-    return static_cast<Heading>(smallestDirection);
+    return smallestDirection;
   }
 
  private:
   MazeMask m_mask = MASK_OPEN;
-  uint16_t m_width = 16;
-  uint8_t m_goal_cell = 0x077;
   Location m_goal_loc{7, 7};
   // on Arduino only use 8 bits for cost to save space
   uint8_t m_cost[MAZE_WIDTH][MAZE_WIDTH];
