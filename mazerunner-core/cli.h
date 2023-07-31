@@ -310,7 +310,7 @@ class CommandLineInterface {
         break;
       case 'X':
         Serial.println(F("Reset Maze"));
-        maze.initialise_maze();
+        maze.initialise();
         break;
       case 'C':
         // MazePrinter::print_maze(maze, COSTS);
@@ -368,9 +368,11 @@ class CommandLineInterface {
       case 2:
         mouse.search_maze();
         break;
-      case 3:
-        mouse.follow_to(maze.maze_goal());
-        break;
+      case 3: {
+        Location goal = maze.goal();
+        int cell = goal.x * MAZE_WIDTH + goal.y;
+        mouse.follow_to(cell);
+      } break;
       case 4:
         mouse.test_SS90E();
         break;

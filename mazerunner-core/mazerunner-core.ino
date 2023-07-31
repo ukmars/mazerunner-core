@@ -74,7 +74,7 @@ void setup() {
   systick.begin();
   /// keep the button held down after a reset to clear the maze
   if (switches.button_pressed()) {
-    maze.initialise_maze();
+    maze.initialise();
     for (int i = 0; i < 4; i++) {
       digitalWrite(LED_BUILTIN, 1);
       delay(50);
