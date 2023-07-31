@@ -251,12 +251,10 @@ class Mouse {
    * It will follow the left wall until it reaches the supplied taget
    * cell.
    */
-  void follow_to(unsigned char target_cell) {
+  void follow_to(Location target) {
     Serial.println(F("Follow TO"));
-    Location target(7, 7);
-    Location location;
     m_handStart = true;
-    location = 0;
+    m_location = START;
     m_heading = NORTH;
     maze.initialise();
     sensors.wait_for_user_start();
@@ -268,20 +266,20 @@ class Mouse {
     Serial.println(F("Off we go..."));
     motion.wait_until_position(SENSING_POSITION);
     // at the start of this loop we are always at the sensing point
-    while (location != target_cell) {
+    while (m_location != target) {
       if (switches.button_pressed()) {
         break;
       }
       Serial.println();
       reporter.log_action_status('-', m_location, m_heading);
       sensors.set_steering_mode(STEER_NORMAL);
-      location = location.neighbour(m_heading);
+      m_location = m_location.neighbour(m_heading);
       update_map();
       Serial.write(' ');
       Serial.write('|');
       Serial.write(' ');
       char action = '#';
-      if (location != target_cell) {
+      if (m_location != target) {
         if (!sensors.see_left_wall) {
           turn_left();
           action = 'L';
@@ -345,11 +343,9 @@ class Mouse {
    *         -1 if the maze has no route to the target.
    */
 
-  int search_to(unsigned char target_cell) {
-    Location target(7, 7);
-    Location location;
+  int search_to(Location target) {
     maze.flood(target);
-    delay(1000);
+    delay(200);
     sensors.enable();
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);  // never steer from zero speed
@@ -364,20 +360,20 @@ class Mouse {
     Serial.println(F("Off we go..."));
     motion.wait_until_position(SENSING_POSITION);
     // Each iteration of this loop starts at the sensing point
-    while (location != target_cell) {
+    while (m_location != target) {
       if (switches.button_pressed()) {  // allow user to abort gracefully
         break;
       }
       Serial.println();
       reporter.log_action_status('-', m_location, m_heading);
       sensors.set_steering_mode(STEER_NORMAL);
-      location = location.neighbour(static_cast<Heading>(m_heading));  // the cell we are about to enter
+      m_location = m_location.neighbour(m_heading);  // the cell we are about to enter
       update_map();
       maze.flood(target);
-      unsigned char newHeading = maze.direction_to_smallest(location, m_heading);
+      unsigned char newHeading = maze.direction_to_smallest(m_location, m_heading);
       unsigned char hdgChange = (newHeading - m_heading) & 0x3;
       char action = '#';
-      if (location != target_cell) {
+      if (m_location != target) {
         switch (hdgChange) {
           // each of the following actions will finish with the
           // robot moving and at the sensing point ready for the

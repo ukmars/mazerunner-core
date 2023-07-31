@@ -30,8 +30,8 @@
 #include "queue.h"
 // #include "reporting.h"
 
-#define GOAL 0x22
-#define START 0x00
+#define GOAL Location(2, 2)
+#define START Location(0, 0)
 
 #define VISITED 0xF0
 
@@ -47,6 +47,7 @@ enum WallState {
   VIRTUAL = 3,
 };
 
+//***************************************************************************//
 struct WallInfo {
   unsigned char north : 2;
   unsigned char east : 2;
@@ -54,6 +55,7 @@ struct WallInfo {
   unsigned char west : 2;
 };
 
+//***************************************************************************//
 enum Heading { NORTH, EAST, SOUTH, WEST, HEADING_COUNT, BLOCKED = 99 };
 
 inline Heading right_from(const Heading heading) {
@@ -71,12 +73,16 @@ inline Heading ahead_from(const Heading heading) {
 inline Heading behind_from(const Heading heading) {
   return static_cast<Heading>((heading + 2) % HEADING_COUNT);
 }
+//***************************************************************************//
 
 enum Direction { AHEAD, RIGHT, BACK, LEFT, DIRECTION_COUNT };
+//***************************************************************************//
 
 #define MAX_COST 255
 #define MAZE_WIDTH 16
 #define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_WIDTH)
+
+//***************************************************************************//
 
 struct Location {
   uint8_t x;
@@ -108,27 +114,19 @@ struct Location {
 
   // these operators prevent the user from exceeding the bounds of the maze
   Location north() const {
-    uint8_t new_y = (y + 1) % MAZE_WIDTH;
-    uint8_t new_x = x;
-    return Location(new_x, new_y);
+    return Location(x, (y + 1) + MAZE_WIDTH);
   }
 
   Location east() const {
-    uint8_t new_y = y;
-    uint8_t new_x = (x + 1) % MAZE_WIDTH;
-    return Location(new_x, new_y);
+    return Location((x + 1) + MAZE_WIDTH, y);
   }
 
   Location south() const {
-    uint8_t new_y = (y + MAZE_WIDTH - 1) % MAZE_WIDTH;
-    uint8_t new_x = x;
-    return Location(new_x, new_y);
+    return Location(x, (y + MAZE_WIDTH - 1) % MAZE_WIDTH);
   }
 
   Location west() const {
-    uint8_t new_y = y;
-    uint8_t new_x = (x + MAZE_WIDTH - 1) % MAZE_WIDTH;
-    return Location(new_x, new_y);
+    return Location((x + MAZE_WIDTH - 1) % MAZE_WIDTH, y);
   }
 
   Location neighbour(const Heading heading) const {
