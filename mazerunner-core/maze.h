@@ -172,10 +172,10 @@ class Maze {
     return not has_unknown_walls(cell);
   }
 
-  bool is_exit(const Location loc, const Heading direction) const {
+  bool is_exit(const Location loc, const Heading heading) const {
     bool result = false;
     WallInfo walls = m_walls[loc.x][loc.y];
-    switch (direction) {
+    switch (heading) {
       case NORTH:
         result = (walls.north & m_mask) == EXIT;
         break;
@@ -197,8 +197,8 @@ class Maze {
 
   // Unconditionally set a wall state.
   // Normally you only use this in setting up the maze at the start
-  void set_wall_state(const Location loc, const Heading direction, const WallState state) {
-    switch (direction) {
+  void set_wall_state(const Location loc, const Heading heading, const WallState state) {
+    switch (heading) {
       case NORTH:
         m_walls[loc.x][loc.y].north = state;
         m_walls[loc.north().x][loc.north().y].south = state;
@@ -216,15 +216,15 @@ class Maze {
         m_walls[loc.south().x][loc.south().y].north = state;
         break;
       default:
-        // ignore any other direction (blocked)
+        // ignore any other heading (blocked)
         break;
     }
   }
 
   // only change a wall if it is unknown
   // This is what you use when exploring. Once seen, a wall should not be changed again.
-  void update_wall_state(const Location loc, const Heading direction, const WallState state) {
-    switch (direction) {
+  void update_wall_state(const Location loc, const Heading heading, const WallState state) {
+    switch (heading) {
       case NORTH:
         if ((m_walls[loc.x][loc.y].north & UNKNOWN) != UNKNOWN) {
           return;
@@ -246,10 +246,10 @@ class Maze {
         }
         break;
       default:
-        // ignore any other direction (blocked)
+        // ignore any other heading (blocked)
         break;
     }
-    set_wall_state(loc, direction, state);
+    set_wall_state(loc, heading, state);
   }
 
   /***
@@ -294,11 +294,11 @@ class Maze {
    * Assumes the maze has been flooded
    */
 
-  uint16_t neighbour_cost(const Location cell, const Heading direction) const {
-    if (not is_exit(cell, direction)) {
+  uint16_t neighbour_cost(const Location cell, const Heading heading) const {
+    if (not is_exit(cell, heading)) {
       return MAX_COST;
     }
-    Location next_cell = cell.neighbour(direction);
+    Location next_cell = cell.neighbour(heading);
     return m_cost[next_cell.x][next_cell.y];
   }
 
@@ -353,41 +353,41 @@ class Maze {
    * probably is not worth the effort
    *
    * @param cell
-   * @param startDirection
+   * @param start_heading
    * @return
    */
-  Heading direction_to_smallest(const Location cell, const Heading startDirection) const {
-    Heading nextDirection = startDirection;
-    Heading smallestDirection = BLOCKED;
-    uint16_t nextCost;
-    uint16_t smallestCost = cost(cell);
-    nextCost = neighbour_cost(cell, nextDirection);
-    if (nextCost < smallestCost) {
-      smallestCost = nextCost;
-      smallestDirection = nextDirection;
+  Heading heading_to_smallest(const Location cell, const Heading start_heading) const {
+    Heading next_heading = start_heading;
+    Heading best_heading = BLOCKED;
+    uint16_t best_cost = cost(cell);
+    uint16_t cost;
+    cost = neighbour_cost(cell, next_heading);
+    if (cost < best_cost) {
+      best_cost = cost;
+      best_heading = next_heading;
     };
-    nextDirection = right_from(startDirection);
-    nextCost = neighbour_cost(cell, nextDirection);
-    if (nextCost < smallestCost) {
-      smallestCost = nextCost;
-      smallestDirection = nextDirection;
+    next_heading = right_from(start_heading);
+    cost = neighbour_cost(cell, next_heading);
+    if (cost < best_cost) {
+      best_cost = cost;
+      best_heading = next_heading;
     };
-    nextDirection = left_from(startDirection);
-    nextCost = neighbour_cost(cell, nextDirection);
-    if (nextCost < smallestCost) {
-      smallestCost = nextCost;
-      smallestDirection = nextDirection;
+    next_heading = left_from(start_heading);
+    cost = neighbour_cost(cell, next_heading);
+    if (cost < best_cost) {
+      best_cost = cost;
+      best_heading = next_heading;
     };
-    nextDirection = behind_from(startDirection);
-    nextCost = neighbour_cost(cell, nextDirection);
-    if (nextCost < smallestCost) {
-      smallestCost = nextCost;
-      smallestDirection = nextDirection;
+    next_heading = behind_from(start_heading);
+    cost = neighbour_cost(cell, next_heading);
+    if (cost < best_cost) {
+      best_cost = cost;
+      best_heading = next_heading;
     };
-    if (smallestCost == MAX_COST) {
-      smallestDirection = BLOCKED;
+    if (best_cost == MAX_COST) {
+      best_heading = BLOCKED;
     }
-    return smallestDirection;
+    return best_heading;
   }
 
  private:

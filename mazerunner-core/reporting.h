@@ -424,7 +424,7 @@ class Reporter {
         if (style == COSTS) {
           print_justified((int)maze.cost(location), 3);
         } else if (style == DIRS) {
-          unsigned char direction = maze.direction_to_smallest(location, NORTH);
+          unsigned char direction = maze.heading_to_smallest(location, NORTH);
           if (location == maze.goal()) {
             direction = DIRECTION_COUNT;
           }

@@ -370,7 +370,7 @@ class Mouse {
       m_location = m_location.neighbour(m_heading);  // the cell we are about to enter
       update_map();
       maze.flood(target);
-      unsigned char newHeading = maze.direction_to_smallest(m_location, m_heading);
+      unsigned char newHeading = maze.heading_to_smallest(m_location, m_heading);
       unsigned char hdgChange = (newHeading - m_heading) & 0x3;
       char action = '#';
       if (m_location != target) {
@@ -514,7 +514,7 @@ class Mouse {
     m_heading = NORTH;
     search_to(maze.goal().x * MAZE_WIDTH + maze.goal().y);
     maze.flood(Location(0, 0));
-    Heading best_direction = maze.direction_to_smallest(m_location, m_heading);
+    Heading best_direction = maze.heading_to_smallest(m_location, m_heading);
     turn_to_face(best_direction);
     m_handStart = false;
     search_to(START);
