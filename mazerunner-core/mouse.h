@@ -210,7 +210,7 @@ class Mouse {
   }
 
   //***************************************************************************//
-  /**
+  /***
    * As with all the search turns, this command will be called after the robot has
    * reached the search decision point and decided its next move. It is not known
    * how long that takes or what the exact position will be.
@@ -229,22 +229,6 @@ class Mouse {
     m_heading = behind_from(m_heading);
   }
 
-  // //***************************************************************************//
-  // /***
-  //  * Called at the end of a run when the mouse is about to enter
-  //  * the target cell. The target is just where the mouse is
-  //  * going at this stage and may be the goal, the start cell or any
-  //  * other cell in the maze.
-  //  *
-  //  * The aim is to bring the mouse to a halt in the center of the
-  //  * cell and then do a spin turn of 180 degrees.
-  //  *
-  //  */
-  // void end_run() {
-  //   stop_at_center();
-  //   motion.spin_turn(-180, OMEGA_SPIN_TURN, ALPHA_SPIN_TURN);
-  //   heading = (heading + 2) & 0x03;
-  // }
   //***************************************************************************//
   /***
    * A simple wall follower that knows where it is
@@ -294,7 +278,6 @@ class Mouse {
           action = 'B';
         }
       }
-
       reporter.log_action_status(action, m_location, m_heading);
     }
     // we are entering the target cell so come to an orderly
@@ -339,11 +322,9 @@ class Mouse {
    * facing in the direction it entered that cell. This will
    * always be one of the four cardinal directions NESW
    *
-   * Returns  0  if the search is successful
-   *         -1 if the maze has no route to the target.
    */
 
-  int search_to(Location target) {
+  void search_to(Location target) {
     maze.flood(target);
     delay(200);
     sensors.enable();
@@ -405,10 +386,8 @@ class Mouse {
     Serial.println();
     Serial.println(F("Arrived!  "));
     delay(250);
-
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
-    return 0;
   }
 
   /***
