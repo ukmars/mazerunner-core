@@ -96,6 +96,9 @@ class Mouse {
   /**
    * These convenience functions will bring the robot to a halt
    * before actually turning.
+   *
+   * Note that they do not change the robot's heading. That is
+   * the responsibility of the caller.
    */
 
   void turn_IP180() {
