@@ -699,8 +699,8 @@ class Mouse {
     motion.move(2 * FULL_CELL, SEARCH_TURN_SPEED, 0, SEARCH_ACCELERATION);
     sensor_left -= sensors.lss.value;
     sensor_right -= sensors.rss.value;
-    print_justified(sensor_left, 5);
-    print_justified(sensor_right, 5);
+    reporter.print_justified(sensor_left, 5);
+    reporter.print_justified(sensor_right, 5);
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
   }
