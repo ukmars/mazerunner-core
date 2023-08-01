@@ -181,11 +181,11 @@ struct Location {
   // these operators prevent the user from exceeding the bounds of the maze
   // by wrapping to the opposite edge
   Location north() const {
-    return Location(x, (y + 1) + MAZE_WIDTH);
+    return Location(x, (y + 1) % MAZE_WIDTH);
   }
 
   Location east() const {
-    return Location((x + 1) + MAZE_WIDTH, y);
+    return Location((x + 1) % MAZE_WIDTH, y);
   }
 
   Location south() const {
