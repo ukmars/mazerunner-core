@@ -211,7 +211,7 @@ struct Location {
         return west();
         break;
       default:
-        return *this;
+        return *this;  // this is actually an error and should be handled
         break;
     }
   }
