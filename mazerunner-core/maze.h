@@ -24,37 +24,79 @@
  *
  * A cell is considered to have been visited if all of its walls have been seen.
  *
+ * There are a number of supporting structures and types. These are described below.
+ *
  */
 
 #include <stdint.h>
 #include "queue.h"
 
-#define GOAL Location(2, 2)
 #define START Location(0, 0)
 
-#define VISITED 0xF0
+/***
+ * Walls exist in the map in one of four states and so get recorded using
+ * two bits in the map. There are various schemes for this but here the
+ * state is held in a single entity for each wall. Symbolic names for each
+ * state are listed in the WallState enum.
+ *
+ * Virtual walls are not used in this code but are labelled for completeness
+ */
+enum WallState {
+  EXIT = 0,     // a wall that has been seen and confirmed absent
+  WALL = 1,     // a wall that has been seen and confirmed present
+  UNKNOWN = 2,  // a wall that has not yet been seen
+  VIRTUAL = 3,  // a wall that has not yet been seen
+};
 
+//***************************************************************************//
+/***
+ * The state of all four walls in a cell are stored as a structure in a single
+ * variable.
+ *
+ * Note that GCC for AVR and STM32 (and probably most other) targets should
+ * recognise this as representing a single byte in memory but that is not
+ * guaranteed.
+ */
+struct WallInfo {
+  WallState north : 2;
+  WallState east : 2;
+  WallState south : 2;
+  WallState west : 2;
+};
+
+/***
+ * Since maze wall state can have one of four values, the MazeMask
+ * is used to let you use or ignore the fact that a wall has been seen.
+ *
+ * When the mask is set to MASK_OPEN, any unseen walls are treated as
+ * being absent. Setting it to MASK_CLOSED treats unseen walls as present.
+ *
+ * Practically, this means that fast runs should be calculated after flooding
+ * the maze with the MASK_CLOSE option so that the route never passes through
+ * unseen walls or cels.
+ *
+ * Searching should be performed with the MASK_OPEN option so that the flood
+ * uses all the cels.
+ */
 enum MazeMask {
   MASK_OPEN = 0x01,    // open maze for search
   MASK_CLOSED = 0x03,  // closed maze for fast run
 };
 
-enum WallState {
-  EXIT = 0,
-  WALL = 1,
-  UNKNOWN = 2,
-  VIRTUAL = 3,
-};
-
 //***************************************************************************//
-struct WallInfo {
-  unsigned char north : 2;
-  unsigned char east : 2;
-  unsigned char south : 2;
-  unsigned char west : 2;
-};
 
-//***************************************************************************//
+/***
+ * A Heading represents one of the four cardinal compass headings. Normally
+ * this is sufficient. If you are going to run diagonals, you might want to
+ * expand the list.
+ *
+ * The compiler will number enums consecutively starting at zero so we can
+ * use a couple of tricks to work out what the new value should be when
+ * the robot turns.
+ *
+ * If you expand the list for diagonals, take care to modify the calculations
+ * appropriately.
+ */
 enum Heading { NORTH, EAST, SOUTH, WEST, HEADING_COUNT, BLOCKED = 99 };
 
 inline Heading right_from(const Heading heading) {
