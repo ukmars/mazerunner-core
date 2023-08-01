@@ -41,8 +41,8 @@
  * Line Interface while the robot is running.
  *
  */
-const char hdg_letters[] = "FRAL";
-const char dirLetters[] = "NESW";
+const char dir_letters[] = "FRAL";
+const char hdg_letters[] = "NESW";
 
 // simple formatting functions for printing maze costs
 inline void print_hex_2(unsigned char value) {
@@ -74,18 +74,7 @@ inline void print_justified(int value, int width) {
 }
 
 //***************************************************************************//
-// for the print function
-#define POST 'o'
-#define ERR '?'
-#define GAP "   "
-#define H_WALL F("---")
-#define H_EXIT F("   ")
-#define H_UNKN F("···")
-#define H_VIRT F("###")
-#define V_WALL '|'
-#define V_EXIT ' '
-#define V_UNKN ':'
-#define V_VIRT '#'
+
 enum MazeView { PLAIN, COSTS, DIRS };
 //***************************************************************************//
 
@@ -338,7 +327,11 @@ class Reporter {
     Serial.print(location.y);
     Serial.print(']');
     Serial.print(' ');
-    Serial.print(dirLetters[heading]);
+    if (heading < HEADING_COUNT) {
+      Serial.print(hdg_letters[heading]);
+    } else {
+      Serial.print('!');
+    }
     print_justified(sensors.get_front_sum(), 4);
     Serial.print('@');
     print_justified((int)motion.position(), 4);
@@ -371,6 +364,17 @@ class Reporter {
    * Maze printing.
    *
    */
+#define POST 'o'
+#define ERR '?'
+#define GAP F("   ")
+#define H_WALL F("---")
+#define H_EXIT F("   ")
+#define H_UNKN F("···")
+#define H_VIRT F("###")
+#define V_WALL '|'
+#define V_EXIT ' '
+#define V_UNKN ':'
+#define V_VIRT '#'
 
   void print_h_wall(uint8_t state) {
     if (state == EXIT) {
