@@ -87,6 +87,7 @@ void setup() {
   /// leave the emitters off unless we are actually using the sensors
   /// less power, less risk
   sensors.disable();
+  reporter.set_printer(Serial);
   Serial.println();
   Serial.println();
   Serial.println(F("RDY"));

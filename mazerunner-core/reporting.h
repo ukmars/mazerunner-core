@@ -56,16 +56,22 @@ class Reporter {
   uint32_t s_report_time;
   uint32_t s_report_interval = REPORTING_INTERVAL;
 
+  Stream& printer = Serial;
+
  public:
+  void set_printer(Stream& stream) {
+    printer = stream;
+  }
+
   // note that the Serial device has a 64 character buffer and, at 115200 baud
   // 64 characters will take about 6ms to go out over the wire.
 
   // simple formatting methods for printing maze costs
   void print_hex_2(unsigned char value) {
     if (value < 16) {
-      Serial.print('0');
+      printer.print('0');
     }
-    Serial.print(value, HEX);
+    printer.print(value, HEX);
   }
 
   void print_justified(int32_t value, int width) {
@@ -79,15 +85,15 @@ class Reporter {
       w--;
     }
     while (w > 0) {
-      Serial.write(' ');
+      printer.write(' ');
       --w;
     }
-    Serial.print(value);
+    printer.print(value);
   }
 
-  void print_justified(int value, int width) {
-    print_justified(int32_t(value), width);
-  }
+  // void print_justified(int value, int width) {
+  //   print_justified(int32_t(value), width,p);
+  // }
 
   /**
    * The profile reporter will send out a table of space separated
@@ -110,7 +116,7 @@ class Reporter {
    *
    */
   void report_profile_header() {
-    Serial.println(F("time robotPos robotAngle fwdPos  fwdSpeed rotpos rotSpeed fwdmVolts rotmVolts"));
+    printer.println(F("time robotPos robotAngle fwdPos  fwdSpeed rotpos rotSpeed fwdmVolts rotmVolts"));
     s_start_time = millis();
     s_report_time = s_start_time;
   }
@@ -127,7 +133,7 @@ class Reporter {
       print_justified(int(motion.omega()), 6);
       print_justified(motors.get_fwd_millivolts(), 6);
       print_justified(motors.get_rot_millivolts(), 6);
-      Serial.println();
+      printer.println();
     }
   }
 
@@ -145,7 +151,7 @@ class Reporter {
    *
    */
   void report_sensor_track_header() {
-    Serial.println(F(" time pos angle lfs lss rss rfs cte steer"));
+    printer.println(F(" time pos angle lfs lss rss rfs cte steer"));
     s_start_time = millis();
     s_report_time = s_start_time;
   }
@@ -167,16 +173,16 @@ class Reporter {
         print_justified(sensors.rss.value, 6);
         print_justified(sensors.rfs.value, 6);
       }
-      Serial.print(' ');
-      Serial.print(sensors.get_cross_track_error());
-      Serial.print(' ');
-      Serial.print(sensors.get_steering_feedback());
-      Serial.println();
+      printer.print(' ');
+      printer.print(sensors.get_cross_track_error());
+      printer.print(' ');
+      printer.print(sensors.get_steering_feedback());
+      printer.println();
     }
   }
 
   void report_radial_track_header() {
-    Serial.println(F(" angle lfs lss rss rfs cte steer"));
+    printer.println(F(" angle lfs lss rss rfs cte steer"));
     s_start_time = millis();
     s_report_time = s_start_time;
   }
@@ -197,11 +203,11 @@ class Reporter {
         print_justified(sensors.rss.value, 6);
         print_justified(sensors.rfs.value, 6);
       }
-      Serial.print(' ');
-      Serial.print(sensors.get_cross_track_error());
-      Serial.print(' ');
-      Serial.print(sensors.get_steering_feedback());
-      Serial.println();
+      printer.print(' ');
+      printer.print(sensors.get_cross_track_error());
+      printer.print(' ');
+      printer.print(sensors.get_steering_feedback());
+      printer.println();
     }
   }
 
@@ -221,7 +227,7 @@ class Reporter {
    */
 
   void front_sensor_track_header() {
-    Serial.println(F(" dist front_sum front_diff, distance"));
+    printer.println(F(" dist front_sum front_diff, distance"));
   }
 
   void front_sensor_track() {
@@ -232,7 +238,7 @@ class Reporter {
       print_justified(sensors.get_front_sum(), 7);
       print_justified(sensors.get_front_diff(), 7);
       print_justified((int)sensors.get_distance(sensors.get_front_sum(), FRONT_LINEAR_CONSTANT), 7);
-      Serial.println();
+      printer.println();
     }
   }
 
@@ -251,28 +257,28 @@ class Reporter {
    *
    */
   void wall_sensor_header() {
-    Serial.println(F("|           RAW            |          NORMALISED       |             |            |"));
-    Serial.println(F("|   lf_   ls_   rs_   rf_  |    lfs   lss   rss   rfs  |   sum diff  | front_dist |"));
+    printer.println(F("|           RAW            |          NORMALISED       |             |            |"));
+    printer.println(F("|   lf_   ls_   rs_   rf_  |    lfs   lss   rss   rfs  |   sum diff  | front_dist |"));
   }
 
   void print_wall_sensors() {
-    Serial.print(F("|"));
+    printer.print(F("|"));
     print_justified(sensors.lfs.raw, 6);
     print_justified(sensors.lss.raw, 6);
     print_justified(sensors.rss.raw, 6);
     print_justified(sensors.rfs.raw, 6);
-    Serial.print(F("  | "));
+    printer.print(F("  | "));
     print_justified(sensors.lfs.value, 6);
     print_justified(sensors.lss.value, 6);
     print_justified(sensors.rss.value, 6);
     print_justified(sensors.rfs.value, 6);
-    Serial.print(F("  | "));
+    printer.print(F("  | "));
     print_justified(sensors.get_front_sum(), 5);
     print_justified(sensors.get_front_diff(), 5);
-    Serial.print(F("  | "));
+    printer.print(F("  | "));
     print_justified((int)sensors.get_distance(sensors.get_front_sum(), FRONT_LINEAR_CONSTANT), 6);
-    Serial.print(F("     | "));
-    Serial.println();
+    printer.print(F("     | "));
+    printer.println();
   }
 
   // void
@@ -280,19 +286,19 @@ class Reporter {
   //***************************************************************************//
   void print_walls() {
     if (sensors.see_left_wall) {
-      Serial.print('L');
+      printer.print('L');
     } else {
-      Serial.print('-');
+      printer.print('-');
     }
     if (sensors.see_front_wall) {
-      Serial.print('F');
+      printer.print('F');
     } else {
-      Serial.print('-');
+      printer.print('-');
     }
     if (sensors.see_right_wall) {
-      Serial.print('R');
+      printer.print('R');
     } else {
-      Serial.print('-');
+      printer.print('-');
     }
   }
 
@@ -319,26 +325,26 @@ class Reporter {
   /// @private  don't  show this in doxygen output
   //
   void log_action_status(char action, Location location, Heading heading) {
-    Serial.print('{');
-    Serial.print(action);
-    Serial.print('[');
-    Serial.print(location.x);
-    Serial.print(',');
-    Serial.print(location.y);
-    Serial.print(']');
-    Serial.print(' ');
+    printer.print('{');
+    printer.print(action);
+    printer.print('[');
+    printer.print(location.x);
+    printer.print(',');
+    printer.print(location.y);
+    printer.print(']');
+    printer.print(' ');
     if (heading < HEADING_COUNT) {
-      Serial.print(hdg_letters[heading]);
+      printer.print(hdg_letters[heading]);
     } else {
-      Serial.print('!');
+      printer.print('!');
     }
     print_justified(sensors.get_front_sum(), 4);
-    Serial.print('@');
+    printer.print('@');
     print_justified((int)motion.position(), 4);
-    Serial.print(' ');
+    printer.print(' ');
     // print_walls();
-    Serial.print('}');
-    Serial.print(' ');
+    printer.print('}');
+    printer.print(' ');
   }
 
   //***************************************************************************//
@@ -347,13 +353,13 @@ class Reporter {
       sensors.enable();
       for (int i = 0; i < 4; i++) {
         print_justified(adc.get_raw(i), 5);
-        Serial.print(' ');
+        printer.print(' ');
       }
       for (int i = 6; i < 8; i++) {
         print_justified(adc.get_dark(i), 5);
-        Serial.print(' ');
+        printer.print(' ');
       }
-      Serial.println();
+      printer.println();
       delay(50);
     }
     sensors.disable();
@@ -378,37 +384,37 @@ class Reporter {
 
   void print_h_wall(uint8_t state) {
     if (state == EXIT) {
-      Serial.print(H_EXIT);
+      printer.print(H_EXIT);
     } else if (state == WALL) {
-      Serial.print(H_WALL);
+      printer.print(H_WALL);
     } else if (state == VIRTUAL) {
-      Serial.print(H_VIRT);
+      printer.print(H_VIRT);
     } else {
-      Serial.print(H_UNKN);
+      printer.print(H_UNKN);
     }
   }
   void printNorthWalls(int y) {
     for (int x = 0; x < MAZE_WIDTH; x++) {
-      Serial.print(POST);
+      printer.print(POST);
       WallInfo walls = maze.walls(Location(x, y));
       print_h_wall(walls.north & maze.get_mask());
     }
-    Serial.println(POST);
+    printer.println(POST);
   }
 
   void printSouthWalls(int y) {
     for (int x = 0; x < MAZE_WIDTH; x++) {
-      Serial.print(POST);
+      printer.print(POST);
       WallInfo walls = maze.walls(Location(x, y));
       print_h_wall(walls.south & maze.get_mask());
     }
-    Serial.println(POST);
+    printer.println(POST);
   }
 
   void print_maze(int style = PLAIN) {
     const char dirChars[] = "^>v<*";
 
-    Serial.println();
+    printer.println();
     maze.flood(maze.goal());
     for (int y = MAZE_HEIGHT - 1; y >= 0; y--) {
       printNorthWalls(y);
@@ -417,13 +423,13 @@ class Reporter {
         WallInfo walls = maze.walls(location);
         uint8_t state = walls.west & maze.get_mask();
         if (state == EXIT) {
-          Serial.print(V_EXIT);
+          printer.print(V_EXIT);
         } else if (state == WALL) {
-          Serial.print(V_WALL);
+          printer.print(V_WALL);
         } else if (state == VIRTUAL) {
-          Serial.print(V_VIRT);
+          printer.print(V_VIRT);
         } else {
-          Serial.print(V_UNKN);
+          printer.print(V_UNKN);
         }
         if (style == COSTS) {
           print_justified((int)maze.cost(location), 3);
@@ -432,17 +438,17 @@ class Reporter {
           if (location == maze.goal()) {
             direction = DIRECTION_COUNT;
           }
-          Serial.print(' ');
-          Serial.print(dirChars[direction]);
-          Serial.print(' ');
+          printer.print(' ');
+          printer.print(dirChars[direction]);
+          printer.print(' ');
         } else {
-          Serial.print(GAP);
+          printer.print(GAP);
         }
-        Serial.println(V_WALL);
+        printer.println(V_WALL);
       }
     }
     printSouthWalls(0);
-    Serial.println();
+    printer.println();
   }
 };
 
