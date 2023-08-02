@@ -14,6 +14,7 @@
 
 #include <Arduino.h>
 #include "encoders.h"
+#include "maze.h"
 #include "motion.h"
 #include "motors.h"
 #include "profile.h"
@@ -40,38 +41,12 @@
  * Line Interface while the robot is running.
  *
  */
-const char hdg_letters[] = "FRAL";
-const char dirLetters[] = "NESW";
+const char dir_letters[] = "FRAL";
+const char hdg_letters[] = "NESW";
 
-// simple formatting functions for printing maze costs
-inline void print_hex_2(unsigned char value) {
-  if (value < 16) {
-    Serial.print('0');
-  }
-  Serial.print(value, HEX);
-}
+//***************************************************************************//
 
-inline void print_justified(int32_t value, int width) {
-  int v = value;
-  int w = width;
-  w--;
-  if (v < 0) {
-    w--;
-  }
-  while (v /= 10) {
-    w--;
-  }
-  while (w > 0) {
-    Serial.write(' ');
-    --w;
-  }
-  Serial.print(value);
-}
-
-inline void print_justified(int value, int width) {
-  print_justified(int32_t(value), width);
-}
-
+enum MazeView { PLAIN, COSTS, DIRS };
 //***************************************************************************//
 
 class Reporter;
@@ -84,6 +59,35 @@ class Reporter {
  public:
   // note that the Serial device has a 64 character buffer and, at 115200 baud
   // 64 characters will take about 6ms to go out over the wire.
+
+  // simple formatting methods for printing maze costs
+  void print_hex_2(unsigned char value) {
+    if (value < 16) {
+      Serial.print('0');
+    }
+    Serial.print(value, HEX);
+  }
+
+  void print_justified(int32_t value, int width) {
+    int v = value;
+    int w = width;
+    w--;
+    if (v < 0) {
+      w--;
+    }
+    while (v /= 10) {
+      w--;
+    }
+    while (w > 0) {
+      Serial.write(' ');
+      --w;
+    }
+    Serial.print(value);
+  }
+
+  void print_justified(int value, int width) {
+    print_justified(int32_t(value), width);
+  }
 
   /**
    * The profile reporter will send out a table of space separated
@@ -299,13 +303,13 @@ class Reporter {
    *
    * A typical block might look like this:
    *
-   * {F 23 N  227@ 175 }
-   *  - -- -  ---  ---
-   *  |  | |   |     `---  Robot Position (mm)
-   *  |  | |    `--------  Front Sensor Sum
-   *  |  |  `------------  Heading
-   *  |   `--------------  Current Cell
-   *   `-----------------  Action
+   * {F [3,4]  N   227@ 175 }
+   *  - ----- ---  ---  ---
+   *  |   |    |    |     `---  Robot Position (mm)
+   *  |   |    |     `--------  Front Sensor Sum
+   *  |   |     `-------------  Heading
+   *  |    `------------------  Current Cell
+   *   ` ---------------------  Action
    *
    * During the search, several such blocks will be generated in each cell
    *
@@ -314,13 +318,20 @@ class Reporter {
    */
   /// @private  don't  show this in doxygen output
   //
-  void log_action_status(char action, uint8_t location, uint8_t heading) {
+  void log_action_status(char action, Location location, Heading heading) {
     Serial.print('{');
     Serial.print(action);
+    Serial.print('[');
+    Serial.print(location.x);
+    Serial.print(',');
+    Serial.print(location.y);
+    Serial.print(']');
     Serial.print(' ');
-    print_hex_2(location);
-    Serial.print(' ');
-    Serial.print(dirLetters[heading]);
+    if (heading < HEADING_COUNT) {
+      Serial.print(hdg_letters[heading]);
+    } else {
+      Serial.print('!');
+    }
     print_justified(sensors.get_front_sum(), 4);
     Serial.print('@');
     print_justified((int)motion.position(), 4);
@@ -346,6 +357,92 @@ class Reporter {
       delay(50);
     }
     sensors.disable();
+  }
+
+  //***************************************************************************//
+  /**
+   * Maze printing.
+   *
+   */
+#define POST 'o'
+#define ERR '?'
+#define GAP F("   ")
+#define H_WALL F("---")
+#define H_EXIT F("   ")
+#define H_UNKN F("···")
+#define H_VIRT F("###")
+#define V_WALL '|'
+#define V_EXIT ' '
+#define V_UNKN ':'
+#define V_VIRT '#'
+
+  void print_h_wall(uint8_t state) {
+    if (state == EXIT) {
+      Serial.print(H_EXIT);
+    } else if (state == WALL) {
+      Serial.print(H_WALL);
+    } else if (state == VIRTUAL) {
+      Serial.print(H_VIRT);
+    } else {
+      Serial.print(H_UNKN);
+    }
+  }
+  void printNorthWalls(int y) {
+    for (int x = 0; x < MAZE_WIDTH; x++) {
+      Serial.print(POST);
+      WallInfo walls = maze.walls(Location(x, y));
+      print_h_wall(walls.north & maze.get_mask());
+    }
+    Serial.println(POST);
+  }
+
+  void printSouthWalls(int y) {
+    for (int x = 0; x < MAZE_WIDTH; x++) {
+      Serial.print(POST);
+      WallInfo walls = maze.walls(Location(x, y));
+      print_h_wall(walls.south & maze.get_mask());
+    }
+    Serial.println(POST);
+  }
+
+  void print_maze(int style = PLAIN) {
+    const char dirChars[] = "^>v<*";
+
+    Serial.println();
+    maze.flood(maze.goal());
+    for (int y = MAZE_HEIGHT - 1; y >= 0; y--) {
+      printNorthWalls(y);
+      for (int x = 0; x < MAZE_WIDTH; x++) {
+        Location location(x, y);
+        WallInfo walls = maze.walls(location);
+        uint8_t state = walls.west & maze.get_mask();
+        if (state == EXIT) {
+          Serial.print(V_EXIT);
+        } else if (state == WALL) {
+          Serial.print(V_WALL);
+        } else if (state == VIRTUAL) {
+          Serial.print(V_VIRT);
+        } else {
+          Serial.print(V_UNKN);
+        }
+        if (style == COSTS) {
+          print_justified((int)maze.cost(location), 3);
+        } else if (style == DIRS) {
+          unsigned char direction = maze.heading_to_smallest(location, NORTH);
+          if (location == maze.goal()) {
+            direction = DIRECTION_COUNT;
+          }
+          Serial.print(' ');
+          Serial.print(dirChars[direction]);
+          Serial.print(' ');
+        } else {
+          Serial.print(GAP);
+        }
+        Serial.println(V_WALL);
+      }
+    }
+    printSouthWalls(0);
+    Serial.println();
   }
 };
 

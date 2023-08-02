@@ -202,7 +202,6 @@ class Motion {
    */
   void stop_at(float position) {
     float remaining = position - forward.position();
-    Serial.print(F("STOP AT"));
     forward.move(remaining, forward.speed(), 0, forward.acceleration());
   }
 
@@ -220,7 +219,6 @@ class Motion {
    * @brief bring the robot to a halt after a specific distance
    */
   void stop_after(float distance) {
-    Serial.print(F("STOP AFTER"));
     forward.move(distance, forward.speed(), 0, forward.acceleration());
   }
 

@@ -24,73 +24,245 @@
  *
  * A cell is considered to have been visited if all of its walls have been seen.
  *
+ * There are a number of supporting structures and types. These are described below.
+ *
  */
 
 #include <stdint.h>
 #include "queue.h"
-#include "reporting.h"
 
-#define GOAL 0x22
-#define START 0x00
+#define START Location(0, 0)
 
-#define VISITED 0xF0
+/***
+ * Walls exist in the map in one of four states and so get recorded using
+ * two bits in the map. There are various schemes for this but here the
+ * state is held in a single entity for each wall. Symbolic names for each
+ * state are listed in the WallState enum.
+ *
+ * Virtual walls are not used in this code but are labelled for completeness
+ */
+enum WallState {
+  EXIT = 0,     // a wall that has been seen and confirmed absent
+  WALL = 1,     // a wall that has been seen and confirmed present
+  UNKNOWN = 2,  // a wall that has not yet been seen
+  VIRTUAL = 3,  // a wall that has not yet been seen
+};
 
+//***************************************************************************//
+/***
+ * The state of all four walls in a cell are stored as a structure in a single
+ * variable.
+ *
+ * Note that GCC for AVR and STM32 (and probably most other) targets should
+ * recognise this as representing a single byte in memory but that is not
+ * guaranteed.
+ */
+struct WallInfo {
+  WallState north : 2;
+  WallState east : 2;
+  WallState south : 2;
+  WallState west : 2;
+};
+
+/***
+ * Since maze wall state can have one of four values, the MazeMask
+ * is used to let you use or ignore the fact that a wall has been seen.
+ *
+ * When the mask is set to MASK_OPEN, any unseen walls are treated as
+ * being absent. Setting it to MASK_CLOSED treats unseen walls as present.
+ *
+ * Practically, this means that fast runs should be calculated after flooding
+ * the maze with the MASK_CLOSE option so that the route never passes through
+ * unseen walls or cels.
+ *
+ * Searching should be performed with the MASK_OPEN option so that the flood
+ * uses all the cels.
+ */
 enum MazeMask {
   MASK_OPEN = 0x01,    // open maze for search
   MASK_CLOSED = 0x03,  // closed maze for fast run
 };
 
-enum WallState {
-  EXIT = 0,
-  WALL = 1,
-  UNKNOWN = 2,
-  VIRTUAL = 3,
-};
+//***************************************************************************//
 
-struct WallInfo {
-  unsigned char north : 2;
-  unsigned char east : 2;
-  unsigned char south : 2;
-  unsigned char west : 2;
-};
-
+/***
+ * A Heading represents one of the four cardinal compass headings. Normally
+ * this is sufficient. If you are going to run diagonals, you might want to
+ * expand the list.
+ *
+ * The compiler will number enums consecutively starting at zero so we can
+ * use a couple of tricks to work out what the new value should be when
+ * the robot turns.
+ *
+ * If you expand the list for diagonals, take care to modify the calculations
+ * appropriately.
+ */
 enum Heading { NORTH, EAST, SOUTH, WEST, HEADING_COUNT, BLOCKED = 99 };
+
+inline Heading right_from(const Heading heading) {
+  return static_cast<Heading>((heading + 1) % HEADING_COUNT);
+}
+
+inline Heading left_from(const Heading heading) {
+  return static_cast<Heading>((heading + HEADING_COUNT - 1) % HEADING_COUNT);
+}
+
+inline Heading ahead_from(const Heading heading) {
+  return heading;
+}
+
+inline Heading behind_from(const Heading heading) {
+  return static_cast<Heading>((heading + 2) % HEADING_COUNT);
+}
+//***************************************************************************//
+
+/***
+ * Directions are relative to the robot's orientation. They do not refer to
+ * any particular heading and are just used to make code more readable where
+ * decisions are made about which way to turn.
+ */
 
 enum Direction { AHEAD, RIGHT, BACK, LEFT, DIRECTION_COUNT };
 
-#define MAX_COST 255
+//***************************************************************************//
+
+/***
+ * For the classic micromouse contest, the maze is 16x16 cells. That is
+ * convenient because a single byte can be used to store the cost associated
+ * with each cell when performing a simple flood.
+ *
+ * If you extend the code to cope with a half-size maze of up to 32x32 cells
+ * you will need to make changes to the way the cost is stored.
+ *
+ * A more sophisticated method for flooding the maze might also require larger
+ * values for cost and changes will be needed. the AVR has very limited RAM
+ * so the simplest option is used here.
+ */
 #define MAZE_WIDTH 16
-#define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_WIDTH)
+#define MAZE_HEIGHT 16
+#define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_HEIGHT)
+#define MAX_COST (MAZE_CELL_COUNT - 1)
 
-// for the print function
-#define POST 'o'
-#define ERR '?'
-#define GAP "   "
-#define H_WALL F("---")
-#define H_EXIT F("   ")
-#define H_UNKN F("···")
-#define H_VIRT F("###")
-#define V_WALL '|'
-#define V_EXIT ' '
-#define V_UNKN ':'
-#define V_VIRT '#'
-enum MazeView { PLAIN, COSTS, DIRS };
+//***************************************************************************//
 
+/***
+ * Location stores a position in the maze as an (x,y) coordinate pair. This is
+ * probably a more intuitive representation than storing just a single index
+ * into and array. The method takes a little more code to manage than historical
+ * methods but they were devised for processors with very little program memory.
+ *
+ * This is a example of more processor power making is easier to represent data
+ * in a more user-friendly manner.
+ *
+ * Locations have a number of supporting operations collected into the struct so
+ * that you don't have to keep re-writing the same bits of code.
+ *
+ */
+class Location {
+ public:
+  uint8_t x;
+  uint8_t y;
+
+  Location() : x(0), y(0){};
+  Location(uint8_t ix, uint8_t iy) : x(ix), y(iy){};
+
+  bool is_in_maze() {
+    return x < MAZE_WIDTH && y < MAZE_HEIGHT;
+  }
+
+  bool operator==(const Location &obj) const {
+    return x == obj.x && y == obj.y;
+  }
+
+  bool operator!=(const Location &obj) const {
+    return x != obj.x || y != obj.y;
+  }
+
+  // these operators prevent the user from exceeding the bounds of the maze
+  // by wrapping to the opposite edge
+  Location north() const {
+    return Location(x, (y + 1) % MAZE_HEIGHT);
+  }
+
+  Location east() const {
+    return Location((x + 1) % MAZE_WIDTH, y);
+  }
+
+  Location south() const {
+    return Location(x, (y + MAZE_HEIGHT - 1) % MAZE_HEIGHT);
+  }
+
+  Location west() const {
+    return Location((x + MAZE_WIDTH - 1) % MAZE_WIDTH, y);
+  }
+
+  Location neighbour(const Heading heading) const {
+    switch (heading) {
+      case NORTH:
+        return north();
+        break;
+      case EAST:
+        return east();
+        break;
+      case SOUTH:
+        return south();
+        break;
+      case WEST:
+        return west();
+        break;
+      default:
+        return *this;  // this is actually an error and should be handled
+        break;
+    }
+  }
+};
+
+//***************************************************************************//
+
+/***
+ * The Maze class is the heart of the micromouse data.
+ *
+ * In this basic version, the maze has a single goal location even though all
+ * micromouse mazes can have a rectangular region that defines a goal area.
+ *
+ * The two main data blocks in the class store the wall state of every cell
+ * and a cost associated with every cell after the maze is flooded.
+ *
+ * To keep code simple, you will note that each wall is stored twice - once
+ * as seen from each side. The methods in the maze take care to ensure that
+ * changes to a wall are recorded in both associated cells.
+ *
+ * Before flooding the maze, take care to set the maze mask as appropriate.
+ * See the description above for details of the mask.
+ *
+ * When the robot searches and updates the map, you should call the method
+ * update_wall_state() to record changes. The similar-looking method
+ * set_wall_state() is private for a reason. It is unconditional and may
+ * result in walls being changed after they were frst seen.
+ *
+ */
 class Maze {
  public:
   Maze() {
   }
 
-  void set_goal(uint8_t goal_cell) {
-    m_goal = goal_cell;
-  }
-
-  uint8_t goal() {
+  Location goal() const {
     return m_goal;
   }
 
-  bool has_unknown_walls(int cell) {
-    WallInfo walls_here = m_walls[cell];
+  /// @brief  changes the default goal. For example in a practice maze
+  void set_goal(const Location goal) {
+    m_goal = goal;
+  }
+
+  /// @brief  return the state of the walls in a cell
+  WallInfo walls(const Location cell) const {
+    return m_walls[cell.x][cell.y];
+  }
+
+  /// @brief return true if ANY walls in a cell have NOT been seen
+  bool has_unknown_walls(const Location cell) const {
+    WallInfo walls_here = m_walls[cell.x][cell.y];
     if (walls_here.north == UNKNOWN || walls_here.east == UNKNOWN || walls_here.south == UNKNOWN || walls_here.west == UNKNOWN) {
       return true;
     } else {
@@ -98,24 +270,27 @@ class Maze {
     }
   }
 
-  bool cell_is_visited(uint8_t cell) {
+  /// @brief  return true if ALL the walls in a cell have been seen
+  bool cell_is_visited(const Location cell) const {
     return not has_unknown_walls(cell);
   }
 
-  bool is_exit(uint8_t cell, uint8_t direction) {
+  /// @brief  Use the current mask to test if a given wall is an exit
+  bool is_exit(const Location cell, const Heading heading) const {
     bool result = false;
-    switch (direction) {
+    WallInfo walls = m_walls[cell.x][cell.y];
+    switch (heading) {
       case NORTH:
-        result = (m_walls[cell].north & m_mask) == EXIT;
+        result = (walls.north & m_mask) == EXIT;
         break;
       case EAST:
-        result = (m_walls[cell].east & m_mask) == EXIT;
+        result = (walls.east & m_mask) == EXIT;
         break;
       case SOUTH:
-        result = (m_walls[cell].south & m_mask) == EXIT;
+        result = (walls.south & m_mask) == EXIT;
         break;
       case WEST:
-        result = (m_walls[cell].west & m_mask) == EXIT;
+        result = (walls.west & m_mask) == EXIT;
         break;
       default:
         result = false;
@@ -124,166 +299,89 @@ class Maze {
     return result;
   }
 
-  // Unconditionally set a wall state.
-  // Normally you only use this in settning up te maze at the start
-  void set_wall_state(uint8_t cell, uint8_t direction, WallState state) {
-    switch (direction) {
+  /// @brief only change a wall if it is unknown
+  // This is what you use when exploring. Once seen, a wall should not be changed again.
+  void update_wall_state(const Location cell, const Heading heading, const WallState state) {
+    switch (heading) {
       case NORTH:
-        m_walls[cell].north = state;
-        m_walls[cell_north(cell)].south = state;
-        break;
-      case EAST:
-        m_walls[cell].east = state;
-        m_walls[cell_east(cell)].west = state;
-        break;
-      case WEST:
-        m_walls[cell].west = state;
-        m_walls[cell_west(cell)].east = state;
-        break;
-      case SOUTH:
-        m_walls[cell].south = state;
-        m_walls[cell_south(cell)].north = state;
-        break;
-      default:
-        // ignore any other direction (blocked)
-        break;
-    }
-  }
-
-  // only change a wall if it is unknown
-  // This is what you use when exploring. Once seen, a wall should not be changed.
-  void update_wall_state(uint8_t cell, uint8_t direction, WallState state) {
-    switch (direction) {
-      case NORTH:
-        if ((m_walls[cell].north & UNKNOWN) != UNKNOWN) {
+        if ((m_walls[cell.x][cell.y].north & UNKNOWN) != UNKNOWN) {
           return;
         }
         break;
       case EAST:
-        if ((m_walls[cell].east & UNKNOWN) != UNKNOWN) {
+        if ((m_walls[cell.x][cell.y].east & UNKNOWN) != UNKNOWN) {
           return;
         }
         break;
       case WEST:
-        if ((m_walls[cell].west & UNKNOWN) != UNKNOWN) {
+        if ((m_walls[cell.x][cell.y].west & UNKNOWN) != UNKNOWN) {
           return;
         }
         break;
       case SOUTH:
-        if ((m_walls[cell].south & UNKNOWN) != UNKNOWN) {
+        if ((m_walls[cell.x][cell.y].south & UNKNOWN) != UNKNOWN) {
           return;
         }
         break;
       default:
-        // ignore any other direction (blocked)
+        // ignore any other heading (blocked)
         break;
     }
-    set_wall_state(cell, direction, state);
+    set_wall_state(cell, heading, state);
   }
 
-  /***
-   * Initialise a maze and the costs with border m_walls and the start cell
-   *
-   * If a test maze is provided, the m_walls will all be set up from that
-   * No attempt is made to verufy the correctness of a test maze.
-   *
-   */
+  /// @brief set empty maze with border walls and the start cell, zero costs
   void initialise() {
-    for (int i = 0; i < MAZE_CELL_COUNT; i++) {
-      m_cost[i] = 0;
-      set_wall_state(i, NORTH, UNKNOWN);
-      set_wall_state(i, EAST, UNKNOWN);
-      set_wall_state(i, SOUTH, UNKNOWN);
-      set_wall_state(i, WEST, UNKNOWN);
+    for (int x = 0; x < MAZE_WIDTH; x++) {
+      for (int y = 0; y < MAZE_HEIGHT; y++) {
+        m_walls[x][y].north = UNKNOWN;
+        m_walls[x][y].east = UNKNOWN;
+        m_walls[x][y].south = UNKNOWN;
+        m_walls[x][y].west = UNKNOWN;
+      }
     }
-    // place the boundary walls.
-    for (uint8_t i = 0; i < MAZE_WIDTH; i++) {
-      set_wall_state(i, WEST, WALL);
-      set_wall_state(MAZE_WIDTH * (MAZE_WIDTH - 1) + i, EAST, WALL);
-      set_wall_state(MAZE_WIDTH * i, SOUTH, WALL);
-      set_wall_state(MAZE_WIDTH * i + MAZE_WIDTH - 1, NORTH, WALL);
+    for (int x = 0; x < MAZE_WIDTH; x++) {
+      m_walls[x][0].south = WALL;
+      m_walls[x][MAZE_HEIGHT - 1].north = WALL;
     }
-    // and the start cell m_walls.
-    set_wall_state(START, NORTH, EXIT);
-    set_wall_state(START, EAST, WALL);
+    for (int y = 0; y < MAZE_HEIGHT; y++) {
+      m_walls[0][y].west = WALL;
+      m_walls[MAZE_WIDTH - 1][y].east = WALL;
+    }
+    m_walls[0][0].north = EXIT;
+    m_walls[0][0].east = WALL;
+    m_walls[0][0].south = WALL;
+    m_walls[0][0].west = WALL;
+
     // the open maze treats unknowns as exits
     set_mask(MASK_OPEN);
   }
 
-  void set_mask(MazeMask mask) {
+  void set_mask(const MazeMask mask) {
     m_mask = mask;
   }
 
-  MazeMask get_mask() {
+  MazeMask get_mask() const {
     return m_mask;
   }
 
-  uint8_t cell_north(uint8_t cell) {
-    uint8_t nextCell = (cell + (1));
-    return nextCell;
-  }
-
-  uint8_t cell_east(uint8_t cell) {
-    uint8_t nextCell = (cell + (MAZE_WIDTH));
-    return nextCell;
-  }
-
-  uint8_t cell_south(uint8_t cell) {
-    uint8_t nextCell = (cell + (MAZE_CELL_COUNT - 1));
-    return nextCell;
-  }
-
-  uint8_t cell_west(uint8_t cell) {
-    uint8_t nextCell = (cell + (MAZE_CELL_COUNT - MAZE_WIDTH));
-    return nextCell;
-  }
-
-  static uint8_t ahead_from(uint8_t heading) {
-    return (heading);
-  }
-  static uint8_t right_from(uint8_t heading) {
-    return ((heading + 1) % HEADING_COUNT);
-  }
-  static uint8_t behind(uint8_t heading) {
-    return ((heading + 2) % HEADING_COUNT);
-  }
-  static uint8_t left_from(uint8_t heading) {
-    return ((heading + HEADING_COUNT - 1) % HEADING_COUNT);
-  }
-
-  uint8_t neighbour(uint8_t cell, uint8_t direction) {
-    uint16_t next;
-    switch (direction) {
-      case NORTH:
-        next = cell_north(cell);
-        break;
-      case EAST:
-        next = cell_east(cell);
-        break;
-      case SOUTH:
-        next = cell_south(cell);
-        break;
-      case WEST:
-        next = cell_west(cell);
-        break;
-      default:
-        next = MAX_COST;
-    }
-    return next;
-  }
-
-  /***
-   * Assumes the maze has been flooded
-   */
-  uint8_t neighbour_cost(uint8_t cell, uint8_t direction) {
-    if (not is_exit(cell, direction)) {
+  /// @brief return cost for neighbour cell in supplied heading
+  uint16_t neighbour_cost(const Location cell, const Heading heading) const {
+    if (not is_exit(cell, heading)) {
       return MAX_COST;
     }
-    int next_cell = neighbour(cell, direction);
-    return m_cost[next_cell];
+    Location next_cell = cell.neighbour(heading);
+    return m_cost[next_cell.x][next_cell.y];
+  }
+
+  /// @brief  return the cost associated withthe supplied cell location
+  uint16_t cost(const Location cell) const {
+    return m_cost[cell.x][cell.y];
   }
 
   /***
+   * @brief basic manhattan flood of the maze
+   *
    * Very simple cell counting flood fills m_cost array with the
    * manhattan distance from every cell to the target.
    *
@@ -293,22 +391,26 @@ class Maze {
    *
    * @param target - the cell from which all distances are calculated
    */
-  void flood(uint8_t target) {
-    for (int i = 0; i < MAZE_CELL_COUNT; i++) {
-      m_cost[i] = MAX_COST;
+
+  void flood(const Location target) {
+    for (int x = 0; x < MAZE_WIDTH; x++) {
+      for (int y = 0; y < MAZE_HEIGHT; y++) {
+        m_cost[x][y] = (uint8_t)MAX_COST;
+      }
     }
-    Queue<uint8_t, 64> queue;
-    m_cost[target] = 0;
+    Queue<Location, 64> queue;
+    m_cost[target.x][target.y] = 0;
     queue.add(target);
     while (queue.size() > 0) {
-      uint8_t here = queue.head();
-      uint16_t newCost = m_cost[here] + 1;
-
-      for (uint8_t direction = 0; direction < DIRECTION_COUNT; direction++) {
-        if (is_exit(here, direction)) {
-          uint16_t nextCell = neighbour(here, direction);
-          if (m_cost[nextCell] > newCost) {
-            m_cost[nextCell] = newCost;
+      Location here = queue.head();
+      uint16_t newCost = m_cost[here.x][here.y] + 1;
+      // the casting of enums is potentially problematic
+      for (int h = NORTH; h < HEADING_COUNT; h++) {
+        Heading heading = static_cast<Heading>(h);
+        if (is_exit(here, heading)) {
+          Location nextCell = here.neighbour(heading);
+          if (m_cost[nextCell.x][nextCell.y] > newCost) {
+            m_cost[nextCell.x][nextCell.y] = newCost;
             queue.add(nextCell);
           }
         }
@@ -322,124 +424,78 @@ class Maze {
    * then looking right, then left, the result will preferentially be
    * ahead if there are multiple neighbours with the same m_cost.
    *
+   * This could be extended to look ahead then towards the goal but it
+   * probably is not worth the effort
+   * @brief get the geating to the lowest cost neighbour
    * @param cell
-   * @param startDirection
+   * @param start_heading
    * @return
    */
-  uint8_t direction_to_smallest(uint8_t cell, uint8_t startDirection) {
-    uint8_t nextDirection = startDirection;
-    uint8_t smallestDirection = BLOCKED;
-    uint16_t nextCost;
-    uint16_t smallestCost = m_cost[cell];
-    nextCost = neighbour_cost(cell, nextDirection);
-    if (nextCost < smallestCost) {
-      smallestCost = nextCost;
-      smallestDirection = nextDirection;
+  Heading heading_to_smallest(const Location cell, const Heading start_heading) const {
+    Heading next_heading = start_heading;
+    Heading best_heading = BLOCKED;
+    uint16_t best_cost = cost(cell);
+    uint16_t cost;
+    cost = neighbour_cost(cell, next_heading);
+    if (cost < best_cost) {
+      best_cost = cost;
+      best_heading = next_heading;
     };
-    nextDirection = right_from(startDirection);
-    nextCost = neighbour_cost(cell, nextDirection);
-    if (nextCost < smallestCost) {
-      smallestCost = nextCost;
-      smallestDirection = nextDirection;
+    next_heading = right_from(start_heading);
+    cost = neighbour_cost(cell, next_heading);
+    if (cost < best_cost) {
+      best_cost = cost;
+      best_heading = next_heading;
     };
-    nextDirection = left_from(startDirection);
-    nextCost = neighbour_cost(cell, nextDirection);
-    if (nextCost < smallestCost) {
-      smallestCost = nextCost;
-      smallestDirection = nextDirection;
+    next_heading = left_from(start_heading);
+    cost = neighbour_cost(cell, next_heading);
+    if (cost < best_cost) {
+      best_cost = cost;
+      best_heading = next_heading;
     };
-    nextDirection = behind(startDirection);
-    nextCost = neighbour_cost(cell, nextDirection);
-    if (nextCost < smallestCost) {
-      smallestCost = nextCost;
-      smallestDirection = nextDirection;
+    next_heading = behind_from(start_heading);
+    cost = neighbour_cost(cell, next_heading);
+    if (cost < best_cost) {
+      best_cost = cost;
+      best_heading = next_heading;
     };
-    if (smallestCost == MAX_COST) {
-      smallestDirection = 0;
+    if (best_cost == MAX_COST) {
+      best_heading = BLOCKED;
     }
-    return smallestDirection;
-  }
-
-  /**
-   * Maze printing.
-   *
-   * Included here for want of a better place.
-   *
-   *
-   */
-
-  void print_h_wall(uint8_t state) {
-    if (state == EXIT) {
-      Serial.print(H_EXIT);
-    } else if (state == WALL) {
-      Serial.print(H_WALL);
-    } else if (state == VIRTUAL) {
-      Serial.print(H_VIRT);
-    } else {
-      Serial.print(H_UNKN);
-    }
-  }
-  void printNorthWalls(int row) {
-    for (int col = 0; col < MAZE_WIDTH; col++) {
-      unsigned char cell = row + MAZE_WIDTH * col;
-      Serial.print('o');
-      print_h_wall(m_walls[cell].north & m_mask);
-    }
-    Serial.println(POST);
-  }
-
-  void printSouthWalls(int row) {
-    for (int col = 0; col < MAZE_WIDTH; col++) {
-      unsigned char cell = row + MAZE_WIDTH * col;
-      Serial.print(POST);
-      print_h_wall(m_walls[cell].south & m_mask);
-    }
-    Serial.println(POST);
-  }
-
-  void print(int style = PLAIN) {
-    const char dirChars[] = "^>v<*";
-    Serial.println();
-    flood(goal());
-    for (int row = 15; row >= 0; row--) {
-      printNorthWalls(row);
-      for (int col = 0; col < MAZE_WIDTH; col++) {
-        unsigned char cell = row + MAZE_WIDTH * col;
-        uint8_t state = m_walls[cell].west & m_mask;
-        if (state == EXIT) {
-          Serial.print(V_EXIT);
-        } else if (state == WALL) {
-          Serial.print(V_WALL);
-        } else if (state == VIRTUAL) {
-          Serial.print(V_VIRT);
-        } else {
-          Serial.print(V_UNKN);
-        }
-        if (style == COSTS) {
-          print_justified(m_cost[cell], 3);
-        } else if (style == DIRS) {
-          unsigned char direction = direction_to_smallest(cell, NORTH);
-          if (cell == goal()) {
-            direction = DIRECTION_COUNT;
-          }
-          Serial.print(' ');
-          Serial.print(dirChars[direction]);
-          Serial.print(' ');
-        } else {
-          Serial.print(GAP);
-        }
-      }
-      Serial.println(V_WALL);
-    }
-    printSouthWalls(0);
-    Serial.println();
+    return best_heading;
   }
 
  private:
+  // Unconditionally set a wall state.
+  // use update_wall_state() when exploring
+  void set_wall_state(const Location loc, const Heading heading, const WallState state) {
+    switch (heading) {
+      case NORTH:
+        m_walls[loc.x][loc.y].north = state;
+        m_walls[loc.north().x][loc.north().y].south = state;
+        break;
+      case EAST:
+        m_walls[loc.x][loc.y].east = state;
+        m_walls[loc.east().x][loc.east().y].west = state;
+        break;
+      case WEST:
+        m_walls[loc.x][loc.y].west = state;
+        m_walls[loc.west().x][loc.west().y].east = state;
+        break;
+      case SOUTH:
+        m_walls[loc.x][loc.y].south = state;
+        m_walls[loc.south().x][loc.south().y].north = state;
+        break;
+      default:
+        // ignore any other heading (blocked)
+        break;
+    }
+  }
   MazeMask m_mask = MASK_OPEN;
-  uint8_t m_goal = 0x077;
-  uint8_t m_cost[MAZE_CELL_COUNT];
-  WallInfo m_walls[MAZE_CELL_COUNT];
+  Location m_goal{7, 7};
+  // on Arduino only use 8 bits for cost to save space
+  uint8_t m_cost[MAZE_WIDTH][MAZE_HEIGHT];
+  WallInfo m_walls[MAZE_WIDTH][MAZE_HEIGHT];
 };
 
 extern Maze maze;

@@ -286,11 +286,16 @@ class CommandLineInterface {
     if (strcmp("HELP", args.argv[0]) == 0) {
       help();
     } else if (strcmp("SEARCH", args.argv[0]) == 0) {
-      int target = -1;
-      int is_number = read_integer(args.argv[1], target);
-      if (is_number) {
-        mouse.search_to(target);
-      }
+      int x = 0;
+      int y = 0;
+      if (!read_integer(args.argv[1], x)) {
+        x = 7;
+      };
+
+      if (!read_integer(args.argv[2], y)) {
+        y = 7;
+      };
+      mouse.search_to(Location(x, y));
     }
   }
 
@@ -305,17 +310,17 @@ class CommandLineInterface {
         help();
         break;
       case 'W':
-        maze.print(PLAIN);
+        reporter.print_maze(PLAIN);
         break;
       case 'X':
         Serial.println(F("Reset Maze"));
         maze.initialise();
         break;
       case 'C':
-        maze.print(COSTS);
+        reporter.print_maze(COSTS);
         break;
       case 'R':
-        maze.print(DIRS);
+        reporter.print_maze(DIRS);
         break;
       case 'B':
         Serial.print(F("Battery: "));
@@ -365,9 +370,9 @@ class CommandLineInterface {
       case 2:
         mouse.search_maze();
         break;
-      case 3:
+      case 3: {
         mouse.follow_to(maze.goal());
-        break;
+      } break;
       case 4:
         mouse.test_SS90E();
         break;

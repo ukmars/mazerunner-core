@@ -78,6 +78,10 @@ class Encoders {
    *
    * A more generic solution where the pin names are not constants would be slower
    * unless we can make their definition known at compile time.
+   *
+   * Note that the decoding method used here assumes that one of the channels
+   * is a frequency-doubled clock signal. It is not decoding a 'normal'
+   * quadrature input.
    */
   void left_input_change() {
     static bool oldA = false;
@@ -101,6 +105,34 @@ class Encoders {
     oldB = newB;
   }
 
+  /**
+   * @brief update the robot speeds and positions from the encoders
+   *
+   * The update method is called during each control cycle from the
+   * systick event. It will use the change in encoder value since the
+   * last call to update values for the current speed, angular velocity,
+   * distance travelled and robot angle.
+   *
+   * The recorded speeds are going to show quite a lot of noise when
+   * the encoder resolution is poor. Positions effectively integrate out
+   * a fair bit of the noise.
+   *
+   * The speeds are not recorded directly, only the changes in encoder
+   * readings. This slightly reduces the computational load in the
+   * systick event and the low-level controllers are only using the
+   * changes in robot position and angle, not the speed directly.
+   * If you need to see a value for the current speed or angular
+   * velocity in real units, use the robot_speed() and robot_omeag()
+   * methods.
+   *
+   * Because update() is called from an interrupt service routine it
+   * will be changing the values in ways that the higher level code may
+   * not be able to know about. Always use the methods provided that
+   * guard against unpredictable changes.
+   *
+   * If using an IMU, prefer that for measurement of angular velocity
+   * and angle.
+   */
   void update() {
     int left_delta = 0;
     int right_delta = 0;
@@ -114,11 +146,27 @@ class Encoders {
     float left_change = left_delta * MM_PER_COUNT_LEFT;
     float right_change = right_delta * MM_PER_COUNT_RIGHT;
     m_fwd_change = 0.5 * (right_change + left_change);
-    m_rot_change = (right_change - left_change) * DEG_PER_MM_DIFFERENCE;
     m_robot_distance += m_fwd_change;
+    m_rot_change = (right_change - left_change) * DEG_PER_MM_DIFFERENCE;
     m_robot_angle += m_rot_change;
   }
 
+  /**
+   * These convenience methods provide safe access to the recorded values
+   * from the encoders.
+   *
+   * The ATOMIC_BLOCK guards ensure that the values canot change  while
+   * they are being retreived and are needed because the update() method
+   * is called from an interrupt service routine. The guard block will
+   * temporarily disable any other interrupts for the duration of the
+   * block
+   *
+   * On 32 bit processors, they would not be needed and their use in this
+   * code is sometimes not needed. However, the guards do not significantly
+   * affect performance. They insert only three machine instructions per
+   * guard block and the compiler will almost certainly inline the method
+   * calls so there will not even be a function call overhead.
+   */
   float robot_distance() {
     float distance;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
@@ -146,6 +194,7 @@ class Encoders {
   float robot_fwd_change() {
     float distance;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      ;
       distance = m_fwd_change;
     }
     return distance;
@@ -167,7 +216,7 @@ class Encoders {
     return angle;
   }
 
-  // None of the variables in this file should be directly available to the rest
+  // None of the variables in this class should be directly available to the rest
   // of the code without a guard to ensure atomic access
  private:
   volatile float m_robot_distance;
