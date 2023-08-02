@@ -52,7 +52,7 @@ class Mouse {
   void init() {
     m_handStart = false;
     sensors.set_steering_mode(STEERING_OFF);
-    m_location = 0;
+    m_location = Location(0, 0);
     m_heading = NORTH;
   }
 
@@ -494,8 +494,9 @@ class Mouse {
     m_handStart = true;
     m_location = START;
     m_heading = NORTH;
-    search_to(maze.goal().x * MAZE_WIDTH + maze.goal().y);
-    maze.flood(Location(0, 0));
+    search_to(maze.goal());
+    maze.flood(START);
+
     Heading best_direction = maze.heading_to_smallest(m_location, m_heading);
     turn_to_face(best_direction);
     m_handStart = false;
