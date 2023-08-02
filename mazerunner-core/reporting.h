@@ -410,7 +410,7 @@ class Reporter {
 
     Serial.println();
     maze.flood(maze.goal());
-    for (int y = MAZE_WIDTH - 1; y >= 0; y--) {
+    for (int y = MAZE_HEIGHT - 1; y >= 0; y--) {
       printNorthWalls(y);
       for (int x = 0; x < MAZE_WIDTH; x++) {
         Location location(x, y);
