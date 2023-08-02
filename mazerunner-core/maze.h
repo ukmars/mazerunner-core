@@ -157,9 +157,6 @@ enum Direction { AHEAD, RIGHT, BACK, LEFT, DIRECTION_COUNT };
  * Locations have a number of supporting operations collected into the struct so
  * that you don't have to keep re-writing the same bits of code.
  *
- * Note that in C++ a struct is functionally identical to a class but with all
- * members public by default.
- *
  */
 class Location {
  public:
