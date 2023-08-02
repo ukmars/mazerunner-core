@@ -139,7 +139,8 @@ enum Direction { AHEAD, RIGHT, BACK, LEFT, DIRECTION_COUNT };
  * so the simplest option is used here.
  */
 #define MAZE_WIDTH 16
-#define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_WIDTH)
+#define MAZE_HEIGHT 16
+#define MAZE_CELL_COUNT (MAZE_WIDTH * MAZE_HEIGHT)
 #define MAX_COST (MAZE_CELL_COUNT - 1)
 
 //***************************************************************************//
@@ -164,13 +165,11 @@ struct Location {
   uint8_t x;
   uint8_t y;
 
-
-
   Location() : x(0), y(0){};
   Location(uint8_t ix, uint8_t iy) : x(ix), y(iy){};
 
   bool is_in_maze() {
-    return x < MAZE_WIDTH && y < MAZE_WIDTH;
+    return x < MAZE_WIDTH && y < MAZE_HEIGHT;
   }
 
   bool operator==(const Location &obj) const {
@@ -184,7 +183,7 @@ struct Location {
   // these operators prevent the user from exceeding the bounds of the maze
   // by wrapping to the opposite edge
   Location north() const {
-    return Location(x, (y + 1) % MAZE_WIDTH);
+    return Location(x, (y + 1) % MAZE_HEIGHT);
   }
 
   Location east() const {
@@ -192,7 +191,7 @@ struct Location {
   }
 
   Location south() const {
-    return Location(x, (y + MAZE_WIDTH - 1) % MAZE_WIDTH);
+    return Location(x, (y + MAZE_HEIGHT - 1) % MAZE_HEIGHT);
   }
 
   Location west() const {
@@ -336,7 +335,7 @@ class Maze {
   /// @brief set empty maze with border walls and the start cell, zero costs
   void initialise() {
     for (int x = 0; x < MAZE_WIDTH; x++) {
-      for (int y = 0; y < MAZE_WIDTH; y++) {
+      for (int y = 0; y < MAZE_HEIGHT; y++) {
         m_walls[x][y].north = UNKNOWN;
         m_walls[x][y].east = UNKNOWN;
         m_walls[x][y].south = UNKNOWN;
@@ -345,9 +344,9 @@ class Maze {
     }
     for (int x = 0; x < MAZE_WIDTH; x++) {
       m_walls[x][0].south = WALL;
-      m_walls[x][MAZE_WIDTH - 1].north = WALL;
+      m_walls[x][MAZE_HEIGHT - 1].north = WALL;
     }
-    for (int y = 0; y < MAZE_WIDTH; y++) {
+    for (int y = 0; y < MAZE_HEIGHT; y++) {
       m_walls[0][y].west = WALL;
       m_walls[MAZE_WIDTH - 1][y].east = WALL;
     }
@@ -397,7 +396,7 @@ class Maze {
 
   void flood(const Location target) {
     for (int x = 0; x < MAZE_WIDTH; x++) {
-      for (int y = 0; y < MAZE_WIDTH; y++) {
+      for (int y = 0; y < MAZE_HEIGHT; y++) {
         m_cost[x][y] = (uint8_t)MAX_COST;
       }
     }
@@ -497,8 +496,8 @@ class Maze {
   MazeMask m_mask = MASK_OPEN;
   Location m_goal{7, 7};
   // on Arduino only use 8 bits for cost to save space
-  uint8_t m_cost[MAZE_WIDTH][MAZE_WIDTH];
-  WallInfo m_walls[MAZE_WIDTH][MAZE_WIDTH];
+  uint8_t m_cost[MAZE_WIDTH][MAZE_HEIGHT];
+  WallInfo m_walls[MAZE_WIDTH][MAZE_HEIGHT];
 };
 
 extern Maze maze;
