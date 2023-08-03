@@ -48,7 +48,7 @@
  * module like the HC-05. This can be left plugged in all the time so that
  * reporting can be done while running. You could also connect a serial
  * logger to this port and record data throughout a contest run.
- * 
+ *
  * Note that the Serial device has a 64 character buffer and, at 115200 baud
  * 64 characters will take about 6ms to go out over the wire.
  *
@@ -103,10 +103,6 @@ class Reporter {
     printer.print(value);
   }
 
-  // void print_justified(int value, int width) {
-  //   print_justified(int32_t(value), width,p);
-  // }
-
   /**
    * The profile reporter will send out a table of space separated
    * data so that the results can be saved to a file or imported to
@@ -136,7 +132,6 @@ class Reporter {
   void report_profile() {
     if (millis() >= s_report_time) {
       s_report_time += s_report_interval;
-      print_justified(int(millis() - s_start_time), 6);
       print_justified(int(encoders.robot_distance()), 6);
       print_justified(int(encoders.robot_angle()), 6);
       print_justified(int(motion.position()), 6);
