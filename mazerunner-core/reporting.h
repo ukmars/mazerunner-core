@@ -26,16 +26,31 @@
  * the behaviour of the robot.
  *
  * The Reporter class and its supporting functions provide a number of pre-
- * written reports over the Serial device that let you observe things like
- * controller state and sensor readings. Many of these will be used a lot
- * during development and you can use any of them as a template for custom
- * reports.
+ * written reports that let you observe things like controller state and
+ * sensor readings. Many of these will be used a lot during development and
+ * you can use any of them as a template for custom reports.
+ *
+ * Most commonly the only output device will be the normal Arduino Serial
+ * device. However, if you have a second serial port or some other device such
+ * as a serial logger you can divert reporter output to that. The method
+ * set_printer() will change the destination for _all_ reporter output. Any
+ * interaction on the command line interface will not be affected except, of
+ * course a cli command that fires off a report may not see the output if you
+ * have changed the reporter print device. You can switch devices as often
+ * as you like.
+ *
+ * I would suggest that any interactive use might leave the reporter output
+ * destination as Serial and you could switch it to a logger, for example,
+ * at the start of a maze run.
  *
  * Although the Serial device on an Arduino normally requires the USB connection
  * UKMARSBOT has a connector specially intended for a cheap Bluetooth
  * module like the HC-05. This can be left plugged in all the time so that
  * reporting can be done while running. You could also connect a serial
  * logger to this port and record data throughout a contest run.
+ * 
+ * Note that the Serial device has a 64 character buffer and, at 115200 baud
+ * 64 characters will take about 6ms to go out over the wire.
  *
  * The BT connector also makes it possible to use the interactive Command
  * Line Interface while the robot is running.
@@ -49,6 +64,8 @@ const char hdg_letters[] = "NESW";
 enum MazeView { PLAIN, COSTS, DIRS };
 //***************************************************************************//
 
+static Stream& printer = Serial;
+
 class Reporter;
 extern Reporter reporter;
 class Reporter {
@@ -56,15 +73,10 @@ class Reporter {
   uint32_t s_report_time;
   uint32_t s_report_interval = REPORTING_INTERVAL;
 
-  Stream& printer = Serial;
-
  public:
   void set_printer(Stream& stream) {
     printer = stream;
   }
-
-  // note that the Serial device has a 64 character buffer and, at 115200 baud
-  // 64 characters will take about 6ms to go out over the wire.
 
   // simple formatting methods for printing maze costs
   void print_hex_2(unsigned char value) {
