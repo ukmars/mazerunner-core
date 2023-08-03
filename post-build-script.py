@@ -5,6 +5,7 @@
 
 Import("env", "projenv")
 
+
 # access to global build environment
 # print(env.Dump())
 
@@ -30,8 +31,10 @@ env.AddPostAction(
 env.AddPostAction(
     "$BUILD_DIR/${PROGNAME}.elf",
     env.VerboseAction(" ".join([
-        " avr-nm -Crtd --size-sort", "$BUILD_DIR/${PROGNAME}.elf",
-        "  | grep -i ' [dbv] ' > ", "${PROGNAME}.ram.txt"
+        'avr-nm -Crtd --size-sort', 
+        '$BUILD_DIR/${PROGNAME}.elf',
+        '| grep -i " [dbv] "',
+        '> ${PROGNAME}.ram.txt'
     ]), "Generate RAM file ${PROGNAME}.ram.txt")
 )
 
@@ -39,10 +42,13 @@ env.AddPostAction(
 env.AddPostAction(
     "$BUILD_DIR/${PROGNAME}.elf",
     env.VerboseAction(" ".join([
-        " avr-nm -Crtd --size-sort", "$BUILD_DIR/${PROGNAME}.elf",
-        "  | grep -i ' [t] ' > ", "${PROGNAME}.flash.txt"
+        ' avr-nm -Crtd --size-sort', 
+        '$BUILD_DIR/${PROGNAME}.elf',
+        '  | grep -i " [t] "',
+        ' > ${PROGNAME}.flash.txt'
     ]), "Generate FLASH file ${PROGNAME}.flash.txt")
 )
+
 
 # format sources
 env.AddPostAction(
