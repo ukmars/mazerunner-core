@@ -61,6 +61,37 @@ const char hdg_letters[] = "NESW";
 
 //***************************************************************************//
 
+/*
+// For future expansion, suppose you have a list of operations
+// as a set of defines like this:
+
+#define OP_START_MOVE 0x05
+#define OP_MAKE_MOVE 0x06
+#define OP_STOP 0x07
+
+// you might want to print their names not their values for
+// debugging purposes. Use the stringify operator, #, like this
+
+#define case_print(x)      \
+  case (x):                \
+    Serial.println(F(#x)); \
+    break;
+
+// and use a case statement to display the output
+// remmeber that each identifier string ends up in flash
+
+void print_name(int operation) {
+  switch (operation) {
+    case_print(OP_START_MOVE);
+    case_print(OP_MAKE_MOVE);
+    case_print(OP_STOP);
+    default:
+      Serial.println(F("UNKNOWN"));
+  }
+}
+*/
+//***************************************************************************//
+
 enum MazeView { PLAIN, COSTS, DIRS };
 //***************************************************************************//
 
