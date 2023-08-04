@@ -421,7 +421,6 @@ class Reporter {
   void print_maze(int style = PLAIN) {
     const char dirChars[] = "^>v<*";
 
-    printer.println();
     maze.flood(maze.goal());
     for (int y = MAZE_HEIGHT - 1; y >= 0; y--) {
       printNorthWalls(y);
@@ -451,8 +450,8 @@ class Reporter {
         } else {
           printer.print(GAP);
         }
-        printer.println(V_WALL);
       }
+      printer.println(V_WALL);
     }
     printSouthWalls(0);
     printer.println();
