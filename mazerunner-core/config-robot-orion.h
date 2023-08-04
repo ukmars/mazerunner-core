@@ -22,7 +22,7 @@
  * The sensors consist of SFH4550 emitters and SFH309FA detectors.
  *
  *****************************************************************************/
-
+#define NAME "ORION"
 //***** SENSOR CALIBRATION **************************************************//
 
 #if EVENT == EVENT_HOME

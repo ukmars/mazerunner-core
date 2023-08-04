@@ -95,13 +95,13 @@ struct TurnParameters {
 #define ROBOT_CORE_OSMIUM 1
 #define ROBOT_ORION 2
 
-#ifndef ROBOT_NAME
-#define ROBOT_NAME ROBOT_ORION
+#ifndef ROBOT
+#define ROBOT ROBOT_ORION
 #endif
 
-#if ROBOT_NAME == ROBOT_CORE_OSMIUM
+#if ROBOT == ROBOT_CORE_OSMIUM
 #include "config-robot-osmium.h"
-#elif ROBOT_NAME == ROBOT_ORION
+#elif ROBOT == ROBOT_ORION
 #include "config-robot-orion.h"
 #else
 #error "NO ROBOT DEFINED"

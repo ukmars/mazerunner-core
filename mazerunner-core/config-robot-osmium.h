@@ -24,7 +24,7 @@
  * OSMIUM is a placeholder for you own custom UKMARSBOT configuration
  *
  *****************************************************************************/
-
+#define NAME "OSMIUM CORE"
 //***** SENSOR CALIBRATION **************************************************//
 
 #if EVENT == EVENT_HOME
