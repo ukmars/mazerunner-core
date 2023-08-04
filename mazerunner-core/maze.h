@@ -348,10 +348,8 @@ class Maze {
       m_walls[0][y].west = WALL;
       m_walls[MAZE_WIDTH - 1][y].east = WALL;
     }
-    m_walls[0][0].north = EXIT;
-    m_walls[0][0].east = WALL;
-    m_walls[0][0].south = WALL;
-    m_walls[0][0].west = WALL;
+    set_wall_state(START, EAST, WALL);
+    set_wall_state(START, NORTH, EXIT);
 
     // the open maze treats unknowns as exits
     set_mask(MASK_OPEN);
