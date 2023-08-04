@@ -21,7 +21,7 @@
  * This files lets you pick a specific robot that has its unique
  * configuration stored in that file. In this way, you can write
  * generic code that will work with a variety of different actual
- * robots. there are a number of example robot files in the project.
+ * robots. There are a number of example robot files in the project.
  * You should pick one that is closest to your setup, copy it and
  * then amend the details in that copy. Finally, add or modify
  * the selection settings below to use your new robot configuration.
@@ -83,10 +83,12 @@ struct TurnParameters {
 
 /*************************************************************************/
 /***
- * Even with the same basic hardware,you may build robots with different characteristics
- * such as the motor gear ratio or the whieel size of sensor arrangement.
- * These characteristics are kept in their own config files. Add you robot to the list and create
- * a corresponding config file with its custom values.
+ * Even with the same basic hardware,you may build robots with different
+ * characteristics such as the motor gear ratio or the wheel size or sensor
+ * arrangement.
+ *
+ * These characteristics are kept in their own config files. Add you robot
+ * to the list and create a corresponding config file with its custom values.
  *
  * If you have only one robot then you can reduce this section to a single
  * include line.
@@ -95,9 +97,7 @@ struct TurnParameters {
 #define ROBOT_CORE_OSMIUM 1
 #define ROBOT_ORION 2
 
-#ifndef ROBOT
 #define ROBOT ROBOT_ORION
-#endif
 
 #if ROBOT == ROBOT_CORE_OSMIUM
 #include "config-robot-osmium.h"
@@ -108,8 +108,6 @@ struct TurnParameters {
 #endif
 
 /*************************************************************************/
-
-//***************************************************************************//
 /***
  * This piece of magic lets you define a variable, such as the maze, that can
  * survive a processor reset. The downside is that you MUST take care to
@@ -123,7 +121,7 @@ struct TurnParameters {
  */
 #define PERSISTENT __attribute__((section(".noinit")))
 
-// This is the size for each cell in the maze. Normally 180mm for a classic maze
+// This is the size, in mm,  for each cell in the maze.
 const float FULL_CELL = 180.0f;
 const float HALF_CELL = FULL_CELL / 2.0;
 

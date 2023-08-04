@@ -14,8 +14,6 @@
 
 // hardware configuration for for UKMARSBOT with an Arduino nano processor
 
-// #include "adc.h"
-
 //***************************************************************************//
 // Some physical constants that are likely to be board -specific
 // with robot against back wall, how much travel is there to the cell center?
