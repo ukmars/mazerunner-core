@@ -452,7 +452,6 @@ class Reporter {
   void print_maze(int style = PLAIN) {
     const char dirChars[] = "^>v<*";
 
-    maze.flood(maze.goal());
     for (int y = MAZE_HEIGHT - 1; y >= 0; y--) {
       printNorthWalls(y);
       for (int x = 0; x < MAZE_WIDTH; x++) {
