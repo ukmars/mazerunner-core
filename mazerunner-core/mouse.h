@@ -152,11 +152,9 @@ class Mouse {
         break;
       }
     }
-    if (triggered_by_sensor) {
-      reporter.log_action_status('S', m_location, m_heading);  // the sensors triggered the turn
-    } else {
-      reporter.log_action_status('D', m_location, m_heading);  // the position triggered the turn
-    }
+    char note = triggered_by_sensor ? 's' : 'd';
+    char dir = (turn_id & 1) ? 'R' : 'L';
+    reporter.log_action_status(dir, note, m_location, m_heading);  // the sensors triggered the turn
     // finally we get to actually turn
     motion.turn(params.angle, params.omega, 0, params.alpha);
     motion.move(params.run_out, motion.velocity(), SEARCH_SPEED, SEARCH_ACCELERATION);
@@ -224,6 +222,7 @@ class Mouse {
    * It only takes 27mm of travel to come to a halt from normal search speed.
    */
   void turn_back() {
+    reporter.log_action_status('B',' ',m_location, m_heading);)
     stop_at_center();
     turn_IP180();
     float distance = SENSING_POSITION - HALF_CELL;
@@ -258,7 +257,7 @@ class Mouse {
         break;
       }
       Serial.println();
-      reporter.log_action_status('-', m_location, m_heading);
+      reporter.log_action_status('-', ' ', m_location, m_heading);
       sensors.set_steering_mode(STEER_NORMAL);
       m_location = m_location.neighbour(m_heading);
       update_map();
@@ -281,7 +280,7 @@ class Mouse {
           action = 'B';
         }
       }
-      reporter.log_action_status(action, m_location, m_heading);
+      reporter.log_action_status(action, ' ', m_location, m_heading);
     }
     // we are entering the target cell so come to an orderly
     // halt in the middle of that cell
@@ -349,14 +348,13 @@ class Mouse {
         break;
       }
       Serial.println();
-      reporter.log_action_status('-', m_location, m_heading);
+      reporter.log_action_status('-', ' ', m_location, m_heading);
       sensors.set_steering_mode(STEER_NORMAL);
       m_location = m_location.neighbour(m_heading);  // the cell we are about to enter
       update_map();
       maze.flood(target);
       unsigned char newHeading = maze.heading_to_smallest(m_location, m_heading);
       unsigned char hdgChange = (newHeading - m_heading) & 0x3;
-      char action = '#';
       if (m_location != target) {
         switch (hdgChange) {
           // each of the following actions will finish with the
@@ -364,23 +362,18 @@ class Mouse {
           // next loop iteration
           case AHEAD:
             move_ahead();
-            action = 'F';
             break;
           case RIGHT:
             turn_right();
-            action = 'R';
             break;
           case BACK:
             turn_back();
-            action = 'B';
             break;
           case LEFT:
             turn_left();
-            action = 'L';
             break;
         }
       }
-      reporter.log_action_status(action, m_location, m_heading);
     }
     // we are entering the target cell so come to an orderly
     // halt in the middle of that cell
@@ -440,6 +433,17 @@ class Mouse {
     bool leftWall = sensors.see_left_wall;
     bool frontWall = sensors.see_front_wall;
     bool rightWall = sensors.see_right_wall;
+    char w[] = "--- ";
+    if (leftWall) {
+      w[0] = 'L';
+    };
+    if (frontWall) {
+      w[1] = 'F';
+    };
+    if (rightWall) {
+      w[2] = 'R';
+    };
+    Serial.print(w);
     switch (m_heading) {
       case NORTH:
         maze.update_wall_state(m_location, NORTH, frontWall ? WALL : EXIT);

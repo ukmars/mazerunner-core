@@ -362,9 +362,10 @@ class Reporter {
    */
   /// @private  don't  show this in doxygen output
   //
-  void log_action_status(char action, Location location, Heading heading) {
+  void log_action_status(char action, char note, Location location, Heading heading) {
     printer.print('{');
     printer.print(action);
+    printer.print(note);
     printer.print('[');
     printer.print(location.x);
     printer.print(',');
