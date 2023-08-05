@@ -419,7 +419,7 @@ class Mouse {
   }
 
   void turn_to_face(Heading newHeading) {
-    unsigned char hdgChange = (newHeading - m_heading) % HEADING_COUNT;
+    unsigned char hdgChange = (newHeading + HEADING_COUNT - m_heading) % HEADING_COUNT;
     switch (hdgChange) {
       case AHEAD:
         break;
