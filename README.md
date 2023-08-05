@@ -1,4 +1,12 @@
-# NOT READY FOR RELEASE - TEST CODE ONLY
+# BETA release 0.1.0
+
+This code is experimental and may have bugs, some of which may be serious. Use it without expectation of success.
+
+It is, however, intended to be a complete, fairly bare-bones micromouse software suite. It should contain all the basic functionality needed to allow a UKMARSBOT or close derivative to explore a classic micromouse maze and search to the center and back to the start.
+
+There are a couple of calibation routines by way of an example of how you might do the basic sensor calibration. There is also a command line interpreter for those who have a radio serial link such as a bluetooth module.
+
+
  
 ---
 
@@ -23,20 +31,19 @@ The project is maintained and developed using PlatformIO with Visual Studio Code
 
 Before flashing your robot, look in the config.h file. In here you can place entries that let you maintain your own robot-specific config file containing a number of default settings describing things like the motor gear ratio, wheel diameter and wheel spacing. 
 
-Each physical robot has its own config file. in the main config.h, add an entry for your robot name and create a corresponding config file in the `config` directory. You can start by copying one of the existing config files
-Check that these are at least close to the values required for your robot.
+Each physical robot has its own config file. In the main config.h, add an entry for your robot name and create a corresponding config file in the same directory. You can start by copying one of the existing robot config files. Check that these are at least close to the values required for your robot.
 
 Because it is not possible to know how you wired your motors and encoders, you will also find defaults for the motor and encoder polarity. You will need to first check that moving the wheels forwards by hand increases the corresponding encoder count. If not, change the encoder polarity settings as appropriate. If the robot then moves in the wrong direction or just turns instead of moving forward, adjust the relevant motor polarity settings.
 
-You will also find a directory called `board`. In there is an entry for the UKMARSBOT V1.x hardware. If you are using a different processor, or even a different robot, this is where you can define the pinouts and other hardware related items. It is used in a similar way to the `config` directory in that you can define a board name in `config.h`, add a suitale board definitions file and then make appropriate aliases for the hardware pins in the robot's own config file. It may sound awkward but it should be easier than messing in one bit configuration file and it will certainly help if you are running more than one robot.
+The config-ukmarsbot file contains things like pin definitions. These will be correct for the UKMARSBOT using a four-emitter sensor board. If you have a custom derivative, this is where you get to assign pins ot functions.
 
 ## Getting started
 
-There are very few tests built in to the code. These can be found in tests.cpp. When the controller starts up after power is applied, it will examine the value of the DIP switch at the rear of the robot and decide what to do based on the value it sees.
+To characterise your robot, you will need a separate test suite. Use code from the main mazerunner repository or the ukmarsbot-test repository or, of course, write your own. At the very least you will need to configure the encoder resolution and do some sensor calibration.
 
-To characterise your robot, you will need a separate test suite. Use code from the main mazerunner repository or the ukmarsbot-test repository
+**The first time you start the robot, make sure that switches are set to zero**. That is, all the switches should be 'down' towards the rear of the robot. Now connect the serial monitor at 115200 baud. When the robot boots, you should see a prompt written to the monitor.
 
-**The first time you start the robot, make sure that switches are set to zero**. That is, all the switches should be 'down' towards the rear of the robot. Now connect the serial monotor at 115200 baud. When the robot boots, you should see 'OK' written to the monitor.
+Enter a qustion mark followed by return to see a summary of the available commands.
 
 Most of the functions are activated by first pressing the user button and then bringing your hand close to the front sensor and away again. This is a convenient way to start an action without disturbing the robot. Before that will work, you must calibrate the sensor response. The instructions for that, and the other tests are in the README.MD file found in the code folder.
 
