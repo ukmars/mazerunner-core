@@ -222,7 +222,7 @@ class Mouse {
    * It only takes 27mm of travel to come to a halt from normal search speed.
    */
   void turn_back() {
-    reporter.log_action_status('B',' ',m_location, m_heading);)
+    reporter.log_action_status('B', ' ', m_location, m_heading);
     stop_at_center();
     turn_IP180();
     float distance = SENSING_POSITION - HALF_CELL;
