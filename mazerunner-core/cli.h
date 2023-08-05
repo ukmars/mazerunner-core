@@ -414,8 +414,9 @@ class CommandLineInterface {
    *
    */
   void help() {
-    Serial.println(F("W   : display maze walls"));
     Serial.println(F("X   : reset maze"));
+    Serial.println(F("W   : display maze walls"));
+    Serial.println(F("C   : display maze costs"));
     Serial.println(F("R   : display maze with directions"));
     Serial.println(F("B   : show battery voltage"));
     Serial.println(F("S   : show sensor readings"));
