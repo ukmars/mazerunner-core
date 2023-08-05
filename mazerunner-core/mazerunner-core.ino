@@ -76,9 +76,11 @@ void setup() {
   if (switches.button_pressed()) {
     maze.initialise();
     for (int i = 0; i < 4; i++) {
-      digitalWrite(LED_BUILTIN, 1);
-      delay(50);
+      digitalWrite(LED_USER, 1);
       digitalWrite(LED_BUILTIN, 0);
+      delay(50);
+      digitalWrite(LED_USER, 0);
+      digitalWrite(LED_BUILTIN, 1);
       delay(50);
     }
     Serial.println(F("Maze cleared"));
