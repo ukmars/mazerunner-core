@@ -340,7 +340,14 @@ class Mouse {
     }
     motion.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(HALF_CELL);
-    Serial.println(F("Off we go..."));
+    Serial.print(F("Off we go..."));
+    printer.print('[');
+    printer.print(target.x);
+    printer.print(',');
+    printer.print(target.y);
+    printer.print(']');
+    Serial.println();
+
     motion.wait_until_position(SENSING_POSITION);
     // Each iteration of this loop starts at the sensing point
     while (m_location != target) {
