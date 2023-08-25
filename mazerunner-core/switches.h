@@ -40,13 +40,6 @@
  *       systick event.
  */
 
-/***
- * The adc_thresholds may need adjusting for non-standard resistors.
- * Use the adc_reading() method to find the ADC values for each switch
- * combination and enter them in this table
- */
-const int adc_thesholds[] PROGMEM = {660, 647, 630, 614, 590, 570, 545, 522, 461, 429, 385, 343, 271, 212, 128, 44, 0};
-
 // we need a forward declaration...
 class Switches;
 // so that we can declare the instance

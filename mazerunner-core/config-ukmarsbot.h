@@ -48,6 +48,16 @@ const uint8_t SWITCHES_PIN = A6;
 const uint8_t BATTERY_PIN = A7;
 
 /******************************************************************************
+ * The switch input is driven by a resistor chain forming a potential divider.
+ * These are the measured thresholds if using the specified resistor values.
+ *
+ * The adc_thresholds may need adjusting for non-standard resistors.
+ * Use the adc_reading() method to find the ADC values for each switch
+ * combination and enter them in this table
+ */
+const int adc_thesholds[] PROGMEM = {660, 647, 630, 614, 590, 570, 545, 522, 461, 429, 385, 343, 271, 212, 128, 44, 0};
+
+/******************************************************************************
  * FAST IO for ATMEGA328 ONLY
  *
  * There are places in the code (ADC and ENCODERS) where it is important that
