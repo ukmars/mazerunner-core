@@ -101,12 +101,11 @@ class Sensors {
   volatile bool see_left_wall;
   volatile bool see_right_wall;
 
-  volatile int m_front_sum;
-  volatile int m_front_diff;
-
+ public:
   /*** steering variables ***/
   uint8_t g_steering_mode = STEER_NORMAL;
-
+  // these are functions in case you want to modify them to
+  // perform corrections or other scaling
   int get_front_sum() {
     return int(m_front_sum);
   };
@@ -138,29 +137,33 @@ class Sensors {
    * @param error calculated from wall sensors, Negative if too far right
    * @return steering adjustment in degrees
    *
-   * TODO: It is not clear that this belongs here rather tham fo example,
+   * TODO: It is not clear that this belongs here rather tham for example,
    *       in a Robot class.
    */
   float calculate_steering_adjustment() {
     // always calculate the adjustment for testing. It may not get used.
     float pTerm = STEERING_KP * m_cross_track_error;
-    float dTerm = STEERING_KD * (m_cross_track_error - last_steering_error);
+    float dTerm = STEERING_KD * (m_cross_track_error - m_last_steering_error);
     float adjustment = (pTerm + dTerm) * LOOP_INTERVAL;
     // TODO: are these limits appropriate, or even needed?
     adjustment = constrain(adjustment, -STEERING_ADJUST_LIMIT, STEERING_ADJUST_LIMIT);
-    last_steering_error = m_cross_track_error;
+    m_last_steering_error = m_cross_track_error;
     m_steering_adjustment = adjustment;
     return adjustment;
   }
 
   void set_steering_mode(uint8_t mode) {
-    last_steering_error = m_cross_track_error;
+    m_last_steering_error = m_cross_track_error;
     m_steering_adjustment = 0;
     g_steering_mode = mode;
   }
 
-  //***************************************************************************//
-  // These just turn on or off the emitters. Conversions happen anyway.
+  /***************************************************************************
+   * This is just a way of letting the emnitters turn on for the second read.
+   * ADC Conversions happen anyway.
+   * with the sendors disabled, you will probably get zero for the raw value on
+   * all sensor channels (0..5).
+   */
 
   void enable() {
     adc.enable_emitters();
@@ -172,8 +175,12 @@ class Sensors {
     m_active = false;
   }
 
-  //***************************************************************************//
-  // square roots and divisions are pretty slow. Don't call this from systick()
+  /***************************************************************************
+   * square roots and divisions are pretty slow. Don't call this from systick()
+   * If you really want to use this in the control loop, consider pre-calculating
+   * a table of k/sqrt(i) for some suitable range of i. The table would need to be
+   * stored in flash.
+   */
   float get_distance(float sensor_value, float k) {
     float distance = k / sqrtf(sensor_value);
     return min(200, distance);
@@ -200,19 +207,22 @@ class Sensors {
     // This should be the only place that the actual ADC channels are referenced
     // if there is only a single front sensor (Basic sensor board) then the value is
     // just used twice
-    // keep these values for calibration assistance
+    // Keep these values for calibration assistance
     // they should never be negative
     rfs.raw = adc.get_raw(RFS_ADC_CHANNEL);
     rss.raw = adc.get_raw(RSS_ADC_CHANNEL);
     lss.raw = adc.get_raw(LSS_ADC_CHANNEL);
     lfs.raw = adc.get_raw(LFS_ADC_CHANNEL);
 
+    // this is the value that is normally used for wall detection and steering
+    // yes, it wouldbe faster to do integer arithmetic here
     lfs.value = FRONT_LEFT_SCALE * lfs.raw;
     lss.value = LEFT_SCALE * lss.raw;
     rss.value = RIGHT_SCALE * rss.raw;
     rfs.value = FRONT_RIGHT_SCALE * rfs.raw;
 
     // set the wall detection flags
+    // you could calculate these on-demand in the higher level code
     see_left_wall = lss.value > LEFT_THRESHOLD;
     see_right_wall = rss.value > RIGHT_THRESHOLD;
     m_front_sum = lfs.value + rfs.value;
@@ -306,10 +316,12 @@ class Sensors {
   }
 
  private:
-  float last_steering_error = 0;
+  float m_last_steering_error = 0;
   volatile bool m_active = false;
   volatile float m_cross_track_error;
   volatile float m_steering_adjustment;
+  volatile int m_front_sum;
+  volatile int m_front_diff;
 };
 
 #endif

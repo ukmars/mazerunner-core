@@ -209,7 +209,6 @@ class Encoders {
 
   float robot_angle() {
     float angle;
-    _NOP();
     ATOMIC {
       angle = m_robot_angle;
     }
