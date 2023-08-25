@@ -16,7 +16,7 @@
  *
  * ORION is a specific implementation of UKMARSBOT
  *
- * It uses a wall sensor board with four emitter-detector pairs. gearmotors
+ * It uses a wall sensor board with four emitter-detector pairs. Gearmotors
  * with 11:1 ratio gearboxes and custom encoder discs with 18 magnets in each.
  *
  * The sensors consist of SFH4550 emitters and SFH309FA detectors.
@@ -41,6 +41,7 @@ const int RIGHT_CALIBRATION = 198;
 // sensors.get_distance(sensor,k) return 68 when the mouse is backed up
 // against a wall with only a wall ahead
 const int FRONT_LINEAR_CONSTANT = 861;
+const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
 
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
@@ -58,7 +59,11 @@ const int FRONT_RIGHT_CALIBRATION = 39;
 const int LEFT_CALIBRATION = 80;
 const int RIGHT_CALIBRATION = 72;
 
+// The front linear constant is the value of k needed to make the function
+// sensors.get_distance(sensor,k) return 68 when the mouse is backed up
+// against a wall with only a wall ahead
 const int FRONT_LINEAR_CONSTANT = 934;
+const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
 
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
@@ -75,6 +80,13 @@ const int FRONT_RIGHT_CALIBRATION = 134;
 // and there is no wall ahead
 const int LEFT_CALIBRATION = 159;
 const int RIGHT_CALIBRATION = 255;
+
+// The front linear constant is the value of k needed to make the function
+// sensors.get_distance(sensor,k) return 68 when the mouse is backed up
+// against a wall with only a wall ahead
+const int FRONT_LINEAR_CONSTANT = 934;
+const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
+
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
 // when the robot is 20mm past the threshold.
@@ -91,7 +103,11 @@ const int FRONT_RIGHT_CALIBRATION = 156;
 const int LEFT_CALIBRATION = 125;
 const int RIGHT_CALIBRATION = 200;
 
+// The front linear constant is the value of k needed to make the function
+// sensors.get_distance(sensor,k) return 68 when the mouse is backed up
+// against a wall with only a wall ahead
 const int FRONT_LINEAR_CONSTANT = 934;
+const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
 
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
@@ -125,7 +141,7 @@ const int EMITTER_DIAGONAL = EMITTER_B;
 // Channel 6 is pre-allocated to the Battery monitor
 // Channel 7 is re-allocated to the function switch and button
 
-// NOTE - these are the AnalogueConverter channel indexes, not cecessarlity the
+// NOTE - these are the AnalogueConverter channel indexes, not necessariy the
 // hardware ADC channel numbers
 
 // ADVANCED SENSOR
@@ -181,7 +197,7 @@ const float MOUSE_RADIUS = 38.70;  // 39.50; // Adjust on test
 const float ROTATION_BIAS = -0.005;  // Negative makes robot curve to left
 
 // Now we can pre-calculate the key constats for the motion control
-const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);  // 0.2607
+const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
 const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * MM_PER_COUNT;
 const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * MM_PER_COUNT;
 const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
@@ -279,10 +295,9 @@ const float LEFT_SCALE = (float)SIDE_NOMINAL / LEFT_CALIBRATION;
 const float RIGHT_SCALE = (float)SIDE_NOMINAL / RIGHT_CALIBRATION;
 
 // the values above which, a wall is seen
-const int LEFT_THRESHOLD = 40;    // minimum value to register a wall
-const int RIGHT_THRESHOLD = 40;   // minimum value to register a wall
-const int FRONT_THRESHOLD = 45;   // minimum value to register a wall
-const int FRONT_REFERENCE = 840;  // reading when mouse centered with wall ahead
+const int LEFT_THRESHOLD = 40;   // minimum value to register a wall
+const int RIGHT_THRESHOLD = 40;  // minimum value to register a wall
+const int FRONT_THRESHOLD = 45;  // minimum value to register a wall
 
 const int left_edge_pos = 90;
 const int right_edge_pos = 90;

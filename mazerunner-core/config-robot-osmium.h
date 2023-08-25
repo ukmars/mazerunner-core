@@ -21,8 +21,6 @@
  *
  * The sensors consist of SFH4550 emitters and SFH309FA detectors.
  *
- * OSMIUM is a placeholder for you own custom UKMARSBOT configuration
- *
  *****************************************************************************/
 #define NAME "OSMIUM CORE"
 
@@ -39,14 +37,18 @@ const int FRONT_RIGHT_CALIBRATION = 48;
 const int LEFT_CALIBRATION = 87;
 const int RIGHT_CALIBRATION = 80;
 
-const int FRONT_LINEAR_CONSTANT = 934;
+// The front linear constant is the value of k needed to make the function
+// sensors.get_distance(sensor,k) return 68 when the mouse is backed up
+// against a wall with only a wall ahead
+const int FRONT_LINEAR_CONSTANT = 861;
+const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
 
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
 // when the robot is 20mm past the cell boundary. That is, the distance
 // from the front of the mouse to the wall ahead is 92mm
 const int TURN_THRESHOLD_SS90E = 115;
-const int EXTRA_WALL_ADJUST = 6;
+const int EXTRA_WALL_ADJUST = 5;
 
 #elif EVENT == EVENT_UK
 
@@ -57,7 +59,11 @@ const int FRONT_RIGHT_CALIBRATION = 39;
 const int LEFT_CALIBRATION = 80;
 const int RIGHT_CALIBRATION = 72;
 
+// The front linear constant is the value of k needed to make the function
+// sensors.get_distance(sensor,k) return 68 when the mouse is backed up
+// against a wall with only a wall ahead
 const int FRONT_LINEAR_CONSTANT = 934;
+const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
 
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
@@ -65,30 +71,9 @@ const int FRONT_LINEAR_CONSTANT = 934;
 const int TURN_THRESHOLD_SS90E = 100;
 const int EXTRA_WALL_ADJUST = 6;
 
-#elif EVENT == EVENT_PORTUGAL
-// wall sensor thresholds and constants
-// RAW values for the front sensor when the robot is backed up to a wall
-const int FRONT_LEFT_CALIBRATION = 97;
-const int FRONT_RIGHT_CALIBRATION = 48;
-// RAW values for the side sensors when the robot is centred in a cell
-// and there is no wall ahead
-const int LEFT_CALIBRATION = 87;
-const int RIGHT_CALIBRATION = 80;
-
-const int FRONT_LINEAR_CONSTANT = 934;
-
-// SS90E turn thresholds. This is the front sum reading to trigger a turn
-// it changes a bit if there is an adjacent wall. The threshold is set for
-// when the robot is 20mm past the threshold.
-const int TURN_THRESHOLD_SS90E = 115;
-const int EXTRA_WALL_ADJUST = 6;
-
-#elif EVENT == EVENT_APEC
-
 #endif
 
 //***** IO PINS *****************************************************//
-
 // the BASIC sensor board has two LEDs
 // const int LED_LEFT = USER_IO;
 // const int LED_RIGHT = EMITTER_A;
@@ -111,17 +96,24 @@ const int EMITTER_DIAGONAL = EMITTER_B;
 // Channels 4 and 5 are available if you do not want to add an I2C device
 // Channel 6 is pre-allocated to the Battery monitor
 // Channel 7 is re-allocated to the function switch and button
+
+// NOTE - these are the AnalogueConverter channel indexes, not necessariy the
+// hardware ADC channel numbers
+
 // ADVANCED SENSOR
-#define RFS_CHANNEL 0
-#define RSS_CHANNEL 1
-#define LSS_CHANNEL 2
-#define LFS_CHANNEL 3
+const int RFS_ADC_CHANNEL = 0;
+const int RSS_ADC_CHANNEL = 1;
+const int LSS_ADC_CHANNEL = 2;
+const int LFS_ADC_CHANNEL = 3;
+
 // BASIC SENSOR - just repeat the front sensor to make the code cleaner
 // #define RFS_ADC_CHANNEL 1
 // #define RSS_ADC_CHANNEL 0
 // #define LSS_ADC_CHANNEL 2
 // #define LFS_ADC_CHANNEL 1
-
+// there are two other ADC channels used by the robot
+const int SWITCHES_ADC_CHANNEL = 6;
+const int BATTERY_ADC_CHANNEL = 7;
 //***************************************************************************//
 const uint32_t BAUDRATE = 115200;
 
@@ -136,28 +128,41 @@ const int REPORTING_INTERVAL = 10;
 
 //***************************************************************************//
 // We need to know about the drive mechanics.
-const float WHEEL_DIAMETER = 32.0;
-const float ENCODER_PULSES = 12.0;
-const float GEAR_RATIO = 19.54;
+// The encoder pulse counts should be obvious from the encoder itself.
+// Work out the gear ratio by rotating the wheel a number of turns and counting
+// the pulses.
+// Finally, move the mouse in a straight line through 1000mm of travel to work
+// out the wheel diameter.
+const float WHEEL_DIAMETER = 32.00;
+const float ENCODER_PULSES = 12.00;
+const float GEAR_RATIO = 19.540;
 
 // Mouse radius is the distance between the contact patches of the drive wheels.
 // A good starting approximation is half the distance between the wheel centres.
 // After testing, you may find the working value to be larger or smaller by some
-// small amount.
-const float MOUSE_RADIUS = 38.070;  // 39.50; // Adjust on test
+// small amount. AFTER you have the wheel diameter and gear ratio calibrated,
+// have the mouse turn in place and adjust the MOUSE_RADIUS until these turns are
+// as accurate as you can get them
+const float MOUSE_RADIUS = 38.70;  // 39.50; // Adjust on test
 
-// The robot is likely to have wheels of different diameters and that must be
-// compensated for if the robot is to reliably drive in a straight line
+// The robot is likely to have wheels of different diameters or motors of slightly
+// different characteristics and that must be compensated for if the robot is to
+// reliably drive in a straight line.
+// This number is a fraction of the applied motor voltage to be added to the left
+// and subtracted from the right motor.
 const float ROTATION_BIAS = 0.0025;  // Negative makes robot curve to left
 
-const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);  // 0.429
+// Now we can pre-calculate the key constats for the motion control
+const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
 const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * MM_PER_COUNT;
 const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * MM_PER_COUNT;
-const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));  // 0.7525
+const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 
-//*** MOTION CONTROL CONSTANTS **********************************************//
+//*** MOTION CONTROLLER CONSTANTS **********************************************//
 
-// Dynamic performance constants RETEST FOR FRANK
+// Dynamic performance constants
+// There is a video describing how to get these numbers and calculate the feedforward
+// constnats here: https://youtu.be/BrabDeHGsa0
 const float FWD_KM = 475.0;  // mm/s/Volt
 const float FWD_TM = 0.190;  // forward time constant
 const float ROT_KM = 775.0;  // deg/s/Volt
@@ -182,26 +187,26 @@ const float ROT_TM = 0.210;  // rotation time constant
  */
 const float MAX_MOTOR_VOLTS = 6.0;
 
-const float SPEED_FF = 0.00357;
-const float ACC_FF = 0.000392;
+const float SPEED_FF = (1.0 / FWD_KM);
+const float ACC_FF = (FWD_TM / FWD_KM);
 const float BIAS_FF = 0.121;
 const float TOP_SPEED = (6.0 - BIAS_FF) / SPEED_FF;
 
 //*** MOTION CONTROL CONSTANTS **********************************************//
 
 // forward motion controller constants
-// const float FWD_ZETA = 0.707;
-// const float FWD_TD = FWD_TM;
+const float FWD_ZETA = 0.707;
+const float FWD_TD = FWD_TM;
 
-const float FWD_KP = 2.0;
-const float FWD_KD = 1.1;
+const float FWD_KP = 16 * FWD_TM / (FWD_KM * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);
+const float FWD_KD = LOOP_FREQUENCY * (8 * FWD_TM - FWD_TD) / (FWD_KM * FWD_TD);
 
 // rotation motion controller constants
-// const float ROT_ZETA = 0.707;
-// const float ROT_TD = ROT_TM;
+const float ROT_ZETA = 0.707;
+const float ROT_TD = ROT_TM;
 
-const float ROT_KP = 2.1;
-const float ROT_KD = 1.2;
+const float ROT_KP = 16 * ROT_TM / (ROT_KM * ROT_ZETA * ROT_ZETA * ROT_TD * ROT_TD);
+const float ROT_KD = LOOP_FREQUENCY * (8 * ROT_TM - ROT_TD) / (ROT_KM * ROT_TD);
 
 // controller constants for the steering controller
 const float STEERING_KP = 0.25;
@@ -222,7 +227,7 @@ const float STEERING_ADJUST_LIMIT = 10.0;  // deg/s
 //***** PERFORMANCE CONSTANTS************************************************//
 // search and run speeds in mm/s and mm
 const int SEARCH_SPEED = 400;
-const int SEARCH_ACCELERATION = 3000;
+const int SEARCH_ACCELERATION = 2000;
 const int SEARCH_TURN_SPEED = 300;
 const int SMOOTH_TURN_SPEED = 500;
 const int FAST_TURN_SPEED = 600;
@@ -246,10 +251,9 @@ const float LEFT_SCALE = (float)SIDE_NOMINAL / LEFT_CALIBRATION;
 const float RIGHT_SCALE = (float)SIDE_NOMINAL / RIGHT_CALIBRATION;
 
 // the values above which, a wall is seen
-const int LEFT_THRESHOLD = 40;    // minimum value to register a wall
-const int RIGHT_THRESHOLD = 40;   // minimum value to register a wall
-const int FRONT_THRESHOLD = 20;   // minimum value to register a wall
-const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
+const int LEFT_THRESHOLD = 40;   // minimum value to register a wall
+const int RIGHT_THRESHOLD = 40;  // minimum value to register a wall
+const int FRONT_THRESHOLD = 20;  // minimum value to register a wall
 
 const int left_edge_pos = 90;
 const int right_edge_pos = 90;
@@ -296,6 +300,8 @@ const float ADC_FSR = 1023.0;     // The maximum reading for the ADC
 const float ADC_REF_VOLTS = 5.0;  // Reference voltage of ADC
 
 const float BATTERY_MULTIPLIER = (ADC_REF_VOLTS / ADC_FSR / BATTERY_DIVIDER_RATIO);
+
 const int MOTOR_MAX_PWM = 255;
+
 // the position in the cell where the sensors are sampled.
 const float SENSING_POSITION = 170.0;

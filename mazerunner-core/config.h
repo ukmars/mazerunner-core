@@ -98,7 +98,7 @@ struct TurnParameters {
 #define ROBOT_CORE_OSMIUM 1
 #define ROBOT_ORION 2
 
-#define ROBOT ROBOT_ORION
+#define ROBOT ROBOT_CORE_OSMIUM
 
 #if ROBOT == ROBOT_CORE_OSMIUM
 #include "config-robot-osmium.h"
