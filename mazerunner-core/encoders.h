@@ -13,7 +13,6 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-#include <util/atomic.h>
 #include "config.h"
 
 /*******************************************************************************
@@ -59,7 +58,7 @@ class Encoders {
   }
 
   void reset() {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       m_left_counter = 0;
       m_right_counter = 0;
       m_robot_distance = 0;
@@ -85,7 +84,6 @@ class Encoders {
   void left_input_change() {
     static bool oldA = false;
     static bool oldB = false;
-    _NOP();
     // bool newB = digitalReadFast(ENCODER_LEFT_B);
     bool newB = fast_read_pin(ENCODER_LEFT_B);
     bool newA = fast_read_pin(ENCODER_LEFT_CLK) ^ newB;
@@ -138,7 +136,7 @@ class Encoders {
     int left_delta = 0;
     int right_delta = 0;
     // Make sure values don't change while being read. Be quick.
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       left_delta = m_left_counter;
       right_delta = m_right_counter;
       m_left_counter = 0;
@@ -170,7 +168,7 @@ class Encoders {
    */
   float robot_distance() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       distance = m_robot_distance;
     }
     return distance;
@@ -178,7 +176,7 @@ class Encoders {
 
   float robot_speed() {
     float speed;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       speed = LOOP_FREQUENCY * m_fwd_change;
     }
     return speed;
@@ -186,7 +184,7 @@ class Encoders {
 
   float robot_omega() {
     float omega;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       omega = LOOP_FREQUENCY * m_rot_change;
     }
     return omega;
@@ -194,7 +192,7 @@ class Encoders {
 
   float robot_fwd_change() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       ;
       distance = m_fwd_change;
     }
@@ -203,7 +201,7 @@ class Encoders {
 
   float robot_rot_change() {
     float distance;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       distance = m_rot_change;
     }
     return distance;
@@ -211,7 +209,8 @@ class Encoders {
 
   float robot_angle() {
     float angle;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    _NOP();
+    ATOMIC {
       angle = m_robot_angle;
     }
     return angle;

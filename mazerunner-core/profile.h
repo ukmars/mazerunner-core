@@ -13,7 +13,6 @@
 #define PROFILE_H
 
 #include <Arduino.h>
-#include <util/atomic.h>
 #include "config.h"
 //***************************************************************************//
 class Profile;
@@ -58,7 +57,7 @@ class Profile {
   };
 
   void reset() {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       m_position = 0;
       m_speed = 0;
       m_target_speed = 0;
@@ -114,7 +113,7 @@ class Profile {
   ///        note that even when the state is PS_FINISHED, the profiler will
   ///        continue to try and reach the target speed. (zero in this case)
   void stop() {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       m_target_speed = 0;
     }
     finish();
@@ -122,7 +121,7 @@ class Profile {
 
   /// @brief  Force a profile to finish with the target speed set to the final speed
   void finish() {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       m_speed = m_target_speed;
       m_state = PS_FINISHED;
     }
@@ -150,7 +149,7 @@ class Profile {
   /// @return distance travelled (mm)
   float position() {
     float pos;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       pos = m_position;
     }
     return pos;
@@ -160,7 +159,7 @@ class Profile {
   /// @return
   float speed() {
     float speed;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       speed = m_speed;
     }
     return speed;
@@ -168,32 +167,32 @@ class Profile {
 
   float acceleration() {
     float acc;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       acc = m_acceleration;
     }
     return acc;
   }
 
   void set_speed(float speed) {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       m_speed = speed;
     }
   }
   void set_target_speed(float speed) {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       m_target_speed = speed;
     }
   }
 
   // normally only used to alter position for forward error correction
   void adjust_position(float adjustment) {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       m_position += adjustment;
     }
   }
 
   void set_position(float position) {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       m_position = position;
     }
   }

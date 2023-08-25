@@ -299,7 +299,7 @@ class Motors {
 
   float get_left_motor_volts() {
     float volts = 0;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       volts = m_left_motor_volts;
     }
     return volts;
@@ -307,14 +307,14 @@ class Motors {
 
   float get_right_motor_volts() {
     float volts = 0;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       volts = m_right_motor_volts;
     }
     return volts;
   }
 
   void set_speeds(float velocity, float omega) {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       m_velocity = velocity;
       m_omega = omega;
     }

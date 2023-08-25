@@ -13,7 +13,6 @@
 #define SENSORS_H
 
 #include <Arduino.h>
-#include <util/atomic.h>
 #include <wiring_private.h>
 #include "adc.h"
 #include "config.h"

@@ -13,7 +13,6 @@
 #define ADC_H
 
 #include <Arduino.h>
-#include <util/atomic.h>
 #include <wiring_private.h>
 #include "config.h"
 
@@ -163,7 +162,7 @@ class AnalogueConverter {
 
   int get_raw(const int i) const {
     int diff;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC {
       diff = max(1, m_adc_lit[i] - m_adc_dark[i]);
     }
     return diff;
