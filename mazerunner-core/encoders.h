@@ -15,7 +15,6 @@
 #include <stdint.h>
 #include <util/atomic.h>
 #include "config.h"
-#include "digitalWriteFast.h"
 
 /*******************************************************************************
  *
@@ -86,8 +85,10 @@ class Encoders {
   void left_input_change() {
     static bool oldA = false;
     static bool oldB = false;
-    bool newB = digitalReadFast(ENCODER_LEFT_B);
-    bool newA = digitalReadFast(ENCODER_LEFT_CLK) ^ newB;
+    _NOP();
+    // bool newB = digitalReadFast(ENCODER_LEFT_B);
+    bool newB = fast_read_pin(ENCODER_LEFT_B);
+    bool newA = fast_read_pin(ENCODER_LEFT_CLK) ^ newB;
     int delta = ENCODER_LEFT_POLARITY * ((oldA ^ newB) - (newA ^ oldB));
     m_left_counter += delta;
     oldA = newA;
@@ -97,8 +98,8 @@ class Encoders {
   void right_input_change() {
     static bool oldA = false;
     static bool oldB = false;
-    bool newB = digitalReadFast(ENCODER_RIGHT_B);
-    bool newA = digitalReadFast(ENCODER_RIGHT_CLK) ^ newB;
+    bool newB = fast_read_pin(ENCODER_RIGHT_B);
+    bool newA = fast_read_pin(ENCODER_RIGHT_CLK) ^ newB;
     int delta = ENCODER_RIGHT_POLARITY * ((oldA ^ newB) - (newA ^ oldB));
     m_right_counter += delta;
     oldA = newA;

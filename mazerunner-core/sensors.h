@@ -17,7 +17,6 @@
 #include <wiring_private.h>
 #include "adc.h"
 #include "config.h"
-#include "digitalWriteFast.h"
 
 /**
  *
@@ -274,6 +273,7 @@ class Sensors {
    * Leaves the sensors disabled.
    */
   uint8_t wait_for_user_start() {
+    int state = 0;
     digitalWrite(LED_USER, 1);
     enable();
     uint8_t choice = NO_START;
@@ -296,7 +296,8 @@ class Sensors {
         choice = RIGHT_START;
         break;
       }
-      digitalToggleFast(LED_USER);
+      digitalWrite(LED_USER, state);
+      state = 1 - state;
       delay(25);
     }
     disable();

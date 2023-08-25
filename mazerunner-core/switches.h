@@ -17,7 +17,6 @@
 #include <wiring_private.h>
 #include "adc.h"
 #include "config.h"
-#include "digitalWriteFast.h"
 
 /***
  * The Switches class looks after the multifunction analogue input on UKMARSBOT.

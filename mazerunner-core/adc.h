@@ -16,7 +16,6 @@
 #include <util/atomic.h>
 #include <wiring_private.h>
 #include "config.h"
-#include "digitalWriteFast.h"
 
 /***
  * The AnalogueConverter class samples a fixed number of ADC channels from 0 to
@@ -180,20 +179,6 @@ class AnalogueConverter {
     return get_adc_result();
   }
 
-  void emitter_on(uint8_t pin) {
-    if (pin == 255 || not m_emitters_enabled) {
-      return;
-    }
-    digitalWriteFast(pin, 1);
-  }
-
-  void emitter_off(uint8_t pin) {
-    if (pin == 255) {
-      return;
-    }
-    digitalWriteFast(pin, 0);
-  }
-
   void isr() {
     switch (m_phase) {
       case 1:
@@ -208,8 +193,8 @@ class AnalogueConverter {
       case 2:
         get_adc_result();  // dummy read to clear interrupt flag
         if (m_emitters_enabled) {
-          digitalWriteFast(emitter_diagonal(), 1);
-          digitalWriteFast(emitter_front(), 1);
+          digitalWrite(emitter_diagonal(), 1);
+          digitalWrite(emitter_front(), 1);
         }
         m_channel = 0;
         start_conversion(m_channel);  // Start a conversion to generate the interrupt
@@ -235,8 +220,8 @@ class AnalogueConverter {
       default:
         get_adc_result();  // dummy read clears the interrupt flag
         // unconditionally turn off emitters for safety
-        digitalWriteFast(emitter_diagonal(), 0);
-        digitalWriteFast(emitter_front(), 0);
+        digitalWrite(emitter_diagonal(), 0);
+        digitalWrite(emitter_front(), 0);
         bitClear(ADCSRA, ADIE);  // turn off the interrupt
         break;
     }
