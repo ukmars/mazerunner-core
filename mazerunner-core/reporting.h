@@ -9,8 +9,8 @@
  *     https://opensource.org/licenses/MIT.                                   *
  ******************************************************************************/
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef REPORTER_H
+#define REPORTER_H
 
 #include <Arduino.h>
 #include "encoders.h"
