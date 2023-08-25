@@ -34,7 +34,8 @@
 
 /***
  * Structure definitions used in the software. Declared here for lack of a
- * better place.
+ * better place because the structure is needed by the robot configs.
+ *
  * Robot specific instances and values are in the robot config file.
  */
 struct TurnParameters {
