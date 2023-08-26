@@ -85,7 +85,7 @@ struct TurnParameters {
 
 /*************************************************************************/
 /***
- * Even with the same basic hardware,you may build robots with different
+ * Even with the same basic hardware, you may build robots with different
  * characteristics such as the motor gear ratio or the wheel size or sensor
  * arrangement.
  *

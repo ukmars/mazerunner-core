@@ -32,7 +32,7 @@
 // with another wall ahead
 const int FRONT_LEFT_CALIBRATION = 97;
 const int FRONT_RIGHT_CALIBRATION = 48;
-// RAW values for the side sensors when the robot is centred in a cell
+// RAW values for the side sensors when the robot is centered in a cell
 // and there is no wall ahead
 const int LEFT_CALIBRATION = 87;
 const int RIGHT_CALIBRATION = 80;
@@ -148,8 +148,8 @@ const float MOUSE_RADIUS = 38.70;  // 39.50; // Adjust on test
 // The robot is likely to have wheels of different diameters or motors of slightly
 // different characteristics and that must be compensated for if the robot is to
 // reliably drive in a straight line.
-// This number is a fraction of the applied motor voltage to be added to the left
-// and subtracted from the right motor.
+// This number adjusts the encoder count and must be  added to the right
+// and subtracted from the left motor.
 const float ROTATION_BIAS = 0.0025;  // Negative makes robot curve to left
 
 // Now we can pre-calculate the key constats for the motion control
