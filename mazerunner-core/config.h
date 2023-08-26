@@ -81,6 +81,7 @@ struct TurnParameters {
 
 // choose the one you will be using BEFORE selecting the robot below
 #define EVENT EVENT_HOME
+#define GOAL Location(2, 2)
 
 /*************************************************************************/
 /***
@@ -108,7 +109,6 @@ struct TurnParameters {
 #error "NO ROBOT DEFINED"
 #endif
 
-#define GOAL Location(2, 2)
 /*************************************************************************/
 /***
  * This piece of magic lets you define a variable, such as the maze, that can
