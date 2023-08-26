@@ -353,7 +353,7 @@ class CommandLineInterface {
    * ignored so that there is a 'safe' state where the robot will not do anything
    * unexpected.
    *
-   * The function can handle any numer of additional functions if called as a
+   * The function can handle any number of additional functions if called as a
    * result of a command line input like 'F 45'. Otherwise, a command like 'F 1'
    * is equivalent to selecting 1 on te function switches and then pressing
    * the 'start' button.
@@ -414,6 +414,7 @@ class CommandLineInterface {
    *
    */
   void help() {
+    Serial.println(F("?   : this text"));
     Serial.println(F("X   : reset maze"));
     Serial.println(F("W   : display maze walls"));
     Serial.println(F("C   : display maze costs"));
@@ -437,6 +438,8 @@ class CommandLineInterface {
     Serial.println(F("      13 = "));
     Serial.println(F("      14 = "));
     Serial.println(F("      15 = "));
+    Serial.println(F("SEARCH x y : search to location (x,y)"));
+    Serial.println(F("HELP       : this text"));
   }
 
  private:
