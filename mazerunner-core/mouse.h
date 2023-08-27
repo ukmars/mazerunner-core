@@ -415,7 +415,8 @@ class Mouse {
    * facing in the direction it entered that cell. This will
    * always be one of the four cardinal directions NESW
    */
-  void run_to(unsigned char target) {
+  void run_to(Location target) {
+    (void)target;
   }
 
   void turn_to_face(Heading newHeading) {
@@ -544,7 +545,7 @@ class Mouse {
    * the sensors as a function of distance.
    *
    */
-  void user_log_front_sensor() {
+  void conf_log_front_sensor() {
     sensors.enable();
     motion.reset_drive_system();
     reporter.front_sensor_track_header();
@@ -577,7 +578,7 @@ class Mouse {
    * @brief turn in place while streaming sensors
    */
 
-  void test_sensor_spin_calibrate() {
+  void conf_sensor_spin_calibrate() {
     int side = sensors.wait_for_user_start();  // cover front sensor with hand to start
     bool use_raw = (side == LEFT_START) ? true : false;
     sensors.enable();
@@ -616,7 +617,7 @@ class Mouse {
    * @brief find sensor wall edge detection positions
    */
 
-  void test_edge_detection() {
+  void conf_edge_detection() {
     bool left_edge_found = false;
     bool right_edge_found = false;
     int left_edge_position = 0;

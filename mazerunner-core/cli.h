@@ -309,17 +309,17 @@ class CommandLineInterface {
       case '?':
         help();
         break;
-      case 'W':
-        reporter.print_maze(PLAIN);
-        break;
       case 'X':
         Serial.println(F("Reset Maze"));
         maze.initialise();
         break;
+      case 'W':
+        reporter.print_maze(PLAIN);
+        break;
       case 'C':
         reporter.print_maze(COSTS);
         break;
-      case 'R':
+      case 'D':
         reporter.print_maze(DIRS);
         break;
       case 'B':
@@ -377,16 +377,16 @@ class CommandLineInterface {
         mouse.test_SS90E();
         break;
       case 5:
-        // test_SS90F();
+        // mouse.test_SS90F(); // not implemented
         break;
       case 6:
-        mouse.test_edge_detection();
+        mouse.conf_edge_detection();
         break;
       case 7:
-        mouse.test_sensor_spin_calibrate();
+        mouse.conf_sensor_spin_calibrate();
         break;
       case 8:
-        mouse.user_log_front_sensor();
+        mouse.conf_log_front_sensor();
         break;
       default:
         // just to be safe...
@@ -418,7 +418,7 @@ class CommandLineInterface {
     Serial.println(F("X   : reset maze"));
     Serial.println(F("W   : display maze walls"));
     Serial.println(F("C   : display maze costs"));
-    Serial.println(F("R   : display maze with directions"));
+    Serial.println(F("D   : display maze with directions"));
     Serial.println(F("B   : show battery voltage"));
     Serial.println(F("S   : show sensor readings"));
     Serial.println(F("F n : Run user function n"));
