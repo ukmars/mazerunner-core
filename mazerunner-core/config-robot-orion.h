@@ -306,8 +306,8 @@ const int LEFT_THRESHOLD = 40;   // minimum value to register a wall
 const int RIGHT_THRESHOLD = 40;  // minimum value to register a wall
 const int FRONT_THRESHOLD = 45;  // minimum value to register a wall
 
-const int left_edge_pos = 90;
-const int right_edge_pos = 90;
+const int LEFT_EDGE_POS = 90;
+const int RIGHT_EDGE_POS = 90;
 
 // clang-format off
 // These take no storage - the compiler uses the values directly

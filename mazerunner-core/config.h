@@ -37,15 +37,18 @@
  * better place because the structure is needed by the robot configs.
  *
  * Robot specific instances and values are in the robot config file.
+ *
+ * TODO: redefine these in terms of offsets from cell centre
+ * TODO: replace trigger value with sensor identifier
  */
 struct TurnParameters {
-  int speed;    // mm/s
-  int run_in;   // mm
-  int run_out;  // mm
-  int angle;    // deg
-  int omega;    // deg/s
-  int alpha;    // deg/s/s
-  int trigger;  // sensor value
+  int speed;    // mm/s    - constant forward speed during turn
+  int run_in;   // mm      - distance from cell edge to turn start
+  int run_out;  // mm      - distance from turn end to cell start
+  int angle;    // deg     - total turn angle
+  int omega;    // deg/s   - maximum angular velocity
+  int alpha;    // deg/s/s - angular acceleration
+  int trigger;  //         - front sensor value at start of turn
 };
 
 /*************************************************************************/
