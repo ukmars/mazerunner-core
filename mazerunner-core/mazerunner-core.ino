@@ -92,10 +92,11 @@ void setup() {
 /// the main loop exists only to initiate tasks either as a result
 /// of pressing the button or sending a command through the serial port
 void loop() {
-  if (cli.read_serial()) {
-    cli.interpret_line();
-  } else if (switches.button_pressed()) {
+  if (switches.button_pressed()) {
     switches.wait_for_button_release();
-    cli.run_function(switches.read());
+    int function = switches.read();
+    cli.run_function(function);
+  } else if (cli.read_serial()) {
+    cli.interpret_line();
   }
 }
