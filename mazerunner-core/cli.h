@@ -146,8 +146,8 @@ class CommandLineInterface {
  public:
   /***
    * Read characters from the serial port into the buffer.
-   * return 1 if there is a complete line available
-   * return 0 if not.
+   * return true if there is a complete line available
+   * return false if not.
    *
    * Input is echoed back through the serial port and can be
    * edited by the user using the backspace key. Accepted
@@ -164,12 +164,12 @@ class CommandLineInterface {
    *
    */
   const char BACKSPACE = 0x08;
-  int read_serial() {
+  bool read_serial() {
     while (Serial.available()) {
       char c = Serial.read();
       if (c == '\r') {
         Serial.println();
-        return 1;
+        return true;
       } else if (c == BACKSPACE) {
         if (m_index > 0) {
           m_buffer[m_index] = 0;
@@ -189,7 +189,7 @@ class CommandLineInterface {
         // drop the character silently
       }
     }
-    return 0;
+    return false;
   }
 
   /***

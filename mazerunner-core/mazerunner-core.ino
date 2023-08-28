@@ -100,7 +100,7 @@ void setup() {
 /// the main loop exists only to initiate tasks either as a result
 /// of pressing the button or sending a command through the serial port
 void loop() {
-  if (cli.read_serial() > 0) {
+  if (cli.read_serial()) {
     cli.interpret_line();
   } else if (switches.button_pressed()) {
     switches.wait_for_button_release();
