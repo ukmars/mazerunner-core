@@ -81,7 +81,15 @@ struct TurnParameters {
 
 // choose the one you will be using BEFORE selecting the robot below
 #define EVENT EVENT_HOME
+#if EVENT == EVENT_HOME
 #define GOAL Location(2, 2)
+#else
+#define GOAL Location(7, 7)
+#error "NO EVENT DEFINED"
+#endif
+// This is the size, in mm,  for each cell in the maze.
+const float FULL_CELL = 180.0f;
+const float HALF_CELL = FULL_CELL / 2.0;
 
 /*************************************************************************/
 /***
@@ -122,9 +130,5 @@ struct TurnParameters {
  * a reset.
  */
 #define PERSISTENT __attribute__((section(".noinit")))
-
-// This is the size, in mm,  for each cell in the maze.
-const float FULL_CELL = 180.0f;
-const float HALF_CELL = FULL_CELL / 2.0;
 
 #endif

@@ -14,16 +14,6 @@
 
 // hardware configuration for for UKMARSBOT with an Arduino nano processor
 
-//***************************************************************************//
-// Some physical constants that are likely to be board -specific
-// with robot against back wall, how much travel is there to the cell center?
-const int BACK_WALL_TO_CENTER = 48;
-
-//***************************************************************************//
-// Control loop timing. Pre-calculate to save time in interrupts
-const float LOOP_FREQUENCY = 500.0;
-const float LOOP_INTERVAL = (1.0 / LOOP_FREQUENCY);
-
 //**** IO CONFIGURATION ****************************************************//
 const uint8_t ENCODER_LEFT_CLK = 2;
 const uint8_t ENCODER_RIGHT_CLK = 3;

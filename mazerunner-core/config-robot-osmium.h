@@ -125,6 +125,8 @@ const int REPORTING_INTERVAL = 10;
 
 //***************************************************************************//
 // Some physical constants that are likely to be robot-specific
+// with robot against back wall, how much travel is there to the cell center?
+const int BACK_WALL_TO_CENTER = 48;
 
 //***************************************************************************//
 // We need to know about the drive mechanics.
@@ -193,6 +195,11 @@ const float BIAS_FF = 0.121;
 const float TOP_SPEED = (6.0 - BIAS_FF) / SPEED_FF;
 
 //*** MOTION CONTROL CONSTANTS **********************************************//
+
+//***************************************************************************//
+// Control loop timing. Pre-calculate to save time in interrupts
+const float LOOP_FREQUENCY = 500.0;
+const float LOOP_INTERVAL = (1.0 / LOOP_FREQUENCY);
 
 // forward motion controller constants
 const float FWD_ZETA = 0.707;
