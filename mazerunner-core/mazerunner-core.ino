@@ -59,7 +59,6 @@ ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
 }
 
 /******************************************************************************/
-
 void setup() {
   Serial.begin(BAUDRATE);
   // redirectPrintf(); // send printf output to Serial (uses 20 bytes RAM)
@@ -75,14 +74,7 @@ void setup() {
   /// keep the button held down after a reset to clear the maze
   if (switches.button_pressed()) {
     maze.initialise();
-    for (int i = 0; i < 4; i++) {
-      digitalWrite(LED_USER, 1);
-      digitalWrite(LED_BUILTIN, 0);
-      delay(50);
-      digitalWrite(LED_USER, 0);
-      digitalWrite(LED_BUILTIN, 1);
-      delay(50);
-    }
+    mouse.blink(2);
     Serial.println(F("Maze cleared"));
     switches.wait_for_button_release();
   }
