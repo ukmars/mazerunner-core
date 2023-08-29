@@ -219,7 +219,11 @@ class CommandLineInterface {
   void interpret_line() {
     Args args;
     if (get_tokens(args) > 0) {
-      run_command(args);
+      if (strlen(args.argv[0]) == 1) {
+        run_short_cmd(args);
+      } else {
+        run_long_cmd(args);
+      }
     }
     clear_input();
     prompt();
@@ -258,17 +262,6 @@ class CommandLineInterface {
         break;
     }
     return args.argc;
-  }
-
-  void run_command(const Args &args) {
-    if (args.argc == 0) {
-      return;
-    }
-    if (strlen(args.argv[0]) == 1) {
-      run_short_cmd(args);
-    } else {
-      run_long_cmd(args);
-    }
   }
 
   /***
