@@ -84,6 +84,7 @@ void setup() {
   maze.set_goal(GOAL);
   reporter.set_printer(Serial);
   Serial.println();
+  Serial.println(F(CODE));
   Serial.println(F(NAME));
   Serial.println(F("RDY"));
   cli.prompt();
