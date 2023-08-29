@@ -353,6 +353,7 @@ class Maze {
 
     // the open maze treats unknowns as exits
     set_mask(MASK_OPEN);
+    flood(goal());
   }
 
   void set_mask(const MazeMask mask) {
