@@ -515,6 +515,7 @@ class Mouse {
     search_to(START);
     turn_to_face(NORTH);
     motion.stop();
+    motion.disable_drive();
     return 0;
   }
 
