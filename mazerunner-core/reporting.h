@@ -451,7 +451,7 @@ class Reporter {
   }
 
   void print_maze(int style = PLAIN) {
-    const char dirChars[] = "^>v<*";
+    const char dirChars[] = "^>v<* ";
 
     for (int y = MAZE_HEIGHT - 1; y >= 0; y--) {
       printNorthWalls(y);
@@ -475,8 +475,12 @@ class Reporter {
           if (location == maze.goal()) {
             direction = DIRECTION_COUNT;
           }
+          char arrow = ' ';
+          if (direction != BLOCKED) {
+            arrow = dirChars[direction];
+          }
           printer.print(' ');
-          printer.print(dirChars[direction]);
+          printer.print(arrow);
           printer.print(' ');
         } else {
           printer.print(GAP);
