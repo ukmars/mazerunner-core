@@ -336,7 +336,7 @@ class Mouse {
       // back up to the wall behind
       // TODO: what if there is not a wall?
       // perhaps the caller should decide so this ALWAYS starts at the cell centre?
-      motion.move(-60, 120, 0, 1000);  // TODO: magic numbers
+      motion.move(-BACK_WALL_TO_CENTER, SEARCH_SPEED / 4, 0, SEARCH_ACCELERATION / 2);
     }
     motion.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(HALF_CELL);
