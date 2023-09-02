@@ -35,7 +35,6 @@
  * the odometry had better resolution and if an IMU were available. But, you can
  * get remarkably good results with the limited resources available.
  */
-enum { PWM_488_HZ, PWM_977_HZ, PWM_3906_HZ, PWM_31250_HZ };
 
 class Motors;
 
@@ -232,6 +231,7 @@ class Motors {
    * NOTE: it might be wise to check the resolution of the
    * analogueWrite function in other targtes
    */
+  // TODO: HARDWARE DEPENDENCY
   void set_left_motor_pwm(int pwm) {
     pwm = MOTOR_LEFT_POLARITY * constrain(pwm, -MOTOR_MAX_PWM, MOTOR_MAX_PWM);
     if (pwm < 0) {
@@ -242,7 +242,7 @@ class Motors {
       analogWrite(MOTOR_LEFT_PWM, pwm);
     }
   }
-
+  // TODO: HARDWARE DEPENDENCY
   void set_right_motor_pwm(int pwm) {
     pwm = MOTOR_RIGHT_POLARITY * constrain(pwm, -MOTOR_MAX_PWM, MOTOR_MAX_PWM);
     if (pwm < 0) {
@@ -265,6 +265,8 @@ class Motors {
    * going to be a problem with the standard UKMARSBOT.
    *
    */
+  // TODO: HARDWARE DEPENDENCY
+  enum { PWM_488_HZ, PWM_977_HZ, PWM_3906_HZ, PWM_31250_HZ };
   void set_pwm_frequency(int frequency = PWM_31250_HZ) {
     switch (frequency) {
       case PWM_31250_HZ:
