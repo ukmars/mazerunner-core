@@ -50,8 +50,6 @@ class Encoders {
     pinMode(ENCODER_LEFT_B, INPUT);
     pinMode(ENCODER_RIGHT_CLK, INPUT);
     pinMode(ENCODER_RIGHT_B, INPUT);
-    // TODO. if these interrupts are attached in a begin method, the addresses will aready be known
-    // and we can cut out the indirection?
     attachInterrupt(digitalPinToInterrupt(ENCODER_LEFT_CLK), callback_left_encoder_isr, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENCODER_RIGHT_CLK), callback_right_encoder_isr, CHANGE);
     reset();
