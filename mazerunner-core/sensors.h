@@ -247,9 +247,7 @@ class Sensors {
       error = -2 * right_error;
     }
 
-    // the side sensors are not reliable close to a wall ahead.
-    // TODO: The magic number 100 may need adjusting
-    if (m_front_sum > 100) {
+    if (m_front_sum > FRONT_WALL_RELIABILITY_LIMIT) {
       error = 0;
     }
     m_cross_track_error = error;

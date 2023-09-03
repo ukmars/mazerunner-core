@@ -295,6 +295,12 @@ const int ALPHA_SPIN_TURN = 3600;
 const int SIDE_NOMINAL = 100;
 const int FRONT_NOMINAL = 100;
 
+// The side sensors are not reliable close to a wall ahead. This value
+// is the limit for the front sensor reading, above which the side sensors
+// are likely to give innaccurate readings because of reflections from
+// the wall ahead
+const int FRONT_WALL_RELIABILITY_LIMIT = 100;
+
 // Sensor brightness adjustment factor. The compiler calculates these so it saves processor time
 const float FRONT_LEFT_SCALE = (float)FRONT_NOMINAL / FRONT_LEFT_CALIBRATION;
 const float FRONT_RIGHT_SCALE = (float)FRONT_NOMINAL / FRONT_RIGHT_CALIBRATION;
