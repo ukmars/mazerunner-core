@@ -10,7 +10,7 @@ This **mazerunner-core** repository does just the contest part of the job along 
 The available options are relatively limited but will be enough to let you calibrate the wall sensors and perform basic turn configuration as well as run the robot as a maze solver or wall follower.
 
 ### Maze Solving
-The maze solver code is very basic and will search back and forth between the start and the goal for a fixed number of iterations. On each pass, the path taken will improve so long as a better path has been discovered. The code is not optimal and makes no attempt to do things like run faster through known sections or run subsequent passes more quickly. That is left as an exercise for the user.
+The maze solver code is very basic and will just search back and forth between the start and the goal. On each pass, the path taken will improve so long as a better path has been discovered. The code is not optimal and makes no attempt to do things like run faster through known sections or run subsequent passes more quickly. That is left as an exercise for the user.
 
 ### Wall Following
 Wall following is also very simple and will follow a left wall until the robot is physically stopped. Because the same techniques for motion and turning are used here and the maze solver, you can use the wall following function to help you tune the turns. Simply make a rectangular 'racetrack' maze and have the robot run around it either clockwise or anticlockwise so that is does repeated turns. This makes it easy to see the effect of changing the turn parameters.
