@@ -51,7 +51,7 @@ Reporter reporter;                        // formatted reporting of robot state
 // a better place to put them
 
 ISR(ADC_vect) {
-  adc.isr();
+  adc.callback_adc_isr();
 }
 
 ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {

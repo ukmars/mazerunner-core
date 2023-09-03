@@ -178,7 +178,7 @@ class AnalogueConverter {
     return get_adc_result();
   }
 
-  void isr() {
+  void callback_adc_isr() {
     switch (m_phase) {
       case 1:
         // cycle through all 8 channels with emitters off
