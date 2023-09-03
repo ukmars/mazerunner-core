@@ -145,7 +145,6 @@ class Sensors {
     float pTerm = STEERING_KP * m_cross_track_error;
     float dTerm = STEERING_KD * (m_cross_track_error - m_last_steering_error);
     float adjustment = (pTerm + dTerm) * LOOP_INTERVAL;
-    // TODO: are these limits appropriate, or even needed?
     adjustment = constrain(adjustment, -STEERING_ADJUST_LIMIT, STEERING_ADJUST_LIMIT);
     m_last_steering_error = m_cross_track_error;
     m_steering_adjustment = adjustment;
