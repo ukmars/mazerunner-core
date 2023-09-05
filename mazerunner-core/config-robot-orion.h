@@ -312,6 +312,8 @@ const int LEFT_THRESHOLD = 40;   // minimum value to register a wall
 const int RIGHT_THRESHOLD = 40;  // minimum value to register a wall
 const int FRONT_THRESHOLD = 45;  // minimum value to register a wall
 
+// the distance through the cell at which the corresponding sensor
+// will see a falling edge
 const int LEFT_EDGE_POS = 90;
 const int RIGHT_EDGE_POS = 90;
 

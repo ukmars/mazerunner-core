@@ -162,6 +162,11 @@ const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 
 //*** MOTION CONTROLLER CONSTANTS **********************************************//
 
+//***************************************************************************//
+// Control loop timing. Pre-calculate to save time in interrupts
+const float LOOP_FREQUENCY = 500.0;
+const float LOOP_INTERVAL = (1.0 / LOOP_FREQUENCY);
+
 // Dynamic performance constants
 // There is a video describing how to get these numbers and calculate the feedforward
 // constnats here: https://youtu.be/BrabDeHGsa0
@@ -195,11 +200,6 @@ const float BIAS_FF = 0.121;
 const float TOP_SPEED = (6.0 - BIAS_FF) / SPEED_FF;
 
 //*** MOTION CONTROL CONSTANTS **********************************************//
-
-//***************************************************************************//
-// Control loop timing. Pre-calculate to save time in interrupts
-const float LOOP_FREQUENCY = 500.0;
-const float LOOP_INTERVAL = (1.0 / LOOP_FREQUENCY);
 
 // forward motion controller constants
 const float FWD_ZETA = 0.707;
@@ -250,6 +250,12 @@ const int ALPHA_SPIN_TURN = 3600;
 // in its calibration position
 const int SIDE_NOMINAL = 100;
 const int FRONT_NOMINAL = 100;
+
+// The side sensors are not reliable close to a wall ahead. This value
+// is the limit for the front sensor reading, above which the side sensors
+// are likely to give innaccurate readings because of reflections from
+// the wall ahead
+const int FRONT_WALL_RELIABILITY_LIMIT = 100;
 
 // Sensor brightness adjustment factor. The compiler calculates these so it saves processor time
 const float FRONT_LEFT_SCALE = (float)FRONT_NOMINAL / FRONT_LEFT_CALIBRATION;
