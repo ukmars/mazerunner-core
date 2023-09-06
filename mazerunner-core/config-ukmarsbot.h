@@ -121,3 +121,36 @@ const int adc_thesholds[] PROGMEM = {660, 647, 630, 614, 590, 570, 545, 522, 461
 #define ATOMIC
 #endif
 //***************************************************************************//
+
+/***
+ * Finally, a little-known provision of the compiler lets you
+ * configure the standard printf() function to print directly
+ * to a serial device. There is a cost overhead if you are not
+ * using printf() or sprintf() elsewhere but it is a great convenience
+ * if you want formatted printing to the serial port.
+ *
+ * To use this facility add a call to redirectPrintf() early in the
+ * setup() function of your code.
+ *
+ * TODO: this does not work with the NRF52 compiler.
+ */
+
+#if !defined(ARDUINO_ARCH_NRF52840)
+// Function that printf and related will use to print
+int serial_putchar(char c, FILE *f) {
+  if (c == '\n') {
+    // TODO do we need to add carriage returns? I think not.
+    Serial.write('\r');
+  }
+  return Serial.write(c) == 1 ? 0 : 1;
+}
+
+FILE serial_stdout;
+void redirectPrintf() {
+  // Redirect stdout so that we can use printf() with the console
+  fdev_setup_stream(&serial_stdout, serial_putchar, NULL, _FDEV_SETUP_WRITE);
+  stdout = &serial_stdout;
+}
+#else
+void redirectPrintf(){};
+#endif
