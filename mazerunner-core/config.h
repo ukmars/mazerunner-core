@@ -32,6 +32,9 @@
 #define STRING2(x) #x
 #define STRING(x) STRING2(x)
 
+const float RADIANS_PER_DEGREE = 2 * PI / 360.0;
+const float DEGREES_PER_RADIAN = 360.0 / 2 * PI;
+
 /***
  * Structure definitions used in the software. Declared here for lack of a
  * better place because the structure is needed by the robot configs.

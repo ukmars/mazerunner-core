@@ -176,7 +176,7 @@ class Motors {
     left_output = pos_output - rot_output;
     right_output = pos_output + rot_output;
 
-    float tangent_speed = m_omega * MOUSE_RADIUS * (1 / 57.29);
+    float tangent_speed = m_omega * MOUSE_RADIUS * RADIANS_PER_DEGREE;
     float left_speed = m_velocity - tangent_speed;
     float right_speed = m_velocity + tangent_speed;
     float left_ff = leftFeedForward(left_speed);
