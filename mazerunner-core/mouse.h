@@ -803,9 +803,9 @@ class Mouse {
     sensors.enable();
     delay(100);
     motion.reset_drive_system();
-    sensors.set_steering_mode(STEERING_OFF);
+    sensors.set_steering_mode(STEER_NORMAL);
     Serial.println(F("Edge positions:"));
-    motion.start_move(FULL_CELL - 30.0, 100, 0, 1000);
+    motion.start_move(FULL_CELL * 4, 500, 0, 1000);
     while (not motion.move_finished()) {
       if (sensors.lss.value > left_max) {
         left_max = sensors.lss.value;
@@ -829,6 +829,7 @@ class Mouse {
       }
       delay(5);
     }
+    Serial.println(encoders.robot_distance());
     Serial.print(F("Left: "));
     if (left_edge_found) {
       Serial.print(BACK_WALL_TO_CENTER + left_edge_position);
