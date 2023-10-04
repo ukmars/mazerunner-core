@@ -765,6 +765,7 @@ class Mouse {
       reporter.report_radial_track(use_raw);
       // reporter.print_wall_sensors();
     }
+    reporter.report_radial_track(use_raw);
     motion.reset_drive_system();
     motion.disable_drive();
     delay(100);
