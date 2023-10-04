@@ -397,7 +397,14 @@ class Maze {
         m_cost[x][y] = (uint8_t)MAX_COST;
       }
     }
-    Queue<Location, 64> queue;
+    /***
+     * When the maze is being flooded, there is a queue of 'frontier'
+     * cells. These are the cells that are waiting to be checked for
+     * neighbours. I believe the maximum size that this queue can
+     * possibly be for a classic maze is 64 (MAZE_CELL_COUNT/4) cells.
+     * HOWEVER, this is unproven
+     */
+    Queue<Location, MAZE_CELL_COUNT / 4> queue;
     m_cost[target.x][target.y] = 0;
     queue.add(target);
     while (queue.size() > 0) {
