@@ -91,7 +91,6 @@ struct TurnParameters {
 #define GOAL Location(2, 2)
 #else
 #define GOAL Location(7, 7)
-#error "NO EVENT DEFINED"
 #endif
 // This is the size, in mm,  for each cell in the maze.
 const float FULL_CELL = 180.0f;
