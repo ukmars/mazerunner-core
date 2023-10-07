@@ -40,7 +40,7 @@ const int RIGHT_CALIBRATION = 80;
 // The front linear constant is the value of k needed to make the function
 // sensors.get_distance(sensor,k) return 68 when the mouse is backed up
 // against a wall with only a wall ahead
-const int FRONT_LINEAR_CONSTANT = 861;
+const int FRONT_LINEAR_CONSTANT = 1030;
 const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
 
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
@@ -51,24 +51,23 @@ const int TURN_THRESHOLD_SS90E = 115;
 const int EXTRA_WALL_ADJUST = 5;
 
 #elif EVENT == EVENT_UK
-
 // RAW values for the front sensor when the robot is backed up to a wall
-const int FRONT_LEFT_CALIBRATION = 83;
-const int FRONT_RIGHT_CALIBRATION = 39;
+const int FRONT_LEFT_CALIBRATION = 77;
+const int FRONT_RIGHT_CALIBRATION = 34;
 // RAW side sensor values when robot is centred in a cell and wall ahead
-const int LEFT_CALIBRATION = 80;
+const int LEFT_CALIBRATION = 75;
 const int RIGHT_CALIBRATION = 72;
 
 // The front linear constant is the value of k needed to make the function
 // sensors.get_distance(sensor,k) return 68 when the mouse is backed up
 // against a wall with only a wall ahead
-const int FRONT_LINEAR_CONSTANT = 934;
-const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
+const int FRONT_LINEAR_CONSTANT = 1030;
+const int FRONT_REFERENCE = 1286;  // reading when mouse centered with wall ahead
 
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
 // when the robot is 20mm past the threshold.
-const int TURN_THRESHOLD_SS90E = 100;
+const int TURN_THRESHOLD_SS90E = 110;
 const int EXTRA_WALL_ADJUST = 6;
 
 #endif
