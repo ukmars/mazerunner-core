@@ -1,8 +1,8 @@
-# BETA release 0.1.0
+# Release 0.2.0
 
-This code is experimental and may have bugs, some of which may be serious. Use it without expectation of success.
+This ran successfully on a stock UKMARSBOT in competition on October 7th 2023. It may still contain bugs and you will need to setup and calibrate your own robat before you can expect it to run well. 
 
-It is, however, intended to be a complete, fairly bare-bones micromouse software suite. It should contain all the basic functionality needed to allow a UKMARSBOT or close derivative to explore a classic micromouse maze and search to the center and back to the start.
+It is intended to be a complete, fairly bare-bones micromouse software suite. It should contain all the basic functionality needed to allow a UKMARSBOT or close derivative to explore a classic micromouse maze and search to the center and back to the start.
 
 There are a couple of calibation routines by way of an example of how you might do the basic sensor calibration. There is also a command line interpreter for those who have a radio serial link such as a bluetooth module.
 
@@ -12,7 +12,7 @@ There are a couple of calibation routines by way of an example of how you might 
 
 # Mazerunner Core
 
-This repository will hold a version of the mazerunner code for a version of UKMARSBOT that can run in a classic micromouse maze.
+This repository holds a version of the mazerunner code for a version of UKMARSBOT that can run in a classic micromouse maze.
 
 The code assumes you have a standard UKMARSBOT assembled, using an Arduino nano with a basic or advanced wall sensor connected.
 
@@ -60,7 +60,7 @@ At the time of writing, this code contains an absolute minimal set of code neede
 
 ## Updates
 
-Be aware that, if you download a newer copy of the code, and simply unpack it into te same folder, you will overwrite your code and your changes will be lost. Don't be like Julian, don't do that.
+Be aware that, if you download a newer copy of the code, and simply unpack it into the same folder, you will overwrite your code and your changes will be lost. Don't be like Julian, don't do that.
 
 ## Contributing
 
