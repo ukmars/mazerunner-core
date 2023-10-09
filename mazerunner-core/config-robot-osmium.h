@@ -25,6 +25,33 @@
 #define NAME "OSMIUM CORE"
 
 //***** SENSOR CALIBRATION **************************************************//
+/**
+RAW side sensor values when robot is centred in a cell and no wall ahead
+
+##                            ##
+||                            ||
+||                            ||
+||          ______            ||
+||         /       \          ||
+||         |       |          ||
+||         |||   |||          ||
+||         |       |          ||
+||         |_______|          ||
+##============================##
+
+RAW values for the front sensor when the robot is backed up to a wall
+
+##=============================##
+
+
+             ______
+           /       \
+           |       |
+           |||   |||
+           |       |
+           |_______|
+##=============================##
+*/
 
 #if EVENT == EVENT_HOME
 // wall sensor thresholds and constants
@@ -51,37 +78,10 @@ const int TURN_THRESHOLD_SS90E = 115;
 const int EXTRA_WALL_ADJUST = 5;
 
 #elif EVENT == EVENT_UK
-/**
-RAW values for the front sensor when the robot is backed up to a wall
-
-##=============================##
-
-
-             ______
-           /       \
-           |       |
-           |||   |||
-           |       |
-           |_______|
-##=============================##
-*/
+// RAW values for the front sensor when the robot is backed up to a wall
 const int FRONT_LEFT_CALIBRATION = 77;
 const int FRONT_RIGHT_CALIBRATION = 34;
-/**
-RAW side sensor values when robot is centred in a cell and no wall ahead
-
-##                             ##
-||                             ||
-||                             ||
-||          ______             ||
-||         /       \           ||
-||         |       |           ||
-||         |||   |||           ||
-||         |       |           ||
-||         |_______|           ||
-##=============================##
-*/
-
+// RAW side sensor values when robot is centred in a cell and no wall ahead
 const int LEFT_CALIBRATION = 75;
 const int RIGHT_CALIBRATION = 72;
 
