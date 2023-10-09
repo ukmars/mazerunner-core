@@ -71,20 +71,35 @@ class Mouse {
    * If there is a wall ahead, it will use that for a reference to make sure it
    * is well positioned.
    *
+   * On entry the robot is at some position that is an offset from the threshold
+   * of the previous cell. Remember that all offset positions start at zero for the
+   * cell threshold with 90mm (HALF_CELL) being the centre.
+   * The robot is moving forwards. Since this is generally used in the search, the
+   * position is likely to have some value between 170 and 190mm and the offset of
+   * centre of the next cell is (FULL_CELL + HALF_CELL) = 270mm in the classic
+   * contest.
+   *
    * TODO: the critical values are robot-dependent.
    *
    * TODO: need a function just to adjust forward position
+   *
+   * TODO: It would be better to use the distance rather than sensor readigs here
    */
   static void stopAndAdjust() {
     float remaining = (FULL_CELL + HALF_CELL) - motion.position();
     sensors.set_steering_mode(STEERING_OFF);
+    // Keep moving with the intent of stopping at the cell centre
     motion.start_move(remaining, motion.velocity(), 0, motion.acceleration());
+    // While waiting, check to see if a front wall becomes visible and break
+    // out early if it does
     while (not motion.move_finished()) {
       if (sensors.get_front_sum() > (FRONT_REFERENCE - 150)) {
         break;
       }
       delay(2);
     }
+    // If the wait finished early because of a wall ahead then use that
+    // wall to creep up on the cell centre
     if (sensors.see_front_wall) {
       while (sensors.get_front_sum() < FRONT_REFERENCE) {
         motion.start_move(10, 50, 0, 1000);
@@ -126,6 +141,7 @@ class Mouse {
    * the next cell boundary.
    *
    * Does NOT update the mouse heading but it possibly should
+   *
    *
    * TODO: There is only just enough space to get down to turn speed. Increase turn speed?
    *
