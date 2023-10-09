@@ -51,10 +51,37 @@ const int TURN_THRESHOLD_SS90E = 115;
 const int EXTRA_WALL_ADJUST = 5;
 
 #elif EVENT == EVENT_UK
-// RAW values for the front sensor when the robot is backed up to a wall
+/**
+RAW values for the front sensor when the robot is backed up to a wall
+
+##=============================##
+
+
+             ______
+           /       \
+           |       |
+           |||   |||
+           |       |
+           |_______|
+##=============================##
+*/
 const int FRONT_LEFT_CALIBRATION = 77;
 const int FRONT_RIGHT_CALIBRATION = 34;
-// RAW side sensor values when robot is centred in a cell and wall ahead
+/**
+RAW side sensor values when robot is centred in a cell and no wall ahead
+
+##                             ##
+||                             ||
+||                             ||
+||          ______             ||
+||         /       \           ||
+||         |       |           ||
+||         |||   |||           ||
+||         |       |           ||
+||         |_______|           ||
+##=============================##
+*/
+
 const int LEFT_CALIBRATION = 75;
 const int RIGHT_CALIBRATION = 72;
 
@@ -134,9 +161,9 @@ const int BACK_WALL_TO_CENTER = 48;
 // the pulses.
 // Finally, move the mouse in a straight line through 1000mm of travel to work
 // out the wheel diameter.
-const float WHEEL_DIAMETER = 32.00;
 const float ENCODER_PULSES = 12.00;
 const float GEAR_RATIO = 19.540;
+const float WHEEL_DIAMETER = 32.00;
 
 // Mouse radius is the distance between the contact patches of the drive wheels.
 // A good starting approximation is half the distance between the wheel centres.
