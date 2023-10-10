@@ -302,11 +302,11 @@ const int RIGHT_EDGE_POS = 90;
 // clang-format off
 // These take no storage - the compiler uses the values directly
 const TurnParameters turn_params[4] = {
-//               speed, runin, runout, angle, omega, alpha, sensor threshold
-    {SEARCH_TURN_SPEED,    20,     10,    90,   280,  4000, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
-    {SEARCH_TURN_SPEED,    20,     10,   -90,   280,  4000, TURN_THRESHOLD_SS90E}, // 0 => SS90ER
-    {SEARCH_TURN_SPEED,    20,     10,    90,   280,  4000, TURN_THRESHOLD_SS90E}, // 0 => SS90L
-    {SEARCH_TURN_SPEED,    20,     10,   -90,   280,  4000, TURN_THRESHOLD_SS90E}, // 0 => SS90R
+    //           speed, runin, runout, angle, omega, alpha, sensor threshold
+    {SEARCH_TURN_SPEED,    20,     10,    90,   287,  2866, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
+    {SEARCH_TURN_SPEED,    20,     10,   -90,   287,  2866, TURN_THRESHOLD_SS90E}, // 0 => SS90ER
+    {SEARCH_TURN_SPEED,    20,     10,    90,   287,  2866, TURN_THRESHOLD_SS90E}, // 0 => SS90L
+    {SEARCH_TURN_SPEED,    20,     10,   -90,   287,  2866, TURN_THRESHOLD_SS90E}, // 0 => SS90R
 };
 // clang-format on
 
