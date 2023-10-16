@@ -48,9 +48,9 @@ struct TurnParameters {
   int speed;         // mm/s    - constant forward speed during turn
   int entry_offset;  // mm      - distance from turn pivot to turn start
   int exit_offset;   // mm      - distance from turn pivot to turn end
-  int angle;         // deg     - total turn angle
-  int omega;         // deg/s   - maximum angular velocity
-  int alpha;         // deg/s/s - angular acceleration
+  float angle;       // deg     - total turn angle
+  float omega;       // deg/s   - maximum angular velocity
+  float alpha;       // deg/s/s - angular acceleration
   int trigger;       //         - front sensor value at start of turn
 };
 
