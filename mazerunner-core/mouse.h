@@ -160,7 +160,7 @@ class Mouse {
     }
 
     bool triggered_by_sensor = false;
-    float turn_point = FULL_CELL + params.run_in;
+    float turn_point = FULL_CELL + HALF_CELL - params.entry_offset;
     while (motion.position() < turn_point) {
       if (sensors.get_front_sum() > trigger) {
         motion.set_target_velocity(motion.velocity());
@@ -173,7 +173,9 @@ class Mouse {
     reporter.log_action_status(dir, note, m_location, m_heading);  // the sensors triggered the turn
     // finally we get to actually turn
     motion.turn(params.angle, params.omega, 0, params.alpha);
-    motion.move(params.run_out, motion.velocity(), SEARCH_SPEED, SEARCH_ACCELERATION);
+    // robot should be at output offset - run to the sensing position
+    int end_point = HALF_CELL + params.exit_offset;
+    motion.move(SENSING_POSITION - end_point, motion.velocity(), SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(SENSING_POSITION);
   }
 

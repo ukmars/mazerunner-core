@@ -45,13 +45,13 @@ const float DEGREES_PER_RADIAN = 360.0 / 2 * PI;
  * TODO: replace trigger value with sensor identifier
  */
 struct TurnParameters {
-  int speed;    // mm/s    - constant forward speed during turn
-  int run_in;   // mm      - distance from cell edge to turn start
-  int run_out;  // mm      - distance from turn end to cell start
-  int angle;    // deg     - total turn angle
-  int omega;    // deg/s   - maximum angular velocity
-  int alpha;    // deg/s/s - angular acceleration
-  int trigger;  //         - front sensor value at start of turn
+  int speed;         // mm/s    - constant forward speed during turn
+  int entry_offset;  // mm      - distance from turn pivot to turn start
+  int exit_offset;   // mm      - distance from turn pivot to turn end
+  int angle;         // deg     - total turn angle
+  int omega;         // deg/s   - maximum angular velocity
+  int alpha;         // deg/s/s - angular acceleration
+  int trigger;       //         - front sensor value at start of turn
 };
 
 /*************************************************************************/
