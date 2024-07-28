@@ -412,6 +412,136 @@ class Mouse {
   }
 
   /***
+   * search_to will cause the mouse to move to the given target cell
+   * using safe, exploration speeds and turns.
+   *
+   * During the search, walls will be mapped but only when first seen.
+   * A wall will not be changed once it has been mapped.
+   *
+   * It is possible for the mapping process to make the mouse think it
+   * is walled in with no route to the target if wals are falsely
+   * identified as present.
+   *
+   * On entry, the mouse will know its location and heading and
+   * will begin by moving forward. The assumption is that the mouse
+   * is already facing in an appropriate direction.
+   *
+   * All paths will start with a straight.
+   *
+   * If the function is called with handstart set true, you can
+   * assume that the mouse is already backed up to the wall behind.
+   *
+   * Otherwise, the mouse is assumed to be centrally placed in a cell
+   * and may be stationary or moving.
+   *
+   * The walls for the current location are assumed to be correct in
+   * the map since mapping is always done by looking ahead into the
+   * cell that is about to be entered.
+   *
+   * On exit, the mouse will be centered in the target cell still
+   * facing in the direction it entered that cell. This will
+   * always be one of the four cardinal directions NESW
+   *
+   */
+
+  bool getRandomBool() {
+    return rand() % 2 == 0;
+  }
+
+  // when searching the maze select a random direction for the next cell
+  uint8_t randomHeading() {
+    uint8_t turnDirection;
+    bool leftWall = sensors.see_left_wall;
+    bool rightWall = sensors.see_right_wall;
+    bool frontWall = sensors.see_front_wall;
+
+    if (leftWall && rightWall && frontWall) {
+      turnDirection = BACK;
+    } else if (leftWall && rightWall) {
+      turnDirection = AHEAD;
+    } else if (rightWall && frontWall) {
+      turnDirection = LEFT;
+    } else if (leftWall) {
+      if (getRandomBool()) {
+        turnDirection = RIGHT;
+      } else {
+        turnDirection = AHEAD;
+      }
+    } else if (rightWall) {
+      if (getRandomBool()) {
+        turnDirection = LEFT;
+      } else {
+        turnDirection = AHEAD;
+      }
+    } else {
+      if (getRandomBool()) {
+        turnDirection = LEFT;
+      } else {
+        turnDirection = RIGHT;
+      }
+    }
+
+    return turnDirection;
+  }
+
+  void wander_to(Location target) {
+    target = Location(16, 16);
+    Serial.println(F("Wandering..."));
+    m_handStart = true;
+    m_location = START;
+    m_heading = NORTH;
+    maze.initialise();
+    sensors.wait_for_user_start();
+    sensors.enable();
+    motion.reset_drive_system();
+    sensors.set_steering_mode(STEERING_OFF);
+    motion.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
+    motion.set_position(HALF_CELL);
+    Serial.println(F("Off we go..."));
+    motion.wait_until_position(SENSING_POSITION);
+    // at the start of this loop we are always at the sensing point
+    while (m_location != target) {
+      if (switches.button_pressed()) {
+        break;
+      }
+      Serial.println();
+      reporter.log_action_status('-', ' ', m_location, m_heading);
+      sensors.set_steering_mode(STEER_NORMAL);
+      m_location = m_location.neighbour(m_heading);
+      update_map();
+      Serial.write(' ');
+      Serial.write('|');
+      Serial.write(' ');
+      char action = '#';
+      if (m_location != target) {
+        if (!sensors.see_left_wall) {
+          turn_left();
+          action = 'L';
+        } else if (!sensors.see_front_wall) {
+          move_ahead();
+          action = 'F';
+        } else if (!sensors.see_right_wall) {
+          turn_right();
+          action = 'R';
+        } else {
+          turn_back();
+          action = 'B';
+        }
+      }
+      reporter.log_action_status(action, ' ', m_location, m_heading);
+    }
+    // we are entering the target cell so come to an orderly
+    // halt in the middle of that cell
+    stop_at_center();
+    Serial.println();
+    Serial.println(F("Arrived!  "));
+    delay(250);
+    sensors.disable();
+    motion.reset_drive_system();
+    sensors.set_steering_mode(STEERING_OFF);
+  }
+
+  /***
    * run_to should take the mouse to the target cell by whatever
    * fast means it has. There is no mapping done, just the motion.
    *

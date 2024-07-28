@@ -370,7 +370,7 @@ class CommandLineInterface {
         mouse.test_SS90E();
         break;
       case 5:
-        // mouse.test_SS90F(); // not implemented
+        mouse.wander_to(Location(20, 20));  // not implemented
         break;
       case 6:
         mouse.conf_edge_detection();
@@ -420,7 +420,7 @@ class CommandLineInterface {
     Serial.println(F("       2 = Search to the goal and back"));
     Serial.println(F("       3 = Follow a wall to the goal"));
     Serial.println(F("       4 = Test SS90E Turn"));
-    Serial.println(F("       5 = Test SS90F Turn"));
+    Serial.println(F("       5 = Wander"));
     Serial.println(F("       6 = Test Edge Detect Position"));
     Serial.println(F("       7 = Sensor Spin Calibration"));
     Serial.println(F("       8 = "));
