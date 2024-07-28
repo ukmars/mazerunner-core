@@ -270,6 +270,24 @@ class Maze {
     }
   }
 
+  int wall_count(const Location cell) const {
+    int count = 4;
+    if (is_exit(cell, NORTH)) {
+      count -= 1;
+    }
+
+    if (is_exit(cell, EAST)) {
+      count -= 1;
+    }
+    if (is_exit(cell, SOUTH)) {
+      count -= 1;
+    }
+    if (is_exit(cell, WEST)) {
+      count -= 1;
+    }
+    return count;
+  }
+
   /// @brief  return true if ALL the walls in a cell have been seen
   bool cell_is_visited(const Location cell) const {
     return not has_unknown_walls(cell);
