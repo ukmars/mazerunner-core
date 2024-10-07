@@ -112,7 +112,8 @@ const float HALF_CELL = FULL_CELL / 2.0;
 #define ROBOT_CORE_OSMIUM 1
 #define ROBOT_ORION 2
 
-#define ROBOT ROBOT_CORE_OSMIUM
+// #define ROBOT ROBOT_CORE_OSMIUM
+#define ROBOT ROBOT_ORION
 
 #if ROBOT == ROBOT_CORE_OSMIUM
 #include "config-robot-osmium.h"
