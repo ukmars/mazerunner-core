@@ -61,11 +61,14 @@ struct TurnParameters {
  * things like IO pins, ADC channels and so on
  */
 
+/// list the hardware platforms you can suport
 #define HARDWARE_UNKNOWN 0
 #define HARDWARE_UKMARSBOT_1_3A 1
 
+/// define the choice for this build
 #define HARDWARE HARDWARE_UKMARSBOT_1_3A
 
+/// include the relevant config file
 #if HARDWARE == HARDWARE_UKMARSBOT_1_3A
 #include "config-ukmarsbot.h"
 #else
@@ -79,7 +82,7 @@ struct TurnParameters {
  * can have different sensor defaults for each of these environments
  * so here you can define which set will be used.
  */
-
+/// these are the events that require individual settings
 #define EVENT_HOME 1
 #define EVENT_UK 2
 #define EVENT_PORTUGAL 3
@@ -108,11 +111,12 @@ const float HALF_CELL = FULL_CELL / 2.0;
  * If you have only one robot then you can reduce this section to a single
  * include line.
  */
+/// these are the variants that you can run
 #define ROBOT_NOT_DEFINED 0
 #define ROBOT_CORE_OSMIUM 1
 #define ROBOT_ORION 2
 
-// #define ROBOT ROBOT_CORE_OSMIUM
+/// this is the variant you are building for.
 #define ROBOT ROBOT_ORION
 
 #if ROBOT == ROBOT_CORE_OSMIUM
