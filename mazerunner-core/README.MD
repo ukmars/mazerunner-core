@@ -30,3 +30,5 @@ When the code is loaded onto the robot, operation is primarily governed by the f
  - activate the function by pressing the button
 
 Some builtin functions have a secondary start that is triggered by briefly occluding the front sensors. For example, in maze running mode, the user button starts the function. The bult-in LED blinks to indicate that it is ready and you can place the robot in the maze. The robot will not actually start a run until triggered by occluding the front sensors. This is my preference for a start that does not disturb the robot. You may choose whatever technique suits you.
+
+***NOTE*** the maze map is stored in EEPROM. To clear the stored maze, hold down the user button and reset the processor. Hold down the button until the user LED fashes.

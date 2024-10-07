@@ -72,6 +72,7 @@ void setup() {
   /// do not begin systick until the hardware is setup
   systick.begin();
   /// keep the button held down after a reset to clear the maze
+  /// otherwise you will use the last-saved map.
   if (switches.button_pressed()) {
     maze.initialise();
     mouse.blink(2);
