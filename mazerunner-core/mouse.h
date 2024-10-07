@@ -56,6 +56,7 @@ class Mouse {
     m_heading = NORTH;
   }
 
+  //***************************************************************************//
   /**
    * change the mouse heading but do not physically turn
    */
@@ -108,6 +109,7 @@ class Mouse {
     }
   }
 
+  //***************************************************************************//
   /**
    * These convenience functions will bring the robot to a halt
    * before actually turning.
@@ -131,7 +133,6 @@ class Mouse {
   }
 
   //***************************************************************************//
-
   /** Search turns
    *
    * These turns assume that the robot is crossing the cell boundary but is still
@@ -161,9 +162,11 @@ class Mouse {
 
     bool triggered_by_sensor = false;
     float turn_point = FULL_CELL + HALF_CELL - params.entry_offset;
+    // Now we wait until we detect the turn start condition
+    // TODO: there is room for improvement here
     while (motion.position() < turn_point) {
       if (sensors.get_front_sum() > trigger) {
-        motion.set_target_velocity(motion.velocity());
+        motion.set_target_velocity(motion.velocity());  // prevent speed changes
         triggered_by_sensor = true;
         break;
       }
@@ -183,6 +186,9 @@ class Mouse {
   /***
    * bring the mouse to a halt in the center of the current cell. That is,
    * the cell it is entering.
+   *
+   * On entry, we assume that the mouse knows its position in terms of the
+   * distance from the start of the last cell.
    */
   void stop_at_center() {
     bool has_wall = sensors.see_front_wall;
@@ -311,6 +317,41 @@ class Mouse {
     sensors.set_steering_mode(STEERING_OFF);
   }
 
+  /****************************************************************************/
+  /***
+   * This function moves the mouse from the start position to a target location
+   * which is specified as a distance from the start position.
+   *
+   * Use this function to help with calibration of the encoders and wheel
+   * diameter.
+   *
+   * You could also modify it to generate sensor data or control
+   * teemetry while running.
+   *
+   * @param mm the distance from the start location to the target position
+   */
+  void run(int mm) {
+    Serial.println(F("Follow TO"));
+    m_handStart = true;
+    m_location = START;
+    m_heading = NORTH;
+    maze.initialise();
+    sensors.wait_for_user_start();
+    sensors.enable();
+    motion.reset_drive_system();
+    sensors.set_steering_mode(STEER_NORMAL);
+    motion.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
+    motion.set_position(HALF_CELL);
+    motion.move(mm, SEARCH_SPEED, 0, SEARCH_ACCELERATION);
+    Serial.println();
+    Serial.println(F("Arrived!  "));
+    delay(250);
+    sensors.disable();
+    motion.reset_drive_system();
+    sensors.set_steering_mode(STEERING_OFF);
+  }
+
+  /****************************************************************************/
   /***
    * search_to will cause the mouse to move to the given target cell
    * using safe, exploration speeds and turns.
@@ -411,43 +452,12 @@ class Mouse {
     sensors.set_steering_mode(STEERING_OFF);
   }
 
-  /***
-   * search_to will cause the mouse to move to the given target cell
-   * using safe, exploration speeds and turns.
-   *
-   * During the search, walls will be mapped but only when first seen.
-   * A wall will not be changed once it has been mapped.
-   *
-   * It is possible for the mapping process to make the mouse think it
-   * is walled in with no route to the target if wals are falsely
-   * identified as present.
-   *
-   * On entry, the mouse will know its location and heading and
-   * will begin by moving forward. The assumption is that the mouse
-   * is already facing in an appropriate direction.
-   *
-   * All paths will start with a straight.
-   *
-   * If the function is called with handstart set true, you can
-   * assume that the mouse is already backed up to the wall behind.
-   *
-   * Otherwise, the mouse is assumed to be centrally placed in a cell
-   * and may be stationary or moving.
-   *
-   * The walls for the current location are assumed to be correct in
-   * the map since mapping is always done by looking ahead into the
-   * cell that is about to be entered.
-   *
-   * On exit, the mouse will be centered in the target cell still
-   * facing in the direction it entered that cell. This will
-   * always be one of the four cardinal directions NESW
-   *
-   */
-
+  /****************************************************************************/
   bool getRandomBool() {
     return rand() % 2 == 0;
   }
 
+  /****************************************************************************/
   // when searching the maze select a random direction for the next cell
   uint8_t randomHeading() {
     uint8_t turnDirection;
@@ -484,6 +494,7 @@ class Mouse {
     return turnDirection;
   }
 
+  /****************************************************************************/
   void wander_to(Location target) {
     target = Location(16, 16);
     Serial.println(F("Wandering..."));
@@ -541,6 +552,7 @@ class Mouse {
     sensors.set_steering_mode(STEERING_OFF);
   }
 
+  /****************************************************************************/
   /***
    * run_to should take the mouse to the target cell by whatever
    * fast means it has. There is no mapping done, just the motion.
@@ -565,8 +577,10 @@ class Mouse {
    */
   void run_to(Location target) {
     (void)target;
+    //// Not implemented
   }
 
+  /****************************************************************************/
   void turn_to_face(Heading newHeading) {
     unsigned char hdgChange = (newHeading + HEADING_COUNT - m_heading) % HEADING_COUNT;
     switch (hdgChange) {
@@ -585,6 +599,7 @@ class Mouse {
     m_heading = newHeading;
   }
 
+  /****************************************************************************/
   void update_map() {
     bool leftWall = sensors.see_left_wall;
     bool frontWall = sensors.see_front_wall;
@@ -627,6 +642,7 @@ class Mouse {
     }
   }
 
+  /****************************************************************************/
   /***
    * The mouse is expected to be in the start cell heading NORTH
    * The maze may, or may not, have been searched.
