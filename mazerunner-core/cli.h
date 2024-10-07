@@ -381,6 +381,12 @@ class CommandLineInterface {
       case 8:
         mouse.conf_log_front_sensor();
         break;
+
+      case 9:
+        mouse.run(4 * FULL_CELL);
+        ;
+        break;
+
       default:
         // just to be safe...
         sensors.disable();
@@ -423,8 +429,8 @@ class CommandLineInterface {
     Serial.println(F("       5 = Wander"));
     Serial.println(F("       6 = Test Edge Detect Position"));
     Serial.println(F("       7 = Sensor Spin Calibration"));
-    Serial.println(F("       8 = "));
-    Serial.println(F("       9 = "));
+    Serial.println(F("       8 = Get Front Sensor table"));
+    Serial.println(F("       9 = move forward 4 cells"));
     Serial.println(F("      10 = "));
     Serial.println(F("      11 = "));
     Serial.println(F("      12 = "));
