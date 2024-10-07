@@ -523,21 +523,20 @@ class Mouse {
       Serial.write(' ');
       Serial.write('|');
       Serial.write(' ');
-      char action = '#';
-      if (m_location != target) {
-        if (!sensors.see_left_wall) {
-          turn_left();
-          action = 'L';
-        } else if (!sensors.see_front_wall) {
-          move_ahead();
-          action = 'F';
-        } else if (!sensors.see_right_wall) {
-          turn_right();
-          action = 'R';
-        } else {
-          turn_back();
-          action = 'B';
-        }
+      char action = 'W';
+      uint8_t hdg = randomHeading();
+      if (hdg == LEFT) {
+        turn_left();
+        action = 'L';
+      } else if (hdg == AHEAD) {
+        move_ahead();
+        action = 'F';
+      } else if (hdg == RIGHT) {
+        turn_right();
+        action = 'R';
+      } else {
+        turn_back();
+        action = 'B';
       }
       reporter.log_action_status(action, ' ', m_location, m_heading);
     }
