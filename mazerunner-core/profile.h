@@ -10,6 +10,7 @@
  ******************************************************************************/
 
 #ifndef PROFILE_H
+#define PROFILE_H
 
 #include <Arduino.h>
 #include "config.h"
@@ -208,7 +209,7 @@ class Profile {
         m_state = PS_BRAKING;
         if (m_final_speed == 0) {
           // The magic number I normally set to be the same, numerically, as the current
-          // acceleration. It is just a small velicity that ensures that the motion continues 
+          // acceleration. It is just a small velicity that ensures that the motion continues
           // past the finish point in case floating point rounding prevents that happening.
           // It is a nasty hack I keep meaning to find a more tidy solution for.
           m_target_speed = m_sign * 5.0f;  // magic number to make sure we reach zero
@@ -232,7 +233,7 @@ class Profile {
     }
     // increment the position
     m_position += m_speed * LOOP_INTERVAL;
-	// The number is a hack to ensure floating point rounding errors do not prevent the
+    // The number is a hack to ensure floating point rounding errors do not prevent the
     // loop termination. The units are mm and independent of the encoder resolution.
     // I figure that being within 1/8 of a mm will be close enough.
     if (m_state != PS_FINISHED && remaining < 0.125) {

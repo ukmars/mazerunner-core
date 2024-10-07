@@ -144,13 +144,13 @@ class Motors {
   float leftFeedForward(float speed) {
     static float oldSpeed = 0;
     float leftFF = speed * SPEED_FF;
-	if (speed > 0) {
-		leftFF += BIAS_FF ;
-	} else if (speed < 0){
-		leftFF -= BIAS_FF ;
-	} else {
-		// No bias when the speed is 0
-	}
+    if (speed > 0) {
+      leftFF += BIAS_FF;
+    } else if (speed < 0) {
+      leftFF -= BIAS_FF;
+    } else {
+      // No bias when the speed is 0
+    }
     float acc = (speed - oldSpeed) * LOOP_FREQUENCY;
     oldSpeed = speed;
     float accFF = ACC_FF * acc;
@@ -161,13 +161,13 @@ class Motors {
   float rightFeedForward(float speed) {
     static float oldSpeed = 0;
     float rightFF = speed * SPEED_FF;
-	if (speed > 0) {
-		rightFF += BIAS_FF ;
-	} else if (speed < 0){
-		rightFF -= BIAS_FF ;
-	} else {
-		// No bias when the speed is 0
-	}
+    if (speed > 0) {
+      rightFF += BIAS_FF;
+    } else if (speed < 0) {
+      rightFF -= BIAS_FF;
+    } else {
+      // No bias when the speed is 0
+    }
     float acc = (speed - oldSpeed) * LOOP_FREQUENCY;
     oldSpeed = speed;
     float accFF = ACC_FF * acc;
