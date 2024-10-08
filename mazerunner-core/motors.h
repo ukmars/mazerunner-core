@@ -142,7 +142,7 @@ class Motors {
    */
 
   float leftFeedForward(float speed) {
-    static float oldSpeed = 0;
+    static float oldSpeed = speed;
     float leftFF = speed * SPEED_FF;
     if (speed > 0) {
       leftFF += BIAS_FF;
@@ -159,7 +159,7 @@ class Motors {
   }
 
   float rightFeedForward(float speed) {
-    static float oldSpeed = 0;
+    static float oldSpeed = speed;
     float rightFF = speed * SPEED_FF;
     if (speed > 0) {
       rightFF += BIAS_FF;
