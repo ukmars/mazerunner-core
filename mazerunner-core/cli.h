@@ -442,7 +442,7 @@ class CommandLineInterface {
   }
 
  private:
-  char m_buffer[INPUT_BUFFER_SIZE];
+  char m_buffer[INPUT_BUFFER_SIZE] = {0};
   uint8_t m_index = 0;
 };
 

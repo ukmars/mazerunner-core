@@ -100,8 +100,8 @@ static Stream& printer = Serial;
 class Reporter;
 extern Reporter reporter;
 class Reporter {
-  uint32_t s_start_time;
-  uint32_t s_report_time;
+  uint32_t s_start_time = millis();
+  uint32_t s_report_time = millis();
   uint32_t s_report_interval = REPORTING_INTERVAL;
 
  public:

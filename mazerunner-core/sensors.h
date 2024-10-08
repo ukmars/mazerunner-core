@@ -315,10 +315,10 @@ class Sensors {
  private:
   float m_last_steering_error = 0;
   volatile bool m_active = false;
-  volatile float m_cross_track_error;
-  volatile float m_steering_adjustment;
-  volatile int m_front_sum;
-  volatile int m_front_diff;
+  volatile float m_cross_track_error = 0;
+  volatile float m_steering_adjustment = 0;
+  volatile int m_front_sum = 0;
+  volatile int m_front_diff = 0;
 };
 
 #endif

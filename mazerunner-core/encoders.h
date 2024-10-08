@@ -45,6 +45,9 @@ void callback_right_encoder_isr();
 
 class Encoders {
  public:
+  Encoders() {
+    reset();
+  };
   void begin() {
     pinMode(ENCODER_LEFT_CLK, INPUT);
     pinMode(ENCODER_LEFT_B, INPUT);
@@ -219,11 +222,11 @@ class Encoders {
   volatile float m_robot_distance;
   volatile float m_robot_angle;
   // the change in distance or angle in the last tick.
-  float m_fwd_change;
-  float m_rot_change;
+  float m_fwd_change = 0;
+  float m_rot_change = 0;
   // internal use only to track encoder input edges
-  int m_left_counter;
-  int m_right_counter;
+  int m_left_counter = 0;
+  int m_right_counter = 0;
 };
 
 // A bit of indirection for convenience because the encoder instance is

@@ -337,17 +337,17 @@ class Motors {
   }
 
  private:
-  bool m_controller_output_enabled;
+  bool m_controller_output_enabled = true;
   bool m_feedforward_enabled = true;
-  float m_previous_fwd_error;
-  float m_previous_rot_error;
-  float m_fwd_error;
-  float m_rot_error;
-  float m_velocity;
-  float m_omega;
+  float m_previous_fwd_error = 0;
+  float m_previous_rot_error = 0;
+  float m_fwd_error = 0;
+  float m_rot_error = 0;
+  float m_velocity = 0;
+  float m_omega = 0;
   // these are maintained only for logging
-  float m_left_motor_volts;
-  float m_right_motor_volts;
+  float m_left_motor_volts = 0;
+  float m_right_motor_volts = 0;
 };
 
 #endif

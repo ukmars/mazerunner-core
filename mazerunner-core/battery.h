@@ -46,7 +46,7 @@ class Battery {
 
  private:
   Battery();  // no instantiation without an adc channel
-  int m_adc_value;
+  int m_adc_value = 0;
   int m_adc_channel;
-  float m_battery_volts;
+  float m_battery_volts = 0;
 };

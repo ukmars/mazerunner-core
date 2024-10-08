@@ -241,9 +241,14 @@ class Location {
  * result in walls being changed after they were frst seen.
  *
  */
+
 class Maze {
  public:
   Maze() {
+    /// we do not initialise the maze here because it is stored
+    /// in non-volatile memory.
+    /// call initialise() explicitly to clear all walls to defaults and
+    /// reflood the maze.
   }
 
   Location goal() const {
@@ -515,6 +520,7 @@ class Maze {
         break;
     }
   }
+
   MazeMask m_mask = MASK_OPEN;
   Location m_goal{7, 7};
   // on Arduino only use 8 bits for cost to save space
