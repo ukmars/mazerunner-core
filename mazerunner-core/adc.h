@@ -227,8 +227,8 @@ class AnalogueConverter {
   }
 
  private:
-  volatile int m_adc_dark[MAX_CHANNELS];
-  volatile int m_adc_lit[MAX_CHANNELS];
+  volatile int m_adc_dark[MAX_CHANNELS] = {0, 0, 0, 0, 0, 0, 0, 0};
+  volatile int m_adc_lit[MAX_CHANNELS]{0, 0, 0, 0, 0, 0, 0, 0};
   uint8_t m_emitter_front_pin = -1;
   uint8_t m_emitter_diagonal_pin = -1;
   uint8_t m_index = 0;
