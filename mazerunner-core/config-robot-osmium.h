@@ -195,7 +195,7 @@ const float LOOP_INTERVAL = (1.0 / LOOP_FREQUENCY);
 
 // Dynamic performance constants
 // There is a video describing how to get these numbers and calculate the feedforward
-// constnats here: https://youtu.be/BrabDeHGsa0
+// constants here: https://youtu.be/BrabDeHGsa0
 const float FWD_KM = 475.0;  // mm/s/Volt
 const float FWD_TM = 0.190;  // forward time constant
 const float ROT_KM = 775.0;  // deg/s/Volt
@@ -217,6 +217,15 @@ const float ROT_TM = 0.210;  // rotation time constant
  * some minimum voltage needed just to ovecome friction and get the wheels to turn at all.
  * That minimum voltage is the BIAS_FF. It is not dependent upon speed but is expressed
  * here as a fraction for comparison.
+ *
+ * If you want to find out more about how these equations come about and the theory
+ * behind the method and its derivation have a look at this video:
+ * https://youtu.be/qKoPRacXk9Q
+ *
+ * And this paper:
+ * https://github.com/ukmars/motorlab/blob/main/documents/dirty-pd-controller.pdf
+ *
+ *
  */
 const float MAX_MOTOR_VOLTS = 6.0;
 
