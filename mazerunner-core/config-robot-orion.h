@@ -276,7 +276,7 @@ const float MAX_MOTOR_VOLTS = 6.0;
 const float SPEED_FF = (1.0 / FWD_KM);
 const float ACC_FF = (FWD_TM / FWD_KM);
 const float BIAS_FF = 0.340;
-const float TOP_SPEED = (6.0 - BIAS_FF) / SPEED_FF;
+const float TOP_SPEED = (MAX_MOTOR_VOLTS - BIAS_FF) / SPEED_FF;
 
 //*** MOTION CONTROL CONSTANTS **********************************************//
 
