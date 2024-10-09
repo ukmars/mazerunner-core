@@ -387,8 +387,9 @@ const TurnParameters turn_params[4] = {
 // battery voltage calulation is done as efficiently as possible.
 // The compiler will do all these calculations so your program does not have to.
 
-const float BATTERY_R1 = 10000.0;  // resistor to battery +
-const float BATTERY_R2 = 10000.0;  // resistor to Gnd
+const float BATTERY_R1 = 10000.0;      // resistor to battery +
+const float BATTERY_R2 = 10000.0;      // resistor to Gnd
+const float BATTERY_DIODE_DROP = 0.9;  // Voltage drop as battery flows through a diode (D1)
 const float BATTERY_DIVIDER_RATIO = BATTERY_R2 / (BATTERY_R1 + BATTERY_R2);
 const float ADC_FSR = 1023.0;     // The maximum reading for the ADC
 const float ADC_REF_VOLTS = 5.0;  // Reference voltage of ADC
