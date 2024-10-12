@@ -171,7 +171,7 @@ const float GEAR_RATIO = 19.540;
 // small amount. AFTER you have the wheel diameter and gear ratio calibrated,
 // have the mouse turn in place and adjust the MOUSE_RADIUS until these turns are
 // as accurate as you can get them
-const float MOUSE_RADIUS = 38.70;  // 39.50; // Adjust on test
+const float MOUSE_RADIUS = 37.95;  // 39.50; // Adjust on test
 
 // The robot is likely to have wheels of different diameters or motors of slightly
 // different characteristics and that must be compensated for if the robot is to
