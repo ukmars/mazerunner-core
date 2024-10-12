@@ -37,7 +37,7 @@ class Battery {
 
   void update() {
     m_adc_value = adc.get_dark(m_adc_channel);
-    m_battery_volts = BATTERY_MULTIPLIER * m_adc_value;
+    m_battery_volts = (BATTERY_MULTIPLIER * m_adc_value) + BATTERY_DIODE_DROP;
   }
 
   float voltage() {
