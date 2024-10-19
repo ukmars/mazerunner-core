@@ -33,7 +33,7 @@ extern Battery battery;
  */
 class Battery {
  public:
-  explicit Battery(uint8_t channel) : m_adc_channel(channel){};
+  explicit Battery(uint8_t channel) : m_adc_channel(channel) {};
 
   void update() {
     m_adc_value = adc.get_dark(m_adc_channel);

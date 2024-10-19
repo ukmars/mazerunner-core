@@ -46,7 +46,7 @@ class Switches;
 extern Switches switches;
 class Switches {
  public:
-  explicit Switches(uint8_t channel) : m_channel(channel){};
+  explicit Switches(uint8_t channel) : m_channel(channel) {};
 
   void update() {
     m_switches_adc = adc.get_dark(m_channel);

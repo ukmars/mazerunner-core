@@ -68,7 +68,7 @@ const int adc_thesholds[] PROGMEM = {660, 647, 630, 614, 590, 570, 545, 522, 461
 #define __digitalPinToPortReg(P) (((P) <= 7) ? &PORTD : (((P) >= 8 && (P) <= 13) ? &PORTB : &PORTC))
 #define __digitalPinToDDRReg(P) (((P) <= 7) ? &DDRD : (((P) >= 8 && (P) <= 13) ? &DDRB : &DDRC))
 #define __digitalPinToPINReg(P) (((P) <= 7) ? &PIND : (((P) >= 8 && (P) <= 13) ? &PINB : &PINC))
-#define __digitalPinToBit(P) (((P) <= 7) ? (P) : (((P) >= 8 && (P) <= 13) ? (P)-8 : (P)-14))
+#define __digitalPinToBit(P) (((P) <= 7) ? (P) : (((P) >= 8 && (P) <= 13) ? (P) - 8 : (P) - 14))
 
 // general macros/defines
 #if !defined(BIT_READ)
@@ -152,5 +152,5 @@ void redirectPrintf() {
   stdout = &serial_stdout;
 }
 #else
-void redirectPrintf(){};
+void redirectPrintf() {};
 #endif
