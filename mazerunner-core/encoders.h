@@ -64,6 +64,8 @@ class Encoders {
       m_right_counter = 0;
       m_robot_distance = 0;
       m_robot_angle = 0;
+      m_total_right = 0;
+      m_total_left = 0;
     }
   }
 
@@ -143,6 +145,8 @@ class Encoders {
       m_left_counter = 0;
       m_right_counter = 0;
     }
+    m_total_right += left_delta;
+    m_total_left += right_delta;
     float left_change = left_delta * MM_PER_COUNT_LEFT;
     float right_change = right_delta * MM_PER_COUNT_RIGHT;
     m_fwd_change = 0.5 * (right_change + left_change);
@@ -227,6 +231,12 @@ class Encoders {
   // internal use only to track encoder input edges
   int m_left_counter = 0;
   int m_right_counter = 0;
+
+ public:
+  /// These will overflow on a long straight but they are only used for short test runs
+  /// so that is fine
+  int m_total_right = 0;
+  int m_total_left = 0;
 };
 
 // A bit of indirection for convenience because the encoder instance is
