@@ -200,34 +200,34 @@ const int BACK_WALL_TO_CENTER = 48;
 
 //***************************************************************************//
 // We need to know about the drive mechanics.
-// The encoder pulse counts should be obvious from the encoder itself.
-// Work out the gear ratio by rotating the wheel a number of turns and counting
-// the pulses.
-// Finally, move the mouse in a straight line through 1000mm of travel to work
-// out the wheel diameter.
-const float WHEEL_DIAMETER = 32.240;
-const float ENCODER_PULSES = 36.0;
-const float GEAR_RATIO = 10.7917;
 
-// Mouse radius is the distance between the contact patches of the drive wheels.
-// A good starting approximation is half the distance between the wheel centres.
-// After testing, you may find the working value to be larger or smaller by some
-// small amount. AFTER you have the wheel diameter and gear ratio calibrated,
-// have the mouse turn in place and adjust the MOUSE_RADIUS until these turns are
-// as accurate as you can get them
-const float MOUSE_RADIUS = 38.70;  // 39.50; // Adjust on test
+// These calibrations are manual and should make for a good starting setup.
+// Later you can make the robot perform fixed runs and turns to do some fine
+// tuning.
+//
+// Move the mouse in a straight line through 500mm of travel to work while
+// displaying the left and right encoder counts to work out the number of
+// mm per count for each wheel. A more accurate value can be achieved by
+// moving a longer distance.
+// Apply only just enough downward pressure to ensure the wheels do not slip.
+// Make several runs and average them.
+// It is normal for one wheel to show a different count to the other.
 
-// The robot is likely to have wheels of different diameters or motors of slightly
-// different characteristics and that must be compensated for if the robot is to
-// reliably drive in a straight line.
-// This number adjusts the encoder count and must be  added to the right
-// and subtracted from the left motor.
-const float ROTATION_BIAS = -0.005;  // Negative makes robot curve to left
+const float MM_PER_COUNT_LEFT = 500.0 / 1918;
+const float MM_PER_COUNT_RIGHT = 500.0 / 1927;
 
-// Now we can pre-calculate the key constats for the motion control
-const float MM_PER_COUNT = PI * WHEEL_DIAMETER / (ENCODER_PULSES * GEAR_RATIO);
-const float MM_PER_COUNT_LEFT = (1 - ROTATION_BIAS) * MM_PER_COUNT;
-const float MM_PER_COUNT_RIGHT = (1 + ROTATION_BIAS) * MM_PER_COUNT;
+// For accurate turns we need to know how far apart the wheels are. Start by
+// measuring the distance between the tyre centres.
+// Then...
+// Place the mouse on the table and rotate it by hand while reporting the
+// turn angle through the serial port. As with forward motion, push down only
+// enough to prevent the wheels from slipping. Line the edge of the mouse up
+// with a line and turn the mouse as accurately as possible through 360 degrees.
+// Don't worry if it is not perfectly in-place.
+// If the angle displayed is less than 360, set the mouse radius smaller. If
+// the displayed angle is more than 360, set the mouse radius larger.
+const float MOUSE_RADIUS = 38.70;
+
 const float DEG_PER_MM_DIFFERENCE = (180.0 / (2 * MOUSE_RADIUS * PI));
 
 //*** MOTION CONTROLLER CONSTANTS **********************************************//
