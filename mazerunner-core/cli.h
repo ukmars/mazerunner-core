@@ -333,7 +333,24 @@ class CommandLineInterface {
         if (digits) {
           run_function(function);
         }
-      }
+      } break;
+      case 'Q':
+        motors.disable_controllers();
+        encoders.reset();
+        while (!switches.button_pressed()) {
+          delay(10);
+          float position = encoders.robot_distance();
+          float angle = encoders.robot_angle();
+          // reporter.print_justified(encoders.m_total_right, 7);
+          // reporter.print_justified(encoders.m_total_left, 7);
+          // reporter.print_justified(position, 7);
+          // reporter.print_justified(angle, 7);
+          // Serial.println();
+          char buf[60];
+          sprintf_P(buf, PSTR("L:%4d R:%4d P:%5.2f A:%5.2f\r\n"), encoders.m_total_left, encoders.m_total_right, position, angle);
+          Serial.print(buf);
+        }
+        break;
       default:
         break;
     }
@@ -420,6 +437,7 @@ class CommandLineInterface {
     Serial.println(F("D   : display maze with directions"));
     Serial.println(F("B   : show battery voltage"));
     Serial.println(F("S   : show sensor readings"));
+    Serial.println(F("Q   : show encoder readings"));
     Serial.println(F("F n : Run user function n"));
     Serial.println(F("       0 = ---"));
     Serial.println(F("       1 = Sensor Static Calibration"));
