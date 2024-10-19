@@ -68,6 +68,7 @@ void setup() {
   digitalWrite(LED_BUILTIN, 0);
   adc.begin();
   motors.begin();
+  motors.disable_controllers();
   encoders.begin();
   /// do not begin systick until the hardware is setup
   systick.begin();
