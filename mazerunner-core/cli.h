@@ -295,14 +295,15 @@ class CommandLineInterface {
     int index = get_command_index(args);
     if (index < 0) {
       Serial.print(F("UNKNOWN COMMAND: "));
-      Serial.println(args.argv[0]);
+      args.print();
+      // Serial.println(args.argv[0]);
       return;
     }
     switch (index) {
       case 0:
         help();
         break;
-      case 1:
+      case 1: {
         int x = 0;
         int y = 0;
         if (!read_integer(args.argv[1], x)) {
@@ -316,11 +317,7 @@ class CommandLineInterface {
         sprintf_P(buf, PSTR("Search to %d,%d\n"), x, y);
         Serial.print(buf);
         // mouse.search_to(Location(x, y));
-        break;
-      default:
-        Serial.print(F("UNKNOWN COMMAND: "));
-        Serial.println(args.argv[0]);
-        break;
+      } break;
     }
   }
 
