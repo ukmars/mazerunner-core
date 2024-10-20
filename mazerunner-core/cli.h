@@ -225,7 +225,7 @@ class CommandLineInterface {
         run_long_cmd(args);
       }
     }
-    clear_input();
+    clear_input_buffer();
     prompt();
   }
 
@@ -242,14 +242,7 @@ class CommandLineInterface {
    * is a list of where each starts and you can think if it as
    * aan array of strings. The argc element keeps count of how
    * many tokens were found.
-   *
-   * TODO: this creates an Args instance on the stack then
-   * copies it back to the caller which seems wasteful as the stack
-   * will grow by two times the size of Args. There should be a
-   * better way. Perhaps the caller could create the instance and
-   * pass a reference to it.
-   *
-   *
+   *   *
    */
   int get_tokens(Args &args) {
     char *line = m_buffer;
@@ -413,7 +406,7 @@ class CommandLineInterface {
     }
   }
 
-  void clear_input() {
+  void clear_input_buffer() {
     m_index = 0;
     m_buffer[m_index] = 0;
   }
