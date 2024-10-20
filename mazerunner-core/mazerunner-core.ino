@@ -99,7 +99,7 @@ void loop() {
     switches.wait_for_button_release();
     int function = switches.read();
     cli.run_function(function);
-  } else if (cli.read_serial()) {
-    cli.interpret_line();
+  } else {
   }
+  cli.process_serial_data();
 }
