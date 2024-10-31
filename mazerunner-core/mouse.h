@@ -471,6 +471,8 @@ class Mouse {
       turnDirection = AHEAD;
     } else if (rightWall && frontWall) {
       turnDirection = LEFT;
+    } else if (leftWall && frontWall) {
+      turnDirection = RIGHT;
     } else if (leftWall) {
       if (getRandomBool()) {
         turnDirection = RIGHT;
