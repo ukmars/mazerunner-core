@@ -172,8 +172,8 @@ class CommandLineInterface {
         return true;
       } else if (c == BACKSPACE) {
         if (m_index > 0) {
-          m_buffer[m_index] = 0;
           m_index--;
+          m_buffer[m_index] = 0;
           Serial.print(c);  // backspace only moves the cursor
           Serial.print(' ');
           Serial.print(c);
