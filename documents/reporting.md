@@ -16,7 +16,7 @@ When writing your own reporting functions you might like to bear in mind a numbe
 
 ### Serial buffering
 
-The Arduino HardwareSerial object has an output buffer of 64 characters. All serial output comes from this buffer and when you use statements like `Serial.print(42);` the characters are actually placed in the buffer and the buffer is transferred one character at a time under interrupt control. All this means that you can send up to 64 characters in one go with very little impact on the timing of your code but only so long as the buffer is empty when you begin to send. Which leads to
+The Arduino HardwareSerial object has an output buffer of 64 characters. All serial output comes from this buffer and when you use statements like `Serial.print(42);` the characters are actually placed in the buffer and the buffer is transferred one character at a time under interrupt control. All this means that you can send up to 64 characters in one go with very little impact on the timing of your code but only so long as the buffer is empty when you begin to send.
 
 ### Serial baud rates
 
