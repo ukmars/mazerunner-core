@@ -24,7 +24,7 @@ So far the following single-character commands are interpreted. Where a command 
 
 ## Settings commands
 
-Many of the constants needed fortuning and calibrating the robot are stored ins a settings structure. These values are populated either from the ```config.h``` file or read from EEPROM. At present, the values are all read from the ```config.h``` defaults. Future releases will use the EEPROM based values. Meanwhile, it is possible to view and edit these settings without re-programming the robot completely. Values you enter will not be saved after a reset unless you do so explicitly so take notes while experimenting and edit the code later if necessary.
+Many of the constants needed fortuning and calibrating the robot are stored ins a settings structure. These values are populated either from the `config.h` file or read from EEPROM. At present, the values are all read from the `config.h` defaults. Future releases will use the EEPROM based values. Meanwhile, it is possible to view and edit these settings without re-programming the robot completely. Values you enter will not be saved after a reset unless you do so explicitly so take notes while experimenting and edit the code later if necessary.
 
 The following settings commands are implemented:
 
@@ -37,17 +37,12 @@ The following settings commands are implemented:
 |  $!  | store all current settings values to EEPROM               |
 |  $#  | reset all settings to defaults from config.h              |
 
-The reason there are wo ways to see the settings values - with and without a full declaration - is to make it easier to use a simple short-hand manual method for changing settings and for later use with a host-based manager. It is likely that the short-form version will have the setting name appended as a comment at some time.
+The reason there are so ways to see the settings values - with and without a full declaration - is to make it easier to use a simple short-hand manual method for changing settings and for later use with a host-based manager. It is likely that the short-form version will have the setting name appended as a comment at some time.
 
 ### View and change a setting
 
-To view a single setting use the form $n where n is the index number fo the settings as shown in the list that you get from the $ settings list command. For example, the command $2 will display the current value for the forward controller KP setting
+To view a single setting use the form $n where n is the index number of the settings as shown in the list that you get from the $ settings list command. For example, the command $2 will display the current value for the forward controller KP setting
 
-To change a setting use the form $n=vvvvv, where n is the setting number and vvvvv is the new value. For example, to change the forward controller KP setting to 2.13, you can enter ```$2=2.13```. the new value will be echoed to the screen for confirmation.
+To change a setting use the form $n=vvvvv, where n is the setting number and vvvvv is the new value. For example, to change the forward controller KP setting to 2.13, you can enter `$2=2.13`. the new value will be echoed to the screen for confirmation.
 
-There is no undo so double check before writing to EEPROM. You can always get back to the compiled in defaults with ```$#```.
-
-
-
-
-
+There is no undo so double check before writing to EEPROM. You can always get back to the compiled in defaults with `$#`.

@@ -29,9 +29,9 @@ Each of the motion types has its own Proportional-Differential (PD) controller t
 
 This kind of control scheme is reliable and robust in this application but only useful for the small distance changes between control loop cycles. It is not a good scheme for trying to tell the robot it needs to be at a new location 180mm away.
 
-The new positions are generated in small increments everycycle by the motion profilers. These are described in their own section.
+The new positions are generated in small increments every cycle by the motion profilers. These are described in their own section.
 
-Each of the motion PD controllers has a pair of constants that determine its behaviour. These are the following constant in ```config.h```
+Each of the motion PD controllers has a pair of constants that determine its behaviour. These are the following constant in `config.h`
 
 ```
 // forward motion controller constants
@@ -43,4 +43,4 @@ const float ROT_KP = 2.1;
 const float ROT_KD = 1.2;
 ```
 
-The values shown are probably acceptable for a standard UKMARSBOT using 6 Volt motors with 12 pulse encoers and 20:1 gearboxes. If your robot has a different drivetrain, you may want to tune these values somewhat. The system is not overly sensitive to the controller gains. A separate section will look at how to tune the cntrollers to get a better response.
+The values shown are probably acceptable for a standard UKMARSBOT using 6 Volt motors with 12 pulse encoders and 20:1 gearboxes. If your robot has a different drivetrain, you may want to tune these values somewhat. The system is not overly sensitive to the controller gains. A separate section will look at how to tune the controllers to get a better response.

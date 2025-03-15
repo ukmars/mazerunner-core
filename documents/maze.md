@@ -1,6 +1,6 @@
 # The Maze
 
-Since this is a Maze running robot, you will need some code for storing and manipulating a map of the maze as well as the ability to decide on the best route to the goal. The ```maze.cpp``` file contains all this.
+Since this is a Maze running robot, you will need some code for storing and manipulating a map of the maze as well as the ability to decide on the best route to the goal. The `maze.cpp` file contains all this.
 
 ## Maze mapping
 
@@ -49,7 +49,7 @@ In this code, there is a simple and efficient flooding function that should be a
 
 ## The goal
 
-In a full-sized, classic maze, there are 256 cells in a 16x16 square. The goal is one of the four cells in the centre. That is not practical at home so you will probably have a smaller maze and will want to have a goal somewhere that you can reach. in the file ```maze.h``` you will find a definition for the goal cell location that you can change. just don't forget to set it back to one of the contest cell locations when you run a full contest. More than one contestant has been surprised to find their robot searches for and runs quickly to some place other than the actual goal.
+In a full-sized, classic maze, there are 256 cells in a 16x16 square. The goal is one of the four cells in the centre. That is not practical at home so you will probably have a smaller maze and will want to have a goal somewhere that you can reach. in the file `maze.h` you will find a definition for the goal cell location that you can change. just don't forget to set it back to one of the contest cell locations when you run a full contest. More than one contestant has been surprised to find their robot searches for and runs quickly to some place other than the actual goal.
 
 The goal cell location is given in hexadecimal just to help visualise where it is. A practice goal at 0x22 would be in the third column and third row. For the idle, you could set the practice goal to 0x10 which is the cell to the East of the start cell. then you don't even need to stretch out to collect the robot.
 
