@@ -33,7 +33,7 @@ To describe such a profile, a number of parameters are needed. These are:
 
 A profile is always started with these parameters and it runs until it is finished. In this context, 'finished' just means that the given distance has been reached.. User code can wait and do nothing until the profile finishes or it can perform other tasks while it waits.
 
-Speeds and accelerations are always positive but the distance can be negative so that the robot can move forwards or backwards and can turn left (positive) or right  (negative).
+Speeds and accelerations are always positive but the distance can be negative so that the robot can move forwards or backwards and can turn left (positive) or right (negative).
 
 Profiles are very flexible. For example, if the distance is very small, the profile may not be able to reach the maximum speed but will still perform whatever acceleration and braking it can. The starting speed and ending speed do not have to be zero. If the profiler is already running at some speed, the accelerating phase will simply try to match the given maximum speed, even if it is smaller than the current speed. The end speed need not be zero in which case the profiler will continue to run at the specified speed even after it has finished.
 
