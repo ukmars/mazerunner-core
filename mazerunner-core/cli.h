@@ -177,28 +177,36 @@ class CommandLineInterface {
       c = toupper(c);
       if (c == '\r') {
         Serial.println();
-        process_input_line();
+        Args args;
+        if (tokenise(args, m_buffer) > 0) {
+          execute_command(args);
+        }
+        clear_input_buffer();
+        prompt();
         return true;
       } else if (c == BACKSPACE) {
-        // m_index is the next-free location in the buffer
-        if (m_index > 0) {
-          m_index -= 1;
-          m_buffer[m_index] = 0;
-          Serial.print(c);  // backspace only moves the cursor
-          Serial.print(' ');
-          Serial.print(c);
-        }
+        handle_backspace();
       } else if (isPrintable(c)) {
-        if (m_index < INPUT_BUFFER_SIZE - 1) {
-          Serial.print(c);
-          m_buffer[m_index++] = c;
-          m_buffer[m_index] = 0;
-        }
-      } else {
-        // drop the character silently
+        add_to_buffer(c);
       }
     }
     return false;
+  }
+
+  void handle_backspace() {
+    if (m_index > 0) {
+      m_index--;
+      m_buffer[m_index] = 0;
+      Serial.print("\b \b");  // Erases the character on the screen
+    }
+  }
+
+  void add_to_buffer(char c) {
+    if (m_index < INPUT_BUFFER_SIZE - 1) {
+      Serial.print(c);
+      m_buffer[m_index++] = c;
+      m_buffer[m_index] = 0;
+    }
   }
 
   /***
@@ -283,7 +291,7 @@ class CommandLineInterface {
   int get_command_index(const Args &args) {
     char buffer[16];
     for (int i = 0; i < CMD_COUNT; i++) {
-      strncpy_P(buffer, (char *)pgm_read_word(&(commands[i])), 16);
+      strncpy_P(buffer, (char *)pgm_read_word(&(commands[i])), sizeof(buffer) - 1);
       if (strcmp(buffer, args.argv[0]) == 0) {
         return i;
       }
@@ -296,7 +304,6 @@ class CommandLineInterface {
     if (index < 0) {
       Serial.print(F("UNKNOWN COMMAND: "));
       args.print();
-      // Serial.println(args.argv[0]);
       return;
     }
     switch (index) {
@@ -304,21 +311,25 @@ class CommandLineInterface {
         help();
         break;
       case 1: {
-        int x = 0;
-        int y = 0;
-        if (!read_integer(args.argv[1], x)) {
-          x = 7;
-        };
-
-        if (!read_integer(args.argv[2], y)) {
-          y = 7;
-        };
-        char buf[20];
-        sprintf_P(buf, PSTR("Search to %d,%d\n"), x, y);
-        Serial.print(buf);
-        // mouse.search_to(Location(x, y));
+        handle_search_command(args);
       } break;
     }
+  }
+
+  void handle_search_command(const Args &args) {
+    int x = 0;
+    int y = 0;
+    if (!read_integer(args.argv[1], x)) {
+      x = 7;
+    };
+
+    if (!read_integer(args.argv[2], y)) {
+      y = 7;
+    };
+    char buf[20];
+    sprintf_P(buf, PSTR("Search to %d,%d\n"), x, y);
+    Serial.print(buf);
+    // mouse.search_to(Location(x, y));
   }
 
   /***
@@ -364,27 +375,30 @@ class CommandLineInterface {
         }
       } break;
       case 'Q':
-        motors.disable_controllers();
-        encoders.reset();
-        while (!switches.button_pressed()) {
-          delay(10);
-          float position = encoders.robot_distance();
-          float angle = encoders.robot_angle();
-          // reporter.print_justified(encoders.m_total_right, 7);
-          // reporter.print_justified(encoders.m_total_left, 7);
-          // reporter.print_justified(position, 7);
-          // reporter.print_justified(angle, 7);
-          // Serial.println();
-          char buf[60];
-          sprintf_P(buf, PSTR("L:%4d R:%4d P:%5.2f A:%5.2f\r\n"), encoders.m_total_left, encoders.m_total_right, position, angle);
-          Serial.print(buf);
-        }
+        handle_calibrate_encoders_command(args);
         break;
       default:
         break;
     }
   }
 
+  void handle_calibrate_encoders_command(const Args &args) {
+    motors.disable_controllers();
+    encoders.reset();
+    while (!switches.button_pressed()) {
+      delay(10);
+      float position = encoders.robot_distance();
+      float angle = encoders.robot_angle();
+      // reporter.print_justified(encoders.m_total_right, 7);
+      // reporter.print_justified(encoders.m_total_left, 7);
+      // reporter.print_justified(position, 7);
+      // reporter.print_justified(angle, 7);
+      // Serial.println();
+      char buf[60];
+      sprintf_P(buf, PSTR("L:%4d R:%4d P:%5.2f A:%5.2f\r\n"), encoders.m_total_left, encoders.m_total_right, position, angle);
+      Serial.print(buf);
+    }
+  }
   /**
    * These are the actions associated with the function switches on UKMARSBOT
    *
