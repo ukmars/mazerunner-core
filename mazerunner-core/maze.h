@@ -163,8 +163,8 @@ class Location {
   uint8_t x;
   uint8_t y;
 
-  Location() : x(0), y(0) {};
-  Location(uint8_t ix, uint8_t iy) : x(ix), y(iy) {};
+  Location() : x(0), y(0){};
+  Location(uint8_t ix, uint8_t iy) : x(ix), y(iy){};
 
   bool is_in_maze() {
     return x < MAZE_WIDTH && y < MAZE_HEIGHT;
