@@ -124,7 +124,7 @@ class Motors {
   float angle_controller(float steering_adjustment) {
     float increment = m_omega * LOOP_INTERVAL;
     m_rot_error += increment - encoders.robot_rot_change();
-    m_rot_error += steering_adjustment;
+    m_rot_error += steering_adjustment * LOOP_INTERVAL;
     float diff = m_rot_error - m_previous_rot_error;
     m_previous_rot_error = m_rot_error;
     float output = ROT_KP * m_rot_error + ROT_KD * diff;
