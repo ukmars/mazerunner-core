@@ -299,9 +299,9 @@ const float ROT_KP = 16 * ROT_TM / (ROT_KM * ROT_ZETA * ROT_ZETA * ROT_TD * ROT_
 const float ROT_KD = LOOP_FREQUENCY * (8 * ROT_TM - ROT_TD) / (ROT_KM * ROT_TD);
 
 // controller constants for the steering controller
-const float STEERING_KP = 0.06;
-const float STEERING_KD = 0.00;
-const float STEERING_ADJUST_LIMIT = 10.0;  // deg/s
+const float STEERING_KP = 6.3;
+const float STEERING_KD = 2.00;
+const float STEERING_ADJUST_LIMIT = 90.0;  // deg/s
 
 // encoder polarity is either 1 or -1 and is used to account for reversal of the encoder phases
 #define ENCODER_LEFT_POLARITY (-1)
