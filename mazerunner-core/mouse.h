@@ -349,6 +349,7 @@ class Mouse {
     sensors.disable();
     motion.reset_drive_system();
     sensors.set_steering_mode(STEERING_OFF);
+    motion.disable_drive();
   }
 
   /****************************************************************************/
