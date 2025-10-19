@@ -145,8 +145,8 @@ class Encoders {
       m_left_counter = 0;
       m_right_counter = 0;
     }
-    m_total_right += left_delta;
-    m_total_left += right_delta;
+    m_total_left += left_delta;
+    m_total_right += right_delta;
     float left_change = left_delta * MM_PER_COUNT_LEFT;
     float right_change = right_delta * MM_PER_COUNT_RIGHT;
     m_fwd_change = 0.5 * (right_change + left_change);
