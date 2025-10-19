@@ -201,6 +201,7 @@ class CommandLineInterface {
   bool process_serial_data() {
     while (Serial.available()) {
       char c = Serial.read();
+      c = toupper(c);
       if (c == '\n') {
         Serial.println();
         Args args;
@@ -394,7 +395,7 @@ class CommandLineInterface {
         break;
       case 'E':
         delay(10);
-        reporter.print_encoders();
+        reporter.report_encoders();
         break;
       case 'F': {
         // simulate the function switches
