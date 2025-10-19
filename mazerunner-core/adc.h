@@ -26,7 +26,7 @@
  *
  * The second set, with the emitter on, is stored in m_adc_lit[].
  *
- * for wall sensors, you should use the get_raw() method to read the (lit-dark) values.
+ * For wall sensors, you should use the get_raw() method to read the (lit-dark) values.
  *
  * The class does not care what is connected to the adc channel. It just gathers readings.
  *
@@ -79,6 +79,9 @@
 class AnalogueConverter;
 
 extern AnalogueConverter adc;
+
+enum Phase { DARK_READ, EMITTER_ON, SETTLE, LIT_READ, COMPLETE };
+
 class AnalogueConverter {
  public:
   enum {
@@ -100,24 +103,24 @@ class AnalogueConverter {
     set_side_emitter_pin(EMITTER_DIAGONAL);
     converter_init();
     m_configured = true;
-  };
+  }
 
   void set_front_emitter_pin(uint8_t pin) {
     pinMode(pin, OUTPUT);
     m_emitter_front_pin = pin;
-  };
+  }
 
   void set_side_emitter_pin(uint8_t pin) {
     pinMode(pin, OUTPUT);
     m_emitter_diagonal_pin = pin;
-  };
+  }
 
   uint8_t emitter_front() {
     return m_emitter_front_pin;
-  };
+  }
   uint8_t emitter_diagonal() {
     return m_emitter_diagonal_pin;
-  };
+  }
 
   void converter_init() {
     // Change the clock prescaler from 128 to 32 for a 500kHz clock
@@ -133,7 +136,7 @@ class AnalogueConverter {
       return;
     }
 
-    m_phase = 1;  // sync up the start of the sensor sequence
+    m_phase = DARK_READ;  // sync up the start of the sensor sequence
     m_channel = 0;
     bitSet(ADCSRA, ADIE);         // enable the ADC interrupt
     start_conversion(m_channel);  // begin a conversion to get things started
@@ -180,16 +183,16 @@ class AnalogueConverter {
 
   void callback_adc_isr() {
     switch (m_phase) {
-      case 1:
+      case DARK_READ:
         // cycle through all 8 channels with emitters off
         m_adc_dark[m_channel] = get_adc_result();
         m_channel++;
         start_conversion(m_channel);
         if (m_channel >= MAX_CHANNELS) {
-          m_phase = 2;
+          m_phase = EMITTER_ON;
         }
         break;
-      case 2:
+      case EMITTER_ON:
         get_adc_result();  // dummy read to clear interrupt flag
         if (m_emitters_enabled) {
           digitalWrite(emitter_diagonal(), 1);
@@ -197,25 +200,25 @@ class AnalogueConverter {
         }
         m_channel = 0;
         start_conversion(m_channel);  // Start a conversion to generate the interrupt
-        m_phase = 3;
+        m_phase = SETTLE;
         break;
-      case 3:
+      case SETTLE:
         // skip one cycle for the detectors to respond
         get_adc_result();  // dummy read clears the interrupt flag
         start_conversion(m_channel);
-        m_phase = 4;
+        m_phase = LIT_READ;
         break;
-      case 4:
+      case LIT_READ:
         // cycle through the channels again with the emitters on
         // avoid zero result so we know it is working
         m_adc_lit[m_channel] = max(1, get_adc_result());
         m_channel++;
         start_conversion(m_channel);
         if (m_channel >= MAX_CHANNELS) {
-          m_phase = 13;
+          m_phase = COMPLETE;
         }
         break;
-      case 13:
+      case COMPLETE:
       default:
         get_adc_result();  // dummy read clears the interrupt flag
         // unconditionally turn off emitters for safety
