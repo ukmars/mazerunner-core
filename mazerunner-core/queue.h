@@ -52,19 +52,27 @@ class Queue {
   }
 
   void add(item_t item) {
+    if (mItemCount >= num_items) {
+      // Optionally: handle overflow (e.g., ignore, overwrite, assert)
+      return;  // but drop the item for now
+    }
     mData[mTail] = item;
     ++mTail;
     ++mItemCount;
-    if (mTail > num_items) {
-      mTail -= num_items;
+    if (mTail >= num_items + 1) {
+      mTail = 0;
     }
   }
 
   item_t head() {
+    if (mItemCount == 0) {
+      // Optionally: handle underflow (e.g., return default, assert)
+      return item_t();  // default-constructed item
+    }
     item_t result = mData[mHead];
     ++mHead;
-    if (mHead > num_items) {
-      mHead -= num_items;
+    if (mHead >= num_items + 1) {
+      mHead = 0;
     }
     --mItemCount;
     return result;
