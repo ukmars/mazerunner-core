@@ -400,11 +400,11 @@ class Mouse {
     motion.move(BACK_WALL_TO_CENTER, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
     motion.set_position(HALF_CELL);
     Serial.print(F("Off we go..."));
-    printer.print('[');
-    printer.print(target.x);
-    printer.print(',');
-    printer.print(target.y);
-    printer.print(']');
+    Serial.print('[');
+    Serial.print(target.x);
+    Serial.print(',');
+    Serial.print(target.y);
+    Serial.print(']');
     Serial.println();
 
     motion.wait_until_position(SENSING_POSITION);
@@ -471,6 +471,8 @@ class Mouse {
       turnDirection = AHEAD;
     } else if (rightWall && frontWall) {
       turnDirection = LEFT;
+    } else if (leftWall && frontWall) {
+      turnDirection = RIGHT;
     } else if (leftWall) {
       if (getRandomBool()) {
         turnDirection = RIGHT;

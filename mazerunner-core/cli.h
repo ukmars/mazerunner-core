@@ -201,8 +201,7 @@ class CommandLineInterface {
   bool process_serial_data() {
     while (Serial.available()) {
       char c = Serial.read();
-      c = toupper(c);
-      if (c == '\r') {
+      if (c == '\n') {
         Serial.println();
         Args args;
         if (tokenise(args, m_buffer) > 0) {
@@ -392,6 +391,10 @@ class CommandLineInterface {
         delay(10);
         reporter.print_wall_sensors();
         sensors.disable();
+        break;
+      case 'E':
+        delay(10);
+        reporter.print_encoders();
         break;
       case 'F': {
         // simulate the function switches

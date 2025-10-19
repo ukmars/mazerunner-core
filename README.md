@@ -1,13 +1,13 @@
 # Release 0.2.0
 
-This ran successfully on a stock UKMARSBOT in competition on October 7th 2023. It may still contain bugs and you will need to setup and calibrate your own robat before you can expect it to run well. 
+This ran successfully on a stock UKMARSBOT in competition on October 7th 2023. It may still contain bugs and you will need to setup and calibrate your own robot before you can expect it to run well.
 
 It is intended to be a complete, fairly bare-bones micromouse software suite. It should contain all the basic functionality needed to allow a UKMARSBOT or close derivative to explore a classic micromouse maze and search to the center and back to the start.
 
 There are a couple of calibation routines by way of an example of how you might do the basic sensor calibration. There is also a command line interpreter for those who have a radio serial link such as a bluetooth module.
 
 
- 
+
 ---
 
 # Mazerunner Core
@@ -29,7 +29,7 @@ The project is maintained and developed using PlatformIO with Visual Studio Code
 
 ## Initial Configuration
 
-Before flashing your robot, look in the config.h file. In here you can place entries that let you maintain your own robot-specific config file containing a number of default settings describing things like the motor gear ratio, wheel diameter and wheel spacing. 
+Before flashing your robot, look in the config.h file. In here you can place entries that let you maintain your own robot-specific config file containing a number of default settings describing things like the motor gear ratio, wheel diameter and wheel spacing.
 
 Each physical robot has its own config file. In the main config.h, add an entry for your robot name and create a corresponding config file in the same directory. You can start by copying one of the existing robot config files. Check that these are at least close to the values required for your robot.
 
@@ -65,4 +65,3 @@ Be aware that, if you download a newer copy of the code, and simply unpack it in
 ## Contributing
 
 If you have any thoughts about the code, suggestions for changes or improvements, please use the github issues mechanism so that other users can benefit from your observations. Those other users may also be able to offer assistance if the author(s) are not available.
-
