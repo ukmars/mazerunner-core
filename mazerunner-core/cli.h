@@ -167,7 +167,7 @@ class CommandLineInterface {
   bool read_serial() {
     while (Serial.available()) {
       char c = Serial.read();
-      if (c == '\r') {
+      if (c == '\n') {
         Serial.println();
         return true;
       } else if (c == BACKSPACE) {
@@ -325,6 +325,10 @@ class CommandLineInterface {
         delay(10);
         reporter.print_wall_sensors();
         sensors.disable();
+        break;
+      case 'E':
+        delay(10);
+        reporter.print_encoders();
         break;
       case 'F': {
         // simulate the function switches
