@@ -55,6 +55,8 @@ class Motors {
   }
 
   void reset_controllers() {
+    m_old_left_speed = 0;
+    m_old_right_speed = 0;
     m_fwd_error = 0;
     m_rot_error = 0;
     m_previous_fwd_error = 0;
@@ -142,7 +144,6 @@ class Motors {
    */
 
   float leftFeedForward(float speed) {
-    static float oldSpeed = speed;
     float leftFF = speed * SPEED_FF;
     if (speed > 0) {
       leftFF += BIAS_FF;
@@ -151,15 +152,14 @@ class Motors {
     } else {
       // No bias when the speed is 0
     }
-    float acc = (speed - oldSpeed) * LOOP_FREQUENCY;
-    oldSpeed = speed;
+    float acc = (speed - m_old_left_speed) * LOOP_FREQUENCY;
+    m_old_left_speed = speed;
     float accFF = ACC_FF * acc;
     leftFF += accFF;
     return leftFF;
   }
 
   float rightFeedForward(float speed) {
-    static float oldSpeed = speed;
     float rightFF = speed * SPEED_FF;
     if (speed > 0) {
       rightFF += BIAS_FF;
@@ -168,8 +168,8 @@ class Motors {
     } else {
       // No bias when the speed is 0
     }
-    float acc = (speed - oldSpeed) * LOOP_FREQUENCY;
-    oldSpeed = speed;
+    float acc = (speed - m_old_right_speed) * LOOP_FREQUENCY;
+    m_old_right_speed = speed;
     float accFF = ACC_FF * acc;
     rightFF += accFF;
     return rightFF;
@@ -345,6 +345,8 @@ class Motors {
   float m_rot_error = 0;
   float m_velocity = 0;
   float m_omega = 0;
+  float m_old_left_speed = 0;
+  float m_old_right_speed = 0;
   // these are maintained only for logging
   float m_left_motor_volts = 0;
   float m_right_motor_volts = 0;
