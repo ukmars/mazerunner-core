@@ -249,6 +249,15 @@ class Reporter {
     }
   }
 
+  void report_encoders() {
+    print_justified(int(encoders.robot_distance()), 6);
+    print_justified(int(encoders.robot_angle()), 6);
+    printer.print(F(" | "));
+    print_justified(encoders.m_total_left, 6);
+    print_justified(encoders.m_total_right, 6);
+    printer.println();
+  }
+
   //***************************************************************************//
 
   /***
