@@ -32,11 +32,11 @@ const int CMD_COUNT = sizeof(commands) / sizeof(char *);
 
 /***
  * The Args class is little more than an array of pointers to strings and a counter.
- * Input lines can be parsed into tokens and each token ha its location stored in
+ * Input lines can be parsed into tokens and each token has its location stored in
  * the array.
  *
  * During command line processing, a temporary instance of Args will be created
- * on the stack and a reference to that passed around to any methds that may
+ * on the stack and a reference to that passed around to any omethds that may
  * need to see the contents. Control eventually returns to the function that
  * created the instance and when that terminates, the information is lost. This
  * means that memory is only used when needed but bear in mind that the instance
@@ -105,44 +105,71 @@ inline uint8_t read_integer(const char *line, int &value) {
  * RETURNS  the number of digits found an converted
  *
  * optimisations are possible but may not be worth the effort
+ *
+ * exponents are not handled
+ *
+ * Example usage:
+ *
+ * const char *input = "   -123.45 more";
+ * float v;
+ * const char *next;
+ * uint8_t count = read_float(input, v, next);
+ * // v == -123.45
+ * // next points to " more"
+ *
+ *
+ *
  */
-uint8_t read_float(const char *line, float &value) {
-  char *ptr = (char *)line;
-  char c = *ptr++;
+uint8_t read_float(const char *line, float &value, const char *&endptr) {
+  const char *ptr = line;
+  char c = *ptr;
   uint8_t digits = 0;
+
+  // Skip leading whitespace
+  while (c == ' ' || c == '\t') {
+    c = *++ptr;
+  }
 
   bool is_minus = false;
   if (c == '-') {
     is_minus = true;
-    c = *ptr++;
+    c = *++ptr;
   }
 
-  uint32_t a = 0.0;
+  float a = 0.0f;
   int exponent = 0;
-  while (c >= '0' and c <= '9') {
+
+  // Parse integer part
+  while (c >= '0' && c <= '9') {
     if (digits++ < MAX_DIGITS) {
-      a = a * 10 + (c - '0');
+      a = a * 10.0f + (c - '0');
     }
-    c = *ptr++;
-  };
+    c = *++ptr;
+  }
+
+  // Parse fractional part
   if (c == '.') {
-    c = *ptr++;
-    while (c >= '0' and c <= '9') {
+    c = *++ptr;
+    while (c >= '0' && c <= '9') {
       if (digits++ < MAX_DIGITS) {
-        a = a * 10 + (c - '0');
-        exponent = exponent - 1;
+        a = a * 10.0f + (c - '0');
+        exponent--;
       }
-      c = *ptr++;
+      c = *++ptr;
     }
   }
+
   float b = a;
   while (exponent < 0) {
-    b *= 0.1;
+    b *= 0.1f;
     exponent++;
   }
+
   if (digits > 0) {
     value = is_minus ? -b : b;
   }
+
+  endptr = ptr;  // Return updated pointer
   return digits;
 }
 
@@ -163,7 +190,7 @@ class CommandLineInterface {
    * Lines are terminated with a LINEFEED character which is
    * echoed but not placed in the buffer.
    *
-   * All printiable characters are placed in a buffer with a
+   * All printable characters are placed in a buffer with a
    * maximum length of just 32 characters. You could make this
    * longer but there should be little practical need.
    *
@@ -220,7 +247,7 @@ class CommandLineInterface {
    * end. In this way, the original string gets to look like a
    * sequence of shorter strings - the tokens. The argv array
    * is a list of where each starts and you can think if it as
-   * aan array of strings. The argc element keeps count of how
+   * an array of strings. The argc element keeps count of how
    * many tokens were found.
    *   *
    */
@@ -279,7 +306,7 @@ class CommandLineInterface {
 
   /***
    * Run a complex command. These all start with a string with more than
-   * one character in ti and have optional arguments.
+   * one character in it and have optional arguments.
    *
    * The arguments will be passed on to the robot.
    *
