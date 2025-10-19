@@ -137,7 +137,7 @@ class Motion {
   //***************************************************************************//
 
   /**
-   * Performs a turn. Regardless of whether the robot is moving or not
+   * Performs a spin turn.
    *
    * The function is given three parameters
    *
@@ -145,43 +145,15 @@ class Motion {
    *  - omega  : angular velocity of middle phase (deg/s)
    *  - alpha  : angular acceleration of in/out phases (deg/s/s)
    *
-   * If the robot is moving forward, it will execute a smooth, integrated
-   * turn. The turn will only be repeatable if it is always performed at the
-   * same forward speed.
-   *
-   * If the robot is stationary, it will execute an in-place spin turn.
-   *
-   * The parameter alpha will indirectly determine the turn radius. During
-   * the accelerating phase, the angular velocity, will increase until it
-   * reaches the value omega.
-   * The minimum radius during the constant phase is
-   *   radius = (speed/omega) * (180/PI)
-   * The effective radius will be larger because it takes some time
-   * for the rotation to accelerate and decelerate. The parameter alpha
-   * controls that.
-   *
-   * Note that a real mouse may behave slightly different for left and
-   * right turns and so the parameters for, say, a 90 degree left turn
-   * may be slightly different to those for a 90 degree right turn.
-   *
-   * @brief execute an arbitrary in-place or smooth turn
-   */
-  void turn(float angle, float omega, float alpha) {
-    // get ready to turn
-    rotation.reset();
-    rotation.move(angle, omega, 0, alpha);
-  }
-
-  /**
-   *
-   * @brief turn in place. Force forward speed to zero
+   * @brief execute an arbitrary in-place
    */
   void spin_turn(float angle, float omega, float alpha) {
     forward.set_target_speed(0);
     while (forward.speed() != 0) {
       delay(2);
     }
-    turn(angle, omega, alpha);
+    rotation.reset();
+    rotation.move(angle, omega, 0, alpha);
   };
 
   //***************************************************************************//
