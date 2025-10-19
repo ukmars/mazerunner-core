@@ -89,7 +89,7 @@ struct TurnParameters {
 #define EVENT_APEC 4
 
 // choose the one you will be using BEFORE selecting the robot below
-#define EVENT EVENT_UK
+#define EVENT EVENT_HOME
 #if EVENT == EVENT_HOME
 #define GOAL Location(2, 2)
 #else
@@ -117,7 +117,7 @@ const float HALF_CELL = FULL_CELL / 2.0;
 #define ROBOT_ORION 2
 
 /// this is the variant you are building for.
-#define ROBOT ROBOT_CORE_OSMIUM
+#define ROBOT ROBOT_ORION
 
 #if ROBOT == ROBOT_CORE_OSMIUM
 #include "config-robot-osmium.h"

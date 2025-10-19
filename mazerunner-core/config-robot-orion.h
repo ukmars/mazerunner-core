@@ -57,12 +57,12 @@ RAW values for the front sensor when the robot is backed up to a wall
 // wall sensor thresholds and constants
 // RAW values for the front sensor when the robot is backed up to a wall
 // with another wall ahead
-const int FRONT_LEFT_CALIBRATION = 94;
+const int FRONT_LEFT_CALIBRATION = 90;
 const int FRONT_RIGHT_CALIBRATION = 110;
 // RAW values for the side sensors when the robot is centred in a cell
 // and there is no wall ahead
-const int LEFT_CALIBRATION = 144;
-const int RIGHT_CALIBRATION = 198;
+const int LEFT_CALIBRATION = 152;
+const int RIGHT_CALIBRATION = 192;
 
 // The front linear constant is the value of k needed to make the function
 // sensors.get_distance(sensor,k) return 68 when the mouse is backed up
@@ -78,24 +78,28 @@ const int TURN_THRESHOLD_SS90E = 115;
 const int EXTRA_WALL_ADJUST = 5;
 
 #elif EVENT == EVENT_UK
+// wall sensor thresholds and constants
 // RAW values for the front sensor when the robot is backed up to a wall
-const int FRONT_LEFT_CALIBRATION = 83;
-const int FRONT_RIGHT_CALIBRATION = 39;
-// RAW side sensor values when robot is centred in a cell and wall ahead
-const int LEFT_CALIBRATION = 80;
-const int RIGHT_CALIBRATION = 72;
+// with another wall ahead
+const int FRONT_LEFT_CALIBRATION = 90;
+const int FRONT_RIGHT_CALIBRATION = 110;
+// RAW values for the side sensors when the robot is centred in a cell
+// and there is no wall ahead
+const int LEFT_CALIBRATION = 152;
+const int RIGHT_CALIBRATION = 192;
 
 // The front linear constant is the value of k needed to make the function
 // sensors.get_distance(sensor,k) return 68 when the mouse is backed up
 // against a wall with only a wall ahead
-const int FRONT_LINEAR_CONSTANT = 934;
+const int FRONT_LINEAR_CONSTANT = 861;
 const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
 
 // SS90E turn thresholds. This is the front sum reading to trigger a turn
 // it changes a bit if there is an adjacent wall. The threshold is set for
-// when the robot is 20mm past the threshold.
-const int TURN_THRESHOLD_SS90E = 100;
-const int EXTRA_WALL_ADJUST = 6;
+// when the robot is 20mm past the cell boundary. That is, the distance
+// from the front of the mouse to the wall ahead is 92mm
+const int TURN_THRESHOLD_SS90E = 115;
+const int EXTRA_WALL_ADJUST = 5;
 
 #elif EVENT == EVENT_PORTUGAL
 // wall sensor thresholds and constants
@@ -295,7 +299,7 @@ const float ROT_KP = 16 * ROT_TM / (ROT_KM * ROT_ZETA * ROT_ZETA * ROT_TD * ROT_
 const float ROT_KD = LOOP_FREQUENCY * (8 * ROT_TM - ROT_TD) / (ROT_KM * ROT_TD);
 
 // controller constants for the steering controller
-const float STEERING_KP = 0.6;
+const float STEERING_KP = 0.06;
 const float STEERING_KD = 0.00;
 const float STEERING_ADJUST_LIMIT = 10.0;  // deg/s
 
