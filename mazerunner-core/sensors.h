@@ -74,7 +74,7 @@ enum {
   STEERING_OFF,
 };
 
-// used in the wait_for_user_start_function to indicate whih sensor was occluded
+// used in the wait_for_user_start_function to indicate which sensor was occluded
 const uint8_t NO_START = 0;
 const uint8_t LEFT_START = 1;
 const uint8_t RIGHT_START = 2;
@@ -108,16 +108,16 @@ class Sensors {
   // perform corrections or other scaling
   int get_front_sum() {
     return int(m_front_sum);
-  };
+  }
   int get_front_diff() {
     return int(m_front_diff);
-  };
+  }
   float get_steering_feedback() {
     return m_steering_adjustment;
   }
   float get_cross_track_error() {
     return m_cross_track_error;
-  };
+  }
 
   //***************************************************************************//
 
@@ -137,7 +137,7 @@ class Sensors {
    * @param error calculated from wall sensors, Negative if too far right
    * @return steering adjustment in degrees
    *
-   * TODO: It is not clear that this belongs here rather tham for example,
+   * TODO: It is not clear that this belongs here rather them for example,
    *       in a Robot class.
    */
   float calculate_steering_adjustment() {
@@ -158,9 +158,9 @@ class Sensors {
   }
 
   /***************************************************************************
-   * This is just a way of letting the emnitters turn on for the second read.
+   * This is just a way of letting the emitters turn on for the second read.
    * ADC Conversions happen anyway.
-   * with the sendors disabled, you will probably get zero for the raw value on
+   * with the sensors disabled, you will probably get zero for the raw value on
    * all sensor channels (0..5).
    */
 
@@ -214,7 +214,7 @@ class Sensors {
     lfs.raw = adc.get_raw(LFS_ADC_CHANNEL);
 
     // this is the value that is normally used for wall detection and steering
-    // yes, it wouldbe faster to do integer arithmetic here
+    // yes, it would be faster to do integer arithmetic here
     lfs.value = FRONT_LEFT_SCALE * lfs.raw;
     lss.value = LEFT_SCALE * lss.raw;
     rss.value = RIGHT_SCALE * rss.raw;
