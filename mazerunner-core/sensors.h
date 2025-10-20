@@ -234,7 +234,12 @@ class Sensors {
     int left_error = SIDE_NOMINAL - lss.value;
     if (g_steering_mode == STEER_NORMAL) {
       if (sensors.see_left_wall && sensors.see_right_wall) {
-        error = left_error - right_error;
+        if (lss.value > rss.value) {
+          error = 2 * left_error;
+        } else {
+          error = -2 * right_error;
+        }
+        // error = left_error - right_error;
       } else if (sensors.see_left_wall) {
         error = 2 * left_error;
       } else if (sensors.see_right_wall) {
