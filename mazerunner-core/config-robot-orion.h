@@ -74,7 +74,7 @@ const int FRONT_REFERENCE = 850;  // reading when mouse centered with wall ahead
 // it changes a bit if there is an adjacent wall. The threshold is set for
 // when the robot is 20mm past the cell boundary. That is, the distance
 // from the front of the mouse to the wall ahead is 92mm
-const int TURN_THRESHOLD_SS90E = 115;
+const int TURN_THRESHOLD_SS90E = 110;
 const int EXTRA_WALL_ADJUST = 5;
 
 #elif EVENT == EVENT_UK
@@ -361,7 +361,7 @@ const int RIGHT_EDGE_POS = 90;
 const TurnParameters turn_params[4] = {
 //               speed, entry,   exit, angle, omega,  alpha, sensor threshold
     {SEARCH_TURN_SPEED,    70,     80,  90.0, 280.0, 4000.0, TURN_THRESHOLD_SS90E}, // 0 => SS90EL
-    {SEARCH_TURN_SPEED,    70,     80, -90.0, 280.0, 4000.0, TURN_THRESHOLD_SS90E}, // 0 => SS90ER
+    {SEARCH_TURN_SPEED,    55,     80, -90.0, 280.0, 4000.0, TURN_THRESHOLD_SS90E}, // 0 => SS90ER
     {SEARCH_TURN_SPEED,    70,     80,  90.0, 280.0, 4000.0, TURN_THRESHOLD_SS90E}, // 0 => SS90L
     {SEARCH_TURN_SPEED,    70,     80, -90.0, 280.0, 4000.0, TURN_THRESHOLD_SS90E}, // 0 => SS90R
 };
