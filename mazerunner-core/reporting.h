@@ -372,26 +372,25 @@ class Reporter {
   /// @private  don't  show this in doxygen output
   //
   void log_action_status(char action, char note, Location location, Heading heading) {
-    printer.print('{');
     printer.print(action);
     printer.print(note);
     printer.print('[');
-    printer.print(location.x);
+    print_justified(location.x, 2);
     printer.print(',');
-    printer.print(location.y);
-    printer.print(']');
-    printer.print(' ');
+    print_justified(location.y, 2);
+    printer.print(',');
     if (heading < HEADING_COUNT) {
       printer.print(hdg_letters[heading]);
     } else {
       printer.print('!');
     }
+    printer.print(']');
+    printer.print(' ');
+    print_walls();
+    printer.print(' ');
     print_justified(sensors.get_front_sum(), 4);
     printer.print('@');
     print_justified((int)motion.position(), 4);
-    printer.print(' ');
-    // print_walls();
-    printer.print('}');
     printer.print(' ');
   }
 
