@@ -91,7 +91,7 @@ struct TurnParameters {
 // choose the one you will be using BEFORE selecting the robot below
 #define EVENT EVENT_HOME
 #if EVENT == EVENT_HOME
-#define GOAL Location(2, 2)
+#define GOAL Location(1, 0)
 #else
 #define GOAL Location(7, 7)
 #endif
