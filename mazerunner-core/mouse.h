@@ -206,7 +206,7 @@ class Mouse {
       };
     }
     // Be sure robot has come to a halt.
-    motion.stop();
+    motion.reset_drive_system();
   }
 
   //***************************************************************************//
