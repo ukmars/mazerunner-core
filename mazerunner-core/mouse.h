@@ -424,6 +424,11 @@ class Mouse {
       update_map();
       maze.flood(target);
       unsigned char newHeading = maze.heading_to_smallest(m_location, m_heading);
+      if (newHeading == BLOCKED) {
+        Serial.println(F("ERR: no route to target"));
+        panic();
+        return;  // panic() has already stopped the robot; skip stop_at_center()
+      }
       unsigned char hdgChange = (newHeading - m_heading) & 0x3;
       if (m_location != target) {
         switch (hdgChange) {
@@ -673,6 +678,11 @@ class Mouse {
     maze.flood(START);
 
     Heading best_direction = maze.heading_to_smallest(m_location, m_heading);
+    if (best_direction == BLOCKED) {
+      Serial.println(F("ERR: no route to start"));
+      panic();
+      return 0;
+    }
     turn_to_face(best_direction);
     m_handStart = false;
     search_to(START);
@@ -703,9 +713,17 @@ class Mouse {
   }
 
   /***
-   * just sit in a loop, flashing lights waiting for the button to be pressed
+   * Bring the robot to a safe halt, then flash the LED until the user
+   * presses the button. Call this on any unrecoverable error.
+   *
+   * Stops motors, clears all controller state, and disables PWM output
+   * before entering the blink loop so the robot cannot move while waiting.
    */
   void panic() {
+    sensors.set_steering_mode(STEERING_OFF);
+    sensors.disable();
+    motion.reset_drive_system();
+    motion.disable_drive();
     while (!switches.button_pressed()) {
       blink(1);
     }
