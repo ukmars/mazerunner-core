@@ -74,6 +74,43 @@ To add a new robot, create a `config-robot-<name>.h` and add it to the `#if` cha
 | `F n` | run function n (same as setting hardware switches) |
 | `SEARCH x y` | search to cell (x,y) |
 
+## Code Review
+
+A structured review has been completed. Documents are in `review/`:
+
+| File | Contents |
+|------|----------|
+| `review/01-structural-survey.md` | Platform, repo layout, subsystem inventory |
+| `review/02b-hardware-abstraction.md` | HAL strategy, peripheral ownership, driver quality |
+| `review/02d-state-machines.md` | State machine inventory, control loops, safety interlocks |
+| `review/03a-memory-safety.md` | Heap, stack, buffer handling, volatile/atomic analysis |
+| `review/03b-error-handling.md` | Error propagation, fault response, retry/recovery, logging |
+| `review/03c-timing.md` | ISR timing budget, jitter sources, blocking paths |
+| `review/04-final-report.md` | Consolidated findings; Risk Register (FR-01–FR-32) |
+
+GitHub issues were created for all 32 risk register items in `ukmars/mazerunner-core`:
+- FR-01 = issue #16, FR-02 = #17, ..., FR-32 = #47
+
+**To sync the risk register with closed GitHub issues**, ask:
+> "sync the risk register with closed GitHub issues"
+
+This will check `gh issue list --repo ukmars/mazerunner-core --state closed`,
+cross-reference against FR-01–FR-32, and update `review/04-final-report.md`
+to mark resolved items.
+
+## CLI Commands (Serial, 115200 baud)
+
+| Command | Action |
+|---------|--------|
+| `?` / `HELP` | show help |
+| `W` / `C` / `D` | display maze walls / costs / directions |
+| `X` | reset maze |
+| `B` | battery voltage |
+| `S` | sensor readings |
+| `E` | encoder readings |
+| `F n` | run function n (same as setting hardware switches) |
+| `SEARCH x y` | search to cell (x,y) |
+
 Function switch assignments (0 = safe/no-op):
 - 1: sensor static calibration
 - 2: search maze to goal and back
