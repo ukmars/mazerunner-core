@@ -61,18 +61,6 @@ To add a new robot, create a `config-robot-<name>.h` and add it to the `#if` cha
 - **Position tracking**: `motion.set_position()` and `motion.adjust_forward_position()` are used to maintain consistent cell-relative position tracking. The sensing position within each cell is `SENSING_POSITION` (170mm by default).
 - **Steering modes**: set via `sensors.set_steering_mode()` — always set to `STEERING_OFF` when stationary or during turns.
 
-## CLI Commands (Serial, 115200 baud)
-
-| Command | Action |
-|---------|--------|
-| `?` / `HELP` | show help |
-| `W` / `C` / `D` | display maze walls / costs / directions |
-| `X` | reset maze |
-| `B` | battery voltage |
-| `S` | sensor readings |
-| `E` | encoder readings |
-| `F n` | run function n (same as setting hardware switches) |
-| `SEARCH x y` | search to cell (x,y) |
 
 ## Code Review
 
@@ -98,18 +86,6 @@ This will check `gh issue list --repo ukmars/mazerunner-core --state closed`,
 cross-reference against FR-01–FR-32, and update `review/04-final-report.md`
 to mark resolved items.
 
-## CLI Commands (Serial, 115200 baud)
-
-| Command | Action |
-|---------|--------|
-| `?` / `HELP` | show help |
-| `W` / `C` / `D` | display maze walls / costs / directions |
-| `X` | reset maze |
-| `B` | battery voltage |
-| `S` | sensor readings |
-| `E` | encoder readings |
-| `F n` | run function n (same as setting hardware switches) |
-| `SEARCH x y` | search to cell (x,y) |
 
 Function switch assignments (0 = safe/no-op):
 - 1: sensor static calibration
