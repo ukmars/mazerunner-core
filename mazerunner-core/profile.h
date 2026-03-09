@@ -14,6 +14,7 @@
 
 #include <Arduino.h>
 #include "config.h"
+#include "switches.h"
 //***************************************************************************//
 class Profile;
 
@@ -129,6 +130,10 @@ class Profile {
 
   void wait_until_finished() {
     while (m_state != PS_FINISHED) {
+      if (switches.button_pressed()) {
+        stop();
+        return;
+      }
       delay(2);
     }
   }

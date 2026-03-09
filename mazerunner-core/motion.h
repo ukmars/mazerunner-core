@@ -69,6 +69,14 @@ class Motion {
     motors.disable_controllers();
   }
 
+  /// @brief Immediately halt the drive system and disable motor controllers.
+  ///        Called on button press from within blocking wait loops, and by
+  ///        Mouse::panic() before handling operator interaction.
+  void emergency_stop() {
+    reset_drive_system();
+    disable_drive();
+  }
+
   float position() {
     return forward.position();
   }
@@ -150,6 +158,10 @@ class Motion {
   void spin_turn(float angle, float omega, float alpha) {
     forward.set_target_speed(0);
     while (forward.speed() != 0) {
+      if (switches.button_pressed()) {
+        emergency_stop();
+        return;
+      }
       delay(2);
     }
     rotation.reset();
@@ -202,6 +214,10 @@ class Motion {
    */
   void wait_until_position(float position) {
     while (forward.position() < position) {
+      if (switches.button_pressed()) {
+        emergency_stop();
+        return;
+      }
       delay(2);
     }
   }

@@ -718,10 +718,9 @@ class Mouse {
    * before entering the blink loop so the robot cannot move while waiting.
    */
   void panic() {
+    motion.emergency_stop();
     sensors.set_steering_mode(STEERING_OFF);
     sensors.disable();
-    motion.reset_drive_system();
-    motion.disable_drive();
     while (!switches.button_pressed()) {
       blink(1);
     }
