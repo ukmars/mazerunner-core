@@ -156,11 +156,15 @@ class AnalogueConverter {
   }
 
   int get_lit(const int i) const {
-    return m_adc_lit[i];
+    int v;
+    ATOMIC { v = m_adc_lit[i]; }
+    return v;
   }
 
   int get_dark(const int i) const {
-    return m_adc_dark[i];
+    int v;
+    ATOMIC { v = m_adc_dark[i]; }
+    return v;
   }
 
   int get_raw(const int i) const {
