@@ -67,50 +67,6 @@ class Mouse {
 
   //***************************************************************************//
   /**
-   * Used to bring the mouse to a halt, centered in a cell.
-   *
-   * If there is a wall ahead, it will use that for a reference to make sure it
-   * is well positioned.
-   *
-   * On entry the robot is at some position that is an offset from the threshold
-   * of the previous cell. Remember that all offset positions start at zero for the
-   * cell threshold with 90mm (HALF_CELL) being the centre.
-   * The robot is moving forwards. Since this is generally used in the search, the
-   * position is likely to have some value between 170 and 190mm and the offset of
-   * centre of the next cell is (FULL_CELL + HALF_CELL) = 270mm in the classic
-   * contest.
-   *
-   * TODO: the critical values are robot-dependent.
-   *
-   * TODO: need a function just to adjust forward position
-   *
-   * TODO: It would be better to use the distance rather than sensor readigs here
-   */
-  static void stopAndAdjust() {
-    float remaining = (FULL_CELL + HALF_CELL) - motion.position();
-    sensors.set_steering_mode(STEERING_OFF);
-    // Keep moving with the intent of stopping at the cell centre
-    motion.start_move(remaining, motion.velocity(), 0, motion.acceleration());
-    // While waiting, check to see if a front wall becomes visible and break
-    // out early if it does
-    while (not motion.move_finished()) {
-      if (sensors.get_front_sum() > (FRONT_REFERENCE - 150)) {
-        break;
-      }
-      delay(2);
-    }
-    // If the wait finished early because of a wall ahead then use that
-    // wall to creep up on the cell centre
-    if (sensors.see_front_wall) {
-      while (sensors.get_front_sum() < FRONT_REFERENCE) {
-        motion.start_move(10, 50, 0, 1000);
-        delay(2);
-      }
-    }
-  }
-
-  //***************************************************************************//
-  /**
    * These convenience functions will bring the robot to a halt
    * before actually turning.
    *
@@ -184,29 +140,67 @@ class Mouse {
 
   //***************************************************************************//
   /***
-   * bring the mouse to a halt in the center of the current cell. That is,
-   * the cell it is entering.
+   * Bring the mouse to a halt at approximately the centre of the current cell.
    *
-   * On entry, we assume that the mouse knows its position in terms of the
-   * distance from the start of the last cell.
+   * If a front wall is present the robot approaches at low speed and waits for
+   * the front sensor to reach FRONT_REFERENCE. A 500 ms timeout prevents an
+   * infinite wait if the sensor never reaches the threshold.
+   *
+   * Without a front wall the robot coasts to the end of the profiled move; a
+   * 1000 ms backstop timeout guards against a hung profiler.
+   *
+   * Call adjustPosition() afterwards to fine-tune using the front wall when present.
    */
-  void stop_at_center() {
+  void stopAtCentre() {
     bool has_wall = sensors.see_front_wall;
     sensors.set_steering_mode(STEERING_OFF);
     float remaining = (FULL_CELL + HALF_CELL) - motion.position();
-    // finish at very low speed so we can adjust from the wall ahead if present
-    motion.start_move(remaining, motion.velocity(), 30, motion.acceleration());
+    float final_speed = has_wall ? 30 : 0;
+    motion.start_move(remaining, motion.velocity(), final_speed, motion.acceleration());
     if (has_wall) {
+      uint32_t timeout = millis() + 500;
       while (sensors.get_front_sum() < FRONT_REFERENCE) {
+        if (millis() > timeout) {
+          break;
+        }
         delay(2);
       }
     } else {
+      uint32_t timeout = millis() + 1000;
       while (not motion.move_finished()) {
+        if (millis() > timeout) {
+          break;
+        }
         delay(2);
-      };
+      }
     }
-    // Be sure robot has come to a halt.
     motion.reset_drive_system();
+  }
+
+  //***************************************************************************//
+  /***
+   * Fine-tune the robot's position using the front wall as a reference.
+   *
+   * If the robot stopped short of FRONT_REFERENCE it moves forward by a fixed
+   * correction step; if it overshot it moves back. Does nothing if there is no
+   * front wall or the error is within tolerance.
+   *
+   * Must be called after stopAtCentre() when a front wall is present.
+   */
+  void adjustPosition() {
+    if (!sensors.see_front_wall) {
+      return;
+    }
+    const int tolerance = 50;
+    const float correction = 10.0f;
+    const float adj_speed = 100.0f;
+    const float adj_accel = 1000.0f;
+    int error = FRONT_REFERENCE - sensors.get_front_sum();
+    if (error > tolerance) {
+      motion.move(correction, adj_speed, 0, adj_accel);
+    } else if (error < -tolerance) {
+      motion.move(-correction, adj_speed, 0, adj_accel);
+    }
   }
 
   //***************************************************************************//
@@ -247,7 +241,8 @@ class Mouse {
    */
   void turn_back() {
     reporter.log_action_status('B', ' ', m_location, m_heading);
-    stop_at_center();
+    stopAtCentre();
+    adjustPosition();
     turn_IP180();
     float distance = SENSING_POSITION - HALF_CELL;
     motion.move(distance, SEARCH_SPEED, SEARCH_SPEED, SEARCH_ACCELERATION);
@@ -311,7 +306,8 @@ class Mouse {
     }
     // we are entering the target cell so come to an orderly
     // halt in the middle of that cell
-    stop_at_center();
+    stopAtCentre();
+    adjustPosition();
     Serial.println();
     Serial.println(F("Arrived!  "));
     delay(250);
@@ -427,7 +423,7 @@ class Mouse {
       if (newHeading == BLOCKED) {
         Serial.println(F("ERR: no route to target"));
         panic();
-        return;  // panic() has already stopped the robot; skip stop_at_center()
+        return;  // panic() has already stopped the robot; skip stopAtCentre()
       }
       unsigned char hdgChange = (newHeading - m_heading) & 0x3;
       if (m_location != target) {
@@ -452,7 +448,8 @@ class Mouse {
     }
     // we are entering the target cell so come to an orderly
     // halt in the middle of that cell
-    stop_at_center();
+    stopAtCentre();
+    adjustPosition();
     sensors.disable();
     Serial.println();
     Serial.println(F("Arrived!  "));
@@ -547,7 +544,8 @@ class Mouse {
     }
     // we are entering the target cell so come to an orderly
     // halt in the middle of that cell
-    stop_at_center();
+    stopAtCentre();
+    adjustPosition();
     Serial.println();
     Serial.println(F("Arrived!  "));
     delay(250);
