@@ -346,14 +346,14 @@ class CommandLineInterface {
   void handle_search_command(const Args &args) {
     int x = 0;
     int y = 0;
-    if (!read_integer(args.argv[1], x)) {
+    if (args.argc < 2 || !read_integer(args.argv[1], x)) {
       x = 7;
     };
 
-    if (!read_integer(args.argv[2], y)) {
+    if (args.argc < 3 || !read_integer(args.argv[2], y)) {
       y = 7;
     };
-    char buf[20];
+    char buf[28];
     sprintf_P(buf, PSTR("Search to %d,%d\n"), x, y);
     Serial.print(buf);
     // mouse.search_to(Location(x, y));
@@ -400,7 +400,7 @@ class CommandLineInterface {
       case 'F': {
         // simulate the function switches
         int function = -1;
-        int digits = read_integer(args.argv[1], function);
+        int digits = (args.argc >= 2) ? read_integer(args.argv[1], function) : 0;
         if (digits) {
           run_function(function);
         }
