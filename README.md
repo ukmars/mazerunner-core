@@ -64,4 +64,4 @@ Be aware that, if you download a newer copy of the code, and simply unpack it in
 
 ## Contributing
 
-If you have any thoughts about the code, suggestions for changes or improvements, please use the github issues mechanism so that other users can benefit from your observations. Those other users may also be able to offer assistance if the author(s) are not available.
+If you have any thoughts about the code, suggestions for changes or improvements, please use the github issues mechanism so that other users can benefit from your observations. Those other users may also be able to offer assistance if the author(s) are not available. If you want a detailed breakdown of what is going on under the hood, you can find a number of files describing a code review, done by Claude Code, in the [review](./review) folder.
