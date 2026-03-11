@@ -361,13 +361,6 @@ if (switches.button_pressed()) {
 
 On break, each function calls `stop_at_center()` or `reset_drive_system()` to bring the robot to a controlled stop. **This is a graceful abort, not an emergency stop.**
 
-**[HIGH]** The button abort cannot trigger during any blocking wait:
-- `Profile::wait_until_finished()` — spins on `m_state != PS_FINISHED`
-- `Motion::wait_until_position()` — spins on `forward.position() < position`
-- `sensors.wait_for_user_start()` — spins on hand occlusion
-
-If the robot stalls during a move, or if the user wants to abort during a `turn_smooth()`, `spin_turn()`, or `stop_at_center()` call (all of which block internally), the button has no effect. The robot continues driving the stalled motor at maximum clamped voltage until the profiler's distance target is reached (which it never will be), hanging forever.
-
 ### Output saturation — implicit interlock
 
 Motor voltage is clamped at `±MAX_MOTOR_VOLTS = ±6V` (`motors.h:227, 234`) and PWM at `±255` (`motors.h:250, 261`). This prevents the controllers from commanding voltages beyond the hardware limit. The PWM is further battery-compensated: `pwm = MOTOR_MAX_PWM × desired_voltage / battery_voltage`. If battery voltage drops, PWM increases proportionally to maintain the desired voltage — up to the PWM limit. No undervoltage or overcurrent detection.
@@ -384,8 +377,7 @@ Motor voltage is clamped at `±MAX_MOTOR_VOLTS = ±6V` (`motors.h:227, 234`) and
 
 | # | Severity | Issue | Location |
 |---|---|---|---|
-| 1 | **HIGH** | Button abort is ineffective during any blocking motion wait; a stalled robot cannot be stopped by the user until the blocking call returns (which it never will) | `profile.h:130`, `motion.h:203`, `mouse.h` throughout |
-| 2 | **MEDIUM** | `Mouse::State` enum declared but never used — intended mouse-level state machine is absent; no guard against calling run functions in unsafe states | `mouse.h:39` |
+| 1 | **MEDIUM** | `Mouse::State` enum declared but never used — intended mouse-level state machine is absent; no guard against calling run functions in unsafe states | `mouse.h:39` |
 | 3 | **MEDIUM** | No anti-windup clamping on `m_fwd_error` / `m_rot_error` during motor saturation; error accumulates freely during a stall within a motion sequence | `motors.h:104`, `motors.h:126` |
 | 4 | **MEDIUM** | `sensors.g_steering_mode` initialises to `STEER_NORMAL` (not `STEERING_OFF`); startup is safe only because `Mouse::init()` always corrects it before motors are enabled — an implicit ordering dependency | `sensors.h:106`, `mouse.h:54` |
 | 5 | **MEDIUM** | No runtime gain adjustment for any controller; all PD gains and feedforward constants require a recompile to change | `config-robot-orion.h`, `motors.h`, `sensors.h` |

@@ -112,9 +112,9 @@ void wait_until_finished() {
 }
 ```
 
-If a motor stall, encoder failure, or floating-point edge case prevents the profile from reaching `PS_FINISHED`, the robot hangs forever with no recovery path, no LED indication, and no watchdog. The systick ISR continues to run (motors still driven), but all user interaction and sensor decisions stop.
+Button abort via `motion.emergency_stop()` is now checked inside these loops. However, if a motor stall or encoder failure prevents the profile from advancing, a button press is still required to escape — there is no automatic recovery. The systick ISR continues to run (motors still driven) until the user intervenes.
 
-**[MEDIUM]** There is no hardware watchdog configured anywhere in the codebase. A stuck `wait_until_finished()` call would require a manual reset.
+**[MEDIUM]** There is no hardware watchdog configured anywhere in the codebase. Without a watchdog, a wedged loop with no user present requires a manual power cycle.
 
 ### Floating-point in the ISR
 
@@ -216,7 +216,7 @@ On an ATmega4809 (Arduino Nano Every) or any other AVR variant, both macros sile
 |---|---|---|---|
 | 1 | **HIGH** | `Reporter::set_printer()` is non-functional; reference cannot be rebound; output is never redirected | `reporting.h:98-110` |
 | 4 | **MEDIUM** | `AnalogueConverter::do_conversion()` has no runtime guard; concurrent use with interrupt-driven sequencer would corrupt ADC state machine | `adc.h:176-183` |
-| 5 | **MEDIUM** | All motion blocking-waits are infinite loops; no timeout or watchdog means a stalled motor or bad encoder hangs the robot permanently | `profile.h:130`, `motion.h:203` |
+| 5 | **MEDIUM** | No watchdog timer; button abort now present in blocking waits but a wedged loop with no user present still requires manual power cycle | `profile.h:130`, `motion.h:203` |
 | 6 | **LOW** | `OCR2A = 249`, ADC prescaler bits, `ADMUX` shift, switch threshold `800`, profile magic `5.0f`, debounce count `5` are unnamed literals | various |
 | 7 | **LOW** | `BAUDRATE` in robot config and `monitor_speed` in `platformio.ini` must be kept in sync manually | `config-robot-orion.h:192`, `platformio.ini:7` |
 | 8 | **LOW** | `fast_write_pin`/`fast_read_pin` silently fall back to slow `digitalWrite`/`digitalRead` on non-ATmega328P targets with no warning | `config-ukmarsbot.h:91-92` |

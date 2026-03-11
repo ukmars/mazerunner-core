@@ -155,8 +155,6 @@ navigation loop.
 |---|---|---|
 | `sensors.h:291` | `while (choice == NO_START)` | Sensor occlusion never detected — waits forever before every run |
 | `switches.h:81` | `while (not button_pressed())` | Button circuit open — waits forever |
-| `profile.h:131` | `while (m_state != PS_FINISHED)` | Profile never transitions — motors running |
-| `motion.h:204` | `while (forward.position() < position)` | Position never reaches target — motors running |
 | `motion.h:152` | `while (forward.speed() != 0)` | Float equality — likely safe but formally undefined termination |
 | `mouse.h:96-109` | `while (sensors.get_front_sum() < FRONT_REFERENCE)` | Sensor loses front wall — pushes forever |
 | `mouse.h:200-207` | `while (sensors.get_front_sum() < FRONT_REFERENCE)` | Same as above |
@@ -200,20 +198,8 @@ retry loop and it is invisible to the operator.
 There is no error escalation path of any kind. Individual subsystems do not
 signal errors to their callers. Callers do not signal errors upward. There is
 no concept of a system fault level. The only system-level "escalation" is the
-button check at the top of navigation loops:
-
-```cpp
-while (m_location != target) {
-    if (switches.button_pressed()) {
-        break;
-    }
-    ...
-}
-```
-
-This button check is **not** present inside the blocking inner loops
-(`wait_until_position`, `wait_until_finished`, `stop_at_center`, etc.).
-Once execution enters those functions there is no user-accessible abort path.
+button check at the top of navigation loops and inside blocking waits via
+`motion.emergency_stop()`.
 
 ---
 
@@ -282,7 +268,6 @@ alongside it. If the robot crashes and is reset, all run-time state is lost.
 | EH-08 | LOW | `encoders.h:56-57` | `attachInterrupt()` silent failure on wrong pin not detectable at runtime |
 | EH-09 | LOW | `switches.h:73` | `Switches::read()` returns `-1` on invalid ADC range; no call site checks it |
 | EH-10 | LOW | — | No `static_assert` guards on configuration constants; misconfiguration produces no compile-time diagnostic |
-| EH-11 | LOW | `profile.h:131`; `motion.h:204` | No timeout on `wait_until_finished()` / `wait_until_position()` — button abort only works at navigation loop top |
 | EH-12 | LOW | `reporting.h:108-110` | `set_printer()` is a broken no-op; no diagnostic if a caller assumes output was redirected |
 
 ---
