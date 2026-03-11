@@ -100,21 +100,7 @@ Edge-to-edge period: ~208 μs. ISR execution: ~3 μs. No deadline concern.
 **Critical:** Because systick is `ISR_NOBLOCK`, encoder ISRs can preempt systick mid-flight.
 This is correct and intentional — the alternative would be losing counts during the longest ISR.
 
-### Path 4 — Maze Flood (main loop, once per navigation cell)
-
-**Timing requirement:** Not directly safety-critical — motors continue running via ISR during
-the flood. However, the flood blocks button-abort checking and serial input processing.
-
-**Worst-case execution:** `maze.h:417-448` comment: "5.3ms when there are no interrupts."
-In practice, systick preempts the flood every 2 ms. With two systick preemptions of ~800 μs each,
-wall-clock time grows to approximately **5.3 + 2×0.8 ≈ 6.9 ms** per flood call.
-
-`search_to()` calls `maze.flood(target)` **inside** the per-cell navigation loop at `mouse.h:425`.
-At 400 mm/s and 180 mm/cell, the per-cell time budget is ~450 ms. The flood (7 ms) consumes
-~1.5% of that budget. The motion is unaffected, but the main loop cannot check buttons for 7 ms
-per cell, meaning a button press landing during a flood is processed up to 7 ms late.
-
-### Path 5 — Serial TX (main loop, logging during search)
+### Path 4 — Serial TX (main loop, logging during search)
 
 **Timing requirement:** Not safety-critical, but blocking Serial delays button abort.
 
@@ -370,7 +356,6 @@ loops this is inconsequential.
 | ID | Severity | Location | Description |
 |---|---|---|---|
 | TM-01 | HIGH | `systick.h:52-62` | Systick ISR at 35–40% CPU load (700–800 μs / 2000 μs); thin headroom leaves little margin for any additional ISR work or load increase |
-| TM-02 | MEDIUM | `maze.h:417`; `mouse.h:425` | `maze.flood()` (5.3 ms base, ~7 ms with ISR preemption) called every cell during live navigation; blocks button abort for ~7 ms per cell |
 | TM-03 | MEDIUM | `adc.h:197-200`, `224-225` | ADC ISR uses slow `digitalWrite()` (~5 μs) for emitter control instead of `fast_write_pin()` (~60 ns); inconsistent with encoder ISR practice; adds ~20 μs unnecessary latency per cycle |
 | TM-04 | MEDIUM | `mouse.h:395-413` | `Serial.print()` during active navigation adds 1–5 ms of blocking main-loop delay per cell; delays button-abort processing |
 | TM-05 | LOW | `motors.h:222` | `MOTOR_MAX_PWM * v / battery_voltage` performs a float divide (~28 μs) in the systick ISR, twice per tick; could be replaced with cached reciprocal at minimal cost |
