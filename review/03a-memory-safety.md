@@ -186,19 +186,6 @@ Between reading `lfs.raw` and reading `lfs.value` from main context, the systick
 
 The boolean flags `see_left_wall`, `see_front_wall`, `see_right_wall` are single-byte `volatile bool` — these reads **are** individually atomic on AVR and correctly declared.
 
-### [MEDIUM] `adc.get_dark()` / `adc.get_lit()` — no ATOMIC guard on 16-bit read
-
-Already identified in the hardware abstraction review, confirmed here:
-
-```cpp
-// adc.h:162-164
-int get_dark(const int i) const {
-    return m_adc_dark[i];  // volatile int, 16-bit on AVR, no ATOMIC
-}
-```
-
-`m_adc_dark` is `volatile int[8]`. Reading a 16-bit `volatile int` on AVR is not atomic — the ADC ISR can update the high byte between the two 8-bit load instructions. Callers: `Battery::update()` (`battery.h:39`), `Switches::update()` (`switches.h:52`), `Reporter::show_adc()` (`reporting.h:406`). For battery and switch channels (6 and 7), which change slowly, a torn read produces a one-tick error at most. Low observable impact but technically a data race. Compare with `get_raw()` which correctly uses `ATOMIC` (`adc.h:168-171`).
-
 ### [MEDIUM] `volatile float m_cross_track_error` / `m_steering_adjustment` — no ATOMIC on reads
 
 ```cpp
@@ -291,7 +278,6 @@ if ((m_walls[cell.x][cell.y].north & UNKNOWN) != UNKNOWN) {
 | 1 | **MEDIUM** | No stack overflow detection on AVR; no worst-case stack depth analysis performed; 136-byte Queue on stack of a deeply nested call chain in a 2 KB system | `maze.h:430`, `queue.h:82` |
 | 4 | **MEDIUM** | Queue overflow in `Maze::flood()` silently drops BFS frontier cells, producing incorrect cost maps; queue size of 64 is unverified against worst-case maze topology | `queue.h:55-57`, `maze.h:429` |
 | 5 | **MEDIUM** | `volatile SensorChannel` struct fields read non-atomically from main context; ISR can update `raw` and `value` between the two reads | `sensors.h:95-98`, `reporting.h:205-209` |
-| 6 | **MEDIUM** | `adc.get_dark()` / `adc.get_lit()` read 16-bit `volatile int` without ATOMIC — data race with ADC ISR; inconsistent with `get_raw()` which is correctly guarded | `adc.h:162-164` |
 | 7 | **MEDIUM** | `volatile float m_cross_track_error` / `m_steering_adjustment` read in main context without ATOMIC; 4-byte float reads on AVR are non-atomic | `sensors.h:116-120, 323-324` |
 | 8 | **MEDIUM** | `.noinit` Maze: `m_mask` and `m_walls[][]` are uninitialised on cold power-on (in-class initializers do not run for `.noinit` objects); random wall data prevents correct maze operation without button-held clear | `maze.h:524`, `config.h:142`, `mazerunner-core.ino:41` |
 | 9 | **LOW** | `encoders.m_total_left` / `m_total_right` are `int` (16-bit, ±32767) with no overflow protection; noted as intentional for short runs only | `encoders.h:235-236` |

@@ -83,21 +83,6 @@ The systick body calls (in order): `encoders.update()`, `motion.update()`, `sens
 - `Profile::update()` does not use `ATOMIC` internally, but it is only called from systick and its shared state (`m_speed`, `m_position`) is only written by `update()`. Accessors from `loop()` context use `ATOMIC`. Correct.
 - `Motors::update_controllers()` accesses `m_velocity`, `m_omega` which are also written by `motors.set_speeds()` (used nowhere in the current code) via `ATOMIC`. No race in practice.
 
-**`adc.get_dark()` and `adc.get_lit()` — unguarded** (`adc.h:158-164`):
-
-```cpp
-int get_dark(const int i) const {
-    return m_adc_dark[i];   // ← no ATOMIC
-}
-```
-
-`m_adc_dark` is `volatile int[8]`. On AVR, `int` is 16 bits. Reading a 16-bit volatile is **not atomic** — the ADC ISR can update the high byte after the low byte is read, producing a torn value. This affects:
-- `Battery::update()` (`battery.h:39`) — reads channel 7
-- `Switches::update()` (`switches.h:52`) — reads channel 6 (also called from `loop()` to detect button presses)
-- `Reporter::show_adc()` (`reporting.h:406`) — reads channels 6–7
-
-**[MEDIUM]** In practice this is unlikely to cause observable problems (battery voltage and switch state change far slower than 500 Hz), but it is a latent data race. `get_raw()` correctly uses `ATOMIC`; `get_dark()` and `get_lit()` should too.
-
 ### `AnalogueConverter::do_conversion()` — no mutual exclusion guard
 
 `adc.h:176-183`:
@@ -251,7 +236,6 @@ On an ATmega4809 (Arduino Nano Every) or any other AVR variant, both macros sile
 |---|---|---|---|
 | 1 | **HIGH** | `DEGREES_PER_RADIAN` computed as `180*π` (~565) instead of `180/π` (~57.3) due to operator precedence; unused but dangerous if referenced | `config.h:36` |
 | 2 | **HIGH** | `Reporter::set_printer()` is non-functional; reference cannot be rebound; output is never redirected | `reporting.h:98-110` |
-| 3 | **MEDIUM** | `adc.get_dark()` / `adc.get_lit()` have no `ATOMIC` guard; 16-bit reads on AVR are non-atomic — data race with `ADC_vect` | `adc.h:158-164` |
 | 4 | **MEDIUM** | `AnalogueConverter::do_conversion()` has no runtime guard; concurrent use with interrupt-driven sequencer would corrupt ADC state machine | `adc.h:176-183` |
 | 5 | **MEDIUM** | All motion blocking-waits are infinite loops; no timeout or watchdog means a stalled motor or bad encoder hangs the robot permanently | `profile.h:130`, `motion.h:203` |
 | 6 | **LOW** | `OCR2A = 249`, ADC prescaler bits, `ADMUX` shift, switch threshold `800`, profile magic `5.0f`, debounce count `5` are unnamed literals | various |
