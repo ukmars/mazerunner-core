@@ -172,26 +172,6 @@ Baud rate (`BAUDRATE = 115200`) is in the robot config file. The `platformio.ini
 | `delay(40)` | `systick.h:36` | **[LOW]** 40 ms after enabling Timer2 equals 20 systick ticks; comment says "make sure it runs for a few cycles" — the number 40 should be derived from or named relative to `LOOP_INTERVAL` |
 | `if (count > 5)` | `sensors.h:297, 304` | **[LOW]** Debounce count for hand-occlusion detection (5 × 20ms = 100ms). Named constant would clarify intent |
 
-### Incorrect constant definition — operator precedence error
-
-**[HIGH]** `config.h:36`:
-
-```cpp
-const float DEGREES_PER_RADIAN = 360.0 / 2 * PI;
-```
-
-Due to C++ left-to-right associativity of `*` and `/`, this evaluates as:
-
-```
-(360.0 / 2) * PI = 180 * π ≈ 565.49
-```
-
-The correct value is `360.0 / (2 * PI) = 180 / π ≈ 57.296`.
-
-`DEGREES_PER_RADIAN` is **not referenced anywhere** in the codebase (confirmed by search) — the used constant is `RADIANS_PER_DEGREE = 2 * PI / 360.0` which is correct. However, if `DEGREES_PER_RADIAN` is ever used (e.g., when porting or extending the code), it will produce angle values approximately 9.87× too large, causing completely wrong motor outputs.
-
-The paired correct constant (`RADIANS_PER_DEGREE`) is used at `motors.h:193` for the tangent speed calculation.
-
 ### Broken `Reporter::set_printer()` — reference semantics error
 
 **[HIGH]** `reporting.h:98-110`:
@@ -234,8 +214,7 @@ On an ATmega4809 (Arduino Nano Every) or any other AVR variant, both macros sile
 
 | # | Severity | Issue | Location |
 |---|---|---|---|
-| 1 | **HIGH** | `DEGREES_PER_RADIAN` computed as `180*π` (~565) instead of `180/π` (~57.3) due to operator precedence; unused but dangerous if referenced | `config.h:36` |
-| 2 | **HIGH** | `Reporter::set_printer()` is non-functional; reference cannot be rebound; output is never redirected | `reporting.h:98-110` |
+| 1 | **HIGH** | `Reporter::set_printer()` is non-functional; reference cannot be rebound; output is never redirected | `reporting.h:98-110` |
 | 4 | **MEDIUM** | `AnalogueConverter::do_conversion()` has no runtime guard; concurrent use with interrupt-driven sequencer would corrupt ADC state machine | `adc.h:176-183` |
 | 5 | **MEDIUM** | All motion blocking-waits are infinite loops; no timeout or watchdog means a stalled motor or bad encoder hangs the robot permanently | `profile.h:130`, `motion.h:203` |
 | 6 | **LOW** | `OCR2A = 249`, ADC prescaler bits, `ADMUX` shift, switch threshold `800`, profile magic `5.0f`, debounce count `5` are unnamed literals | various |
