@@ -96,20 +96,30 @@ strncpy_P(buffer, (char *)pgm_read_word(&(commands[i])), sizeof(buffer) - 1);
 
 `cli.h:257` uses `strtok(line, " ,=")` which modifies the buffer in-place, replacing delimiters with `'\0'`. The `argv` pointers in `Args` point into `m_buffer`. After `tokenise()`, these pointers remain valid as long as `m_buffer` is not cleared or the function is not re-entered. `clear_input_buffer()` is called after `execute_command()` returns (`cli.h:211`), by which time all `argv` access is complete. **Safe within current usage.**
 
-### Maze array indexing — wrapped, not bounds-checked
+### Maze array indexing — wrapping by deliberate design
 
 All maze array accesses use `m_walls[cell.x][cell.y]` and `m_cost[cell.x][cell.y]` where `cell` is a `Location`. `Location::north()`, `south()`, `east()`, `west()` all use modular arithmetic to wrap coordinates:
 
 ```cpp
-// maze.h:183-184
-Location north() const {
-    return Location(x, (y + 1) % MAZE_HEIGHT);  // wraps 15 → 0
-}
+// maze.h:188-202
+Location north() const { return Location(x, (y + 1) % MAZE_HEIGHT); }
+Location east()  const { return Location((x + 1) % MAZE_WIDTH, y); }
+Location south() const { return Location(x, (y + MAZE_HEIGHT - 1) % MAZE_HEIGHT); }
+Location west()  const { return Location((x + MAZE_WIDTH - 1) % MAZE_WIDTH, y); }
 ```
 
-This ensures array indices are always in `[0, MAZE_WIDTH)` / `[0, MAZE_HEIGHT)` — **no out-of-bounds array access is possible via these accessors**. However, wrapping rather than clamping or erroring means the robot's logical position silently wraps to the opposite edge if it navigates past the boundary. In a correctly walled maze this cannot occur; in a corrupted maze map it could.
+The code comment at `maze.h:181-187` explicitly documents this as intentional:
 
-`Location::is_in_maze()` (`maze.h:169-171`) exists but is never called in the codebase. It is therefore not used as a guard.
+> *"These operators prevent the user from exceeding the bounds of the maze by wrapping to the opposite edge. This is acceptable here because the maze has 256 cells and a uint8_t is used to store the coordinates. If you change the maze size, you will need to change these operators. In any case, a real maze is always bounded by walls so the robot should never be able to go outside the maze and these operators will not cause problems."*
+
+**Why it is safe for a 16×16 maze:** Coordinates are stored as `uint8_t` (0–255). All intermediate values in the direction arithmetic (e.g. `y + MAZE_HEIGHT - 1` = at most 15 + 15 = 30 for `south()`) fit within `uint8_t` without overflow. The modulo then reduces the result back to `[0, 15]`. This ensures array indices are always in `[0, MAZE_WIDTH)` / `[0, MAZE_HEIGHT)` — **no out-of-bounds array access is possible via these accessors**. In a correctly walled maze the boundary can never be reached at all, so wrapping is a safe and sufficient guarantee.
+
+**Review required for a 32×32 maze:** The intermediate arithmetic would produce values up to 31 + 31 = 62, still within `uint8_t`. However:
+- The `Location` coordinate type (`uint8_t`) would need to be confirmed still appropriate for values 0–31.
+- The queue size (`MAZE_CELL_COUNT / 4`, currently 64) would need re-evaluation for a 1024-cell maze — the BFS frontier could be much larger.
+- The comment's rationale ("a real maze is always bounded by walls") still holds, but any code path that constructs a `Location` from raw integer arithmetic (rather than through the direction accessors) should be audited to confirm it cannot produce values ≥ 32.
+
+`Location::is_in_maze()` (`maze.h:169-171`) exists but is never called in the codebase. It is not used as a runtime guard, but could serve as an assertion during maze-size migration.
 
 ### Queue overflow — silent data loss — `queue.h:55-57`
 

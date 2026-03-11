@@ -180,6 +180,11 @@ class Location {
 
   // these operators prevent the user from exceeding the bounds of the maze
   // by wrapping to the opposite edge
+  // This is acceptable here because the maze has 256 cells and a uint8_t is
+  // used to store the coordinates. If you change the maze size, you will need
+  // to change these operators.
+  // in any case, a real maze is always bounded by walls so the robot should
+  // never be able to go outside the maze and these operators will not cause problems.
   Location north() const {
     return Location(x, (y + 1) % MAZE_HEIGHT);
   }
