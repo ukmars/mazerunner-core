@@ -279,7 +279,6 @@ alongside it. If the robot crashes and is reset, all run-time state is lost.
 | EH-04 | MEDIUM | `mouse.h:96-109`, `200-207` | Front-wall approach loops have no timeout and no button escape; push against wall until power cut |
 | EH-05 | MEDIUM | `maze.h:432` | `queue.add()` overflow silently discards BFS frontier cells; incorrect flood result, wrong navigation |
 | EH-06 | MEDIUM | `mouse.h:708-714` | `panic()` is defined but never called; no code path leads to it |
-| EH-07 | MEDIUM | `cli.h:349,353` | `args.argv[1]`/`[2]` dereferenced without `argc` check (also noted in memory safety review) — no error message, UB |
 | EH-08 | LOW | `encoders.h:56-57` | `attachInterrupt()` silent failure on wrong pin not detectable at runtime |
 | EH-09 | LOW | `switches.h:73` | `Switches::read()` returns `-1` on invalid ADC range; no call site checks it |
 | EH-10 | LOW | — | No `static_assert` guards on configuration constants; misconfiguration produces no compile-time diagnostic |

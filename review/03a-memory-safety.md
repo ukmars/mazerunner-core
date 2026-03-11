@@ -70,32 +70,6 @@ The systick ISR body (`Systick::update()`, `systick.h:64-76`) calls `encoders.up
 
 ## Buffer Handling
 
-### [HIGH] `args.argv[N]` dereferenced without checking `args.argc`
-
-**Location 1**: `cli.h:349, 353` — `handle_search_command()`:
-```cpp
-void handle_search_command(const Args &args) {
-    int x = 0;
-    int y = 0;
-    if (!read_integer(args.argv[1], x)) { ... }  // args.argc may be 1
-    if (!read_integer(args.argv[2], y)) { ... }  // args.argc may be 1 or 2
-```
-
-**Location 2**: `cli.h:403` — `run_short_cmd()`, case `'F'`:
-```cpp
-case 'F': {
-    int function = -1;
-    int digits = read_integer(args.argv[1], function);  // args.argc may be 1
-```
-
-`Args` is stack-allocated without explicit initialization (`cli.h:207`). The `argv` array contains 16 `char*` pointers; only those filled by `tokenise()` are valid. If `args.argc == 1`, then `args.argv[1]` through `args.argv[15]` contain whatever uninitialized values were on the stack. Reading them as `char*` pointers and then dereferencing via `read_integer()` or `read_float()` is **undefined behaviour** — it reads from an uninitialized pointer.
-
-On AVR with a flat 16-bit address space, the garbage pointer value will typically point somewhere in SRAM (e.g., to another local variable, to a global, or to a hardware register). `read_integer` scans the pointed-to memory byte-by-byte for ASCII digits (`'0'`–`'9'`, values 0x30–0x39). Most garbage memory content will not match, so the function returns 0 and the caller uses the default value. The program does not usually crash. However:
-- Reading from hardware I/O register space (addresses 0x0000–0x001F on ATmega328P map to CPU registers, 0x0020–0x00FF map to I/O) can have side effects.
-- On a different platform (if the code is ever ported) this would be a clean crash or security hole.
-
-**Fix**: guard with `if (args.argc > 1)` before accessing `args.argv[1]`, etc.
-
 ### [LOW] `buf[60]` size in `handle_calibrate_encoders_command()` — `cli.h:428-429`
 
 ```cpp
@@ -314,8 +288,7 @@ if ((m_walls[cell.x][cell.y].north & UNKNOWN) != UNKNOWN) {
 
 | # | Severity | Issue | Location |
 |---|---|---|---|
-| 1 | **HIGH** | `args.argv[1]` and `args.argv[2]` accessed without checking `args.argc` — dereferencing uninitialized pointer is UB | `cli.h:349, 353, 403` |
-| 3 | **MEDIUM** | No stack overflow detection on AVR; no worst-case stack depth analysis performed; 136-byte Queue on stack of a deeply nested call chain in a 2 KB system | `maze.h:430`, `queue.h:82` |
+| 1 | **MEDIUM** | No stack overflow detection on AVR; no worst-case stack depth analysis performed; 136-byte Queue on stack of a deeply nested call chain in a 2 KB system | `maze.h:430`, `queue.h:82` |
 | 4 | **MEDIUM** | Queue overflow in `Maze::flood()` silently drops BFS frontier cells, producing incorrect cost maps; queue size of 64 is unverified against worst-case maze topology | `queue.h:55-57`, `maze.h:429` |
 | 5 | **MEDIUM** | `volatile SensorChannel` struct fields read non-atomically from main context; ISR can update `raw` and `value` between the two reads | `sensors.h:95-98`, `reporting.h:205-209` |
 | 6 | **MEDIUM** | `adc.get_dark()` / `adc.get_lit()` read 16-bit `volatile int` without ATOMIC — data race with ADC ISR; inconsistent with `get_raw()` which is correctly guarded | `adc.h:162-164` |
