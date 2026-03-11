@@ -70,19 +70,6 @@ The systick ISR body (`Systick::update()`, `systick.h:64-76`) calls `encoders.up
 
 ## Buffer Handling
 
-### [HIGH] `sprintf_P` buffer too small — `cli.h:356-357`
-
-```cpp
-char buf[20];
-sprintf_P(buf, PSTR("Search to %d,%d\n"), x, y);
-```
-
-`x` and `y` are `int` (16-bit on AVR), maximum magnitude 32767 (5 digits). The format string body `"Search to "` is 10 characters. Maximum output: `"Search to 32767,32767\n"` = 10 + 5 + 1 + 5 + 1 = 22 characters + NUL terminator = **23 bytes**. The buffer is only **20 bytes**. Overflow by 3 bytes guaranteed if the user provides large integer arguments.
-
-In practice, `x` and `y` are maze coordinates expected in the range 0–15 (1–2 digits), so the overflow does not trigger during normal use. However, `read_integer` in `handle_search_command()` (`cli.h:349-355`) imposes no range limit — it will accept values up to INT16_MAX. A user typing `SEARCH 32767 32767` would overflow `buf`, writing past the end of the stack frame. On AVR, this overwrites adjacent stack data (saved registers, return address).
-
-**Fix**: use `snprintf` with a size argument, or enlarge `buf` to at least 24 bytes.
-
 ### [HIGH] `args.argv[N]` dereferenced without checking `args.argc`
 
 **Location 1**: `cli.h:349, 353` — `handle_search_command()`:
@@ -327,8 +314,7 @@ if ((m_walls[cell.x][cell.y].north & UNKNOWN) != UNKNOWN) {
 
 | # | Severity | Issue | Location |
 |---|---|---|---|
-| 1 | **HIGH** | `buf[20]` too small for `sprintf_P("Search to %d,%d\n", x, y)` — max output 23 bytes, stack overflow possible | `cli.h:356-357` |
-| 2 | **HIGH** | `args.argv[1]` and `args.argv[2]` accessed without checking `args.argc` — dereferencing uninitialized pointer is UB | `cli.h:349, 353, 403` |
+| 1 | **HIGH** | `args.argv[1]` and `args.argv[2]` accessed without checking `args.argc` — dereferencing uninitialized pointer is UB | `cli.h:349, 353, 403` |
 | 3 | **MEDIUM** | No stack overflow detection on AVR; no worst-case stack depth analysis performed; 136-byte Queue on stack of a deeply nested call chain in a 2 KB system | `maze.h:430`, `queue.h:82` |
 | 4 | **MEDIUM** | Queue overflow in `Maze::flood()` silently drops BFS frontier cells, producing incorrect cost maps; queue size of 64 is unverified against worst-case maze topology | `queue.h:55-57`, `maze.h:429` |
 | 5 | **MEDIUM** | `volatile SensorChannel` struct fields read non-atomically from main context; ISR can update `raw` and `value` between the two reads | `sensors.h:95-98`, `reporting.h:205-209` |
