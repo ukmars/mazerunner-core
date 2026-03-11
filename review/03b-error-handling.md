@@ -174,24 +174,6 @@ void show_adc() {
 `sensors.disable()` after the `while (true)` is dead code; the emitters are
 never turned off if `show_adc()` is called. A power cycle is required to exit.
 
-### BLOCKED heading — silent misdirection
-
-**HIGH** `Maze::heading_to_smallest()` returns `BLOCKED` (value 99) when no
-exit is found — for example when the maze is improperly flooded or the robot
-is truly walled in. The caller in `search_to()` (`mouse.h:426-427`) does:
-
-```cpp
-unsigned char newHeading = maze.heading_to_smallest(m_location, m_heading);
-unsigned char hdgChange = (newHeading - m_heading) & 0x3;
-```
-
-When `newHeading` is `BLOCKED` (99), the subtraction wraps modulo 4. For a
-robot heading NORTH (0): `(99 - 0) & 0x3 == 3 == LEFT`. The robot executes a
-left turn instead of stopping or reporting an error. It will then make another
-left turn, and another, spinning indefinitely in a 4-cell square while emitting
-no diagnostic output. This is the closest the project comes to an unbounded
-retry loop and it is invisible to the operator.
-
 ### Error escalation
 
 There is no error escalation path of any kind. Individual subsystems do not
@@ -258,7 +240,6 @@ alongside it. If the robot crashes and is reset, all run-time state is lost.
 
 | ID | Severity | Location | Description |
 |---|---|---|---|
-| EH-01 | HIGH | `mouse.h:426-427` | `BLOCKED` heading (99) aliased to `LEFT` turn; walled-in robot spins silently forever |
 | EH-02 | HIGH | — | No watchdog timer; hanging blocking loops leave motors running with no automatic recovery |
 | EH-03 | MEDIUM | `reporting.h:399` | `while(true)` in `show_adc()` — requires power cycle to exit; `sensors.disable()` unreachable |
 | EH-05 | MEDIUM | `maze.h:432` | `queue.add()` overflow silently discards BFS frontier cells; incorrect flood result, wrong navigation |
