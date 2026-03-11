@@ -132,7 +132,8 @@ function number. There is no mechanism that calls it in response to an
 observed fault.
 
 `Mouse::panic()` (`mouse.h:708-714`) flashes LEDs and waits for a button press.
-It is never called from any code path; it is dead code.
+It is now wired into the BLOCKED-heading error paths and called whenever the
+navigation reaches an unresolvable state.
 
 ### Assert usage
 
@@ -261,7 +262,6 @@ alongside it. If the robot crashes and is reset, all run-time state is lost.
 | EH-02 | HIGH | — | No watchdog timer; hanging blocking loops leave motors running with no automatic recovery |
 | EH-03 | MEDIUM | `reporting.h:399` | `while(true)` in `show_adc()` — requires power cycle to exit; `sensors.disable()` unreachable |
 | EH-05 | MEDIUM | `maze.h:432` | `queue.add()` overflow silently discards BFS frontier cells; incorrect flood result, wrong navigation |
-| EH-06 | MEDIUM | `mouse.h:708-714` | `panic()` is defined but never called; no code path leads to it |
 | EH-08 | LOW | `encoders.h:56-57` | `attachInterrupt()` silent failure on wrong pin not detectable at runtime |
 | EH-09 | LOW | `switches.h:73` | `Switches::read()` returns `-1` on invalid ADC range; no call site checks it |
 | EH-10 | LOW | — | No `static_assert` guards on configuration constants; misconfiguration produces no compile-time diagnostic |
@@ -277,9 +277,9 @@ SRAM cannot host a rich logging or fault management subsystem. The primary
 safety mechanism is the physical button abort, which works well for most
 routine scenarios.
 
-The highest-risk gap is the combination of **no watchdog** and **unescapable
-inner loops**: a robot running into an unexpected sensor condition (EH-04) or a
-corrupted maze state (EH-01) can become physically stuck with motors powered
-and no automatic path to recovery. On a 700g robot with rubber wheels this is
-unlikely to cause damage, but adding a watchdog with a period of ~500 ms would
-provide a last-resort reset at minimal code cost (~10 bytes).
+The highest-risk gap is the combination of **no watchdog** and **remaining
+unescapable loops** (sensors.h:291, switches.h:81, reporting.h:399): a robot
+waiting for a hand-start signal or stuck in `show_adc()` has no automatic path
+to recovery. On a 700g robot with rubber wheels this is unlikely to cause
+damage, but adding a watchdog with a period of ~500 ms would provide a
+last-resort reset at minimal code cost (~10 bytes).
