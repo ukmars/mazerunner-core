@@ -156,8 +156,6 @@ navigation loop.
 | `sensors.h:291` | `while (choice == NO_START)` | Sensor occlusion never detected — waits forever before every run |
 | `switches.h:81` | `while (not button_pressed())` | Button circuit open — waits forever |
 | `motion.h:152` | `while (forward.speed() != 0)` | Float equality — likely safe but formally undefined termination |
-| `mouse.h:96-109` | `while (sensors.get_front_sum() < FRONT_REFERENCE)` | Sensor loses front wall — pushes forever |
-| `mouse.h:200-207` | `while (sensors.get_front_sum() < FRONT_REFERENCE)` | Same as above |
 | `reporting.h:399` | `while (true)` | Unconditional infinite loop in `show_adc()` |
 
 The `show_adc()` function (`reporting.h:399-413`) is particularly notable:
@@ -262,7 +260,6 @@ alongside it. If the robot crashes and is reset, all run-time state is lost.
 | EH-01 | HIGH | `mouse.h:426-427` | `BLOCKED` heading (99) aliased to `LEFT` turn; walled-in robot spins silently forever |
 | EH-02 | HIGH | — | No watchdog timer; hanging blocking loops leave motors running with no automatic recovery |
 | EH-03 | MEDIUM | `reporting.h:399` | `while(true)` in `show_adc()` — requires power cycle to exit; `sensors.disable()` unreachable |
-| EH-04 | MEDIUM | `mouse.h:96-109`, `200-207` | Front-wall approach loops have no timeout and no button escape; push against wall until power cut |
 | EH-05 | MEDIUM | `maze.h:432` | `queue.add()` overflow silently discards BFS frontier cells; incorrect flood result, wrong navigation |
 | EH-06 | MEDIUM | `mouse.h:708-714` | `panic()` is defined but never called; no code path leads to it |
 | EH-08 | LOW | `encoders.h:56-57` | `attachInterrupt()` silent failure on wrong pin not detectable at runtime |
