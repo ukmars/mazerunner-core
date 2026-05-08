@@ -189,15 +189,11 @@ button check at the top of navigation loops and inside blocking waits via
 ### Logging system
 
 There is no dedicated logging subsystem. All diagnostic output goes directly
-to `Serial` via `Serial.println()` / `printer.print()` call sites scattered
+to `Serial` via `Serial.println()` call sites scattered
 through `mouse.h`, `cli.h`, and `reporting.h`. The `Reporter` class provides
 formatted reports but not a log with severity levels, timestamps, or routing
 control.
 
-The `set_printer()` method in `reporter.h:108-110` was intended to allow
-routing to a different `Stream` (e.g., a Bluetooth serial port), but as noted
-in the memory safety review it is broken: the `static Stream& printer`
-reference cannot be rebound, so all output always goes to `Serial`.
 
 ### Timing impact
 
@@ -246,7 +242,6 @@ alongside it. If the robot crashes and is reset, all run-time state is lost.
 | EH-08 | LOW | `encoders.h:56-57` | `attachInterrupt()` silent failure on wrong pin not detectable at runtime |
 | EH-09 | LOW | `switches.h:73` | `Switches::read()` returns `-1` on invalid ADC range; no call site checks it |
 | EH-10 | LOW | — | No `static_assert` guards on configuration constants; misconfiguration produces no compile-time diagnostic |
-| EH-12 | LOW | `reporting.h:108-110` | `set_printer()` is a broken no-op; no diagnostic if a caller assumes output was redirected |
 
 ---
 

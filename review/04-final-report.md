@@ -156,7 +156,6 @@ All issues from all prior review phases, deduplicated and sorted by severity.
 | FR-08 | Control | `Profile::update()` continues executing in `PS_FINISHED` state (speed tracking towards target still runs); state name implies no further work | **MEDIUM** | `profile.h:201-243` | Add `if (m_state == PS_FINISHED) return;` or guard the speed-tracking block |
 | FR-09 | Control | `g_steering_mode` initialises to `STEER_NORMAL` in the class declaration, not `STEERING_OFF`; steering runs with uninitialised sensor data before `Mouse::init()` is called | **MEDIUM** | `sensors.h:106` | Change default to `STEERING_OFF`; steering must be explicitly enabled |
 | FR-10 | Safety | Button abort checked only at top of `while (m_location != target)` navigation loop; no abort inside `wait_until_finished()`, `wait_until_position()`, or front-wall approach loops | **MEDIUM** | `mouse.h:417, 279, 519`; `profile.h:131`; `motion.h:204` | Pass a button-check predicate into blocking waits, or add a `volatile bool g_abort` checked inside inner loops |
-| FR-11 | Logging | `Reporter::set_printer()` is a broken no-op; `static Stream& printer = Serial` cannot be rebound by reference assignment; all output always goes to `Serial` | **MEDIUM** | `reporting.h:98, 108-110` | Change `printer` to a `Stream*` pointer; `set_printer(Stream& s)` stores `printer = &s` |
 | FR-12 | Safety | Battery voltage reads as 0.0 on first systick tick (ADC not yet sampled); if `enable_controllers()` is called before ADC has run, `pwm_compensated()` divides by zero | **MEDIUM** | `motors.h:222`; `battery.h:38-41` | Clamp denominator: `max(1.0f, battery_voltage)` inside `pwm_compensated()` |
 | FR-13 | Memory | `volatile SensorChannel lfs/rss/lss/rfs` struct fields read field-by-field from main context without ATOMIC; 16-bit `raw` and `value` may tear | **MEDIUM** | `sensors.h:95-98`; callers in `reporting.h`, `mouse.h:885-891` | Take a local snapshot under `ATOMIC` before using both fields of the same channel |
 | FR-14 | Safety | `show_adc()` contains `while(true)` with no exit path; `sensors.disable()` after the loop is unreachable; emitters stay on until power cycle | **MEDIUM** | `reporting.h:399-413` | Add button-press escape: `while (!switches.button_pressed())`; move `sensors.disable()` inside loop exit |
@@ -201,11 +200,6 @@ All issues from all prior review phases, deduplicated and sorted by severity.
 4. **`Mouse::State` enum.** `FRESH_START`, `SEARCHING`, `INPLACE_RUN`, `SMOOTH_RUN`,
    `FINISHED` are declared but the state machine they imply is not implemented. Is this
    planned, partially implemented elsewhere, or abandoned?
-
-5. **`set_printer()`.** The class comment in `reporting.h:36-58` describes redirecting reporter
-   output to a Bluetooth module or logger as a practical workflow. Given that this has never
-   worked (reference assignment is a no-op), has the BT output feature actually been used?
-   If so, how?
 
 6. **ADC clock speed.** The prescaler change (128 → 32) brings the ADC to 500 kHz. The
    ATmega328P datasheet specifies ≤200 kHz for guaranteed 10-bit accuracy. At 500 kHz the

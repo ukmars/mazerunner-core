@@ -156,7 +156,7 @@ Turn parameters (`TurnParameters turn_params[4]`) are looked up by turn ID at ru
 
 ### 4.13 Telemetry / Reporting — `reporting.h`
 **Class**: `Reporter`
-**Purpose**: Formatted serial output for debugging and calibration. Reports include: profile telemetry (position, speed, motor volts vs. time), sensor tracks (normalised and raw), radial spin data, maze wall display (plain / costs / directions), and per-cell action logging during search. Output target is configurable via `set_printer(Stream&)`; defaults to `Serial`.
+**Purpose**: Formatted serial output for debugging and calibration. Reports include: profile telemetry (position, speed, motor volts vs. time), sensor tracks (normalised and raw), radial spin data, maze wall display (plain / costs / directions), and per-cell action logging during search.
 
 ---
 

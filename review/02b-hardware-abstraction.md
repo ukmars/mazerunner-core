@@ -172,21 +172,6 @@ Baud rate (`BAUDRATE = 115200`) is in the robot config file. The `platformio.ini
 | `delay(40)` | `systick.h:36` | **[LOW]** 40 ms after enabling Timer2 equals 20 systick ticks; comment says "make sure it runs for a few cycles" — the number 40 should be derived from or named relative to `LOOP_INTERVAL` |
 | `if (count > 5)` | `sensors.h:297, 304` | **[LOW]** Debounce count for hand-occlusion detection (5 × 20ms = 100ms). Named constant would clarify intent |
 
-### Broken `Reporter::set_printer()` — reference semantics error
-
-**[HIGH]** `reporting.h:98-110`:
-
-```cpp
-static Stream& printer = Serial;   // reference bound to Serial — permanent
-
-void set_printer(Stream& stream) {
-    printer = stream;              // copies stream INTO Serial, does not redirect
-}
-```
-
-In C++, references cannot be rebound after initialization. `printer = stream` invokes `Stream::operator=()` (compiler-generated), which attempts to copy the internal state of `stream` over the already-bound `Serial` object. This does **not** redirect output — it corrupts or no-ops the assignment. The design intent (allow output to be redirected to a Bluetooth module or logger) is completely non-functional.
-
-`set_printer` is called only once in the codebase (`mazerunner-core.ino:87`) with `Serial` itself as the argument, so in practice the self-assignment `Serial = Serial` is a harmless no-op. But the feature is broken. The fix is to use `static Stream* printer = &Serial;` and dereference it as `printer->print(...)`.
 
 ### Implicit Timer2 / `tone()` conflict
 
@@ -214,7 +199,6 @@ On an ATmega4809 (Arduino Nano Every) or any other AVR variant, both macros sile
 
 | # | Severity | Issue | Location |
 |---|---|---|---|
-| 1 | **HIGH** | `Reporter::set_printer()` is non-functional; reference cannot be rebound; output is never redirected | `reporting.h:98-110` |
 | 4 | **MEDIUM** | `AnalogueConverter::do_conversion()` has no runtime guard; concurrent use with interrupt-driven sequencer would corrupt ADC state machine | `adc.h:176-183` |
 | 5 | **MEDIUM** | No watchdog timer; button abort now present in blocking waits but a wedged loop with no user present still requires manual power cycle | `profile.h:130`, `motion.h:203` |
 | 6 | **LOW** | `OCR2A = 249`, ADC prescaler bits, `ADMUX` shift, switch threshold `800`, profile magic `5.0f`, debounce count `5` are unnamed literals | various |
