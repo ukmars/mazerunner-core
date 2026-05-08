@@ -387,6 +387,12 @@ class Mouse {
 
   void search_to(Location target) {
     maze.flood(target);
+    if (maze.flood_queue_overflow()) {
+      reporter.log_action_status('*', ' ', m_location, m_heading);
+      panic();
+      return;  // panic() has already stopped the robot; skip the rest of this function
+    }
+
     delay(200);
     sensors.enable();
     motion.reset_drive_system();
@@ -419,6 +425,11 @@ class Mouse {
       m_location = m_location.neighbour(m_heading);  // the cell we are about to enter
       update_map();
       maze.flood(target);
+      if (maze.flood_queue_overflow()) {
+        reporter.log_action_status('*', ' ', m_location, m_heading);
+        panic();
+        return;  // panic() has already stopped the robot; skip the rest of this function
+      }
       unsigned char newHeading = maze.heading_to_smallest(m_location, m_heading);
       if (newHeading == BLOCKED) {
         Serial.println(F("ERR: no route to target"));
@@ -674,6 +685,11 @@ class Mouse {
     m_heading = NORTH;
     search_to(maze.goal());
     maze.flood(START);
+    if (maze.flood_queue_overflow()) {
+      reporter.log_action_status('*', ' ', m_location, m_heading);
+      panic();
+      return 0;
+    }
 
     Heading best_direction = maze.heading_to_smallest(m_location, m_heading);
     if (best_direction == BLOCKED) {

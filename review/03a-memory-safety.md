@@ -286,7 +286,6 @@ if ((m_walls[cell.x][cell.y].north & UNKNOWN) != UNKNOWN) {
 | # | Severity | Issue | Location |
 |---|---|---|---|
 | 1 | **MEDIUM** | No stack overflow detection on AVR; no worst-case stack depth analysis performed; 136-byte Queue on stack of a deeply nested call chain in a 2 KB system | `maze.h:430`, `queue.h:82` |
-| 4 | **MEDIUM** | Queue overflow in `Maze::flood()` silently drops BFS frontier cells, producing incorrect cost maps; queue size of 64 is unverified against worst-case maze topology | `queue.h:55-57`, `maze.h:429` |
 | 5 | **MEDIUM** | `volatile SensorChannel` struct fields read non-atomically from main context; ISR can update `raw` and `value` between the two reads | `sensors.h:95-98`, `reporting.h:205-209` |
 | 7 | **MEDIUM** | `volatile float m_cross_track_error` / `m_steering_adjustment` read in main context without ATOMIC; 4-byte float reads on AVR are non-atomic | `sensors.h:116-120, 323-324` |
 | 8 | **MEDIUM** | `.noinit` Maze: `m_mask` and `m_walls[][]` are uninitialised on cold power-on (in-class initializers do not run for `.noinit` objects); random wall data prevents correct maze operation without button-held clear | `maze.h:524`, `config.h:142`, `mazerunner-core.ino:41` |

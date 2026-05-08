@@ -382,6 +382,9 @@ class Maze {
     // the open maze treats unknowns as exits
     set_mask(MASK_OPEN);
     flood(goal());
+    if (flood_queue_overflow()) {
+      Serial.println(F("WARNING: flood queue overflow - maze may be incomplete"));
+    }
   }
 
   void set_mask(const MazeMask mask) {
@@ -430,8 +433,11 @@ class Maze {
      * cells. These are the cells that are waiting to be checked for
      * neighbours. I believe the maximum size that this queue can
      * possibly be for a classic maze is 64 (MAZE_CELL_COUNT/4) cells.
-     * HOWEVER, this is unproven
+     * In the unlikely event the queue exceeds this size, An error will
+     * be recorded and the flood will be incomplete. The robot will halt
+     * and flash the LEDs in panic mode.
      */
+    m_flood_queue_overflow = false;
     Queue<Location, MAZE_CELL_COUNT / 4> queue;
     m_cost[target.x][target.y] = 0;
     queue.add(target);
@@ -445,7 +451,14 @@ class Maze {
           Location nextCell = here.neighbour(heading);
           if (m_cost[nextCell.x][nextCell.y] > newCost) {
             m_cost[nextCell.x][nextCell.y] = newCost;
-            queue.add(nextCell);
+            if (!queue.add(nextCell)) {
+              // the frontier is larger than we have space for.
+              // this neighbour was not added and so will not be flooded.
+              // It should still be added later when rediscovered from another
+              // direction but meanwhile, we record the fact that the flood is
+              // incomplete and hope for the best.
+              m_flood_queue_overflow = true;
+            };
           }
         }
       }
@@ -499,6 +512,10 @@ class Maze {
     return best_heading;
   }
 
+  bool flood_queue_overflow() const {
+    return m_flood_queue_overflow;
+  }
+
  private:
   // Unconditionally set a wall state.
   // use update_wall_state() when exploring
@@ -531,6 +548,7 @@ class Maze {
   // on Arduino only use 8 bits for cost to save space
   uint8_t m_cost[MAZE_WIDTH][MAZE_HEIGHT];
   WallInfo m_walls[MAZE_WIDTH][MAZE_HEIGHT];
+  bool m_flood_queue_overflow = false;
 };
 
 extern Maze maze;

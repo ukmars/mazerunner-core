@@ -51,10 +51,10 @@ class Queue {
     mItemCount = 0;
   }
 
-  void add(item_t item) {
+  bool add(item_t item) {
     if (mItemCount >= num_items) {
       // Optionally: handle overflow (e.g., ignore, overwrite, assert)
-      return;  // but drop the item for now
+      return false;  // but drop the item for now
     }
     mData[mTail] = item;
     ++mTail;
@@ -62,6 +62,7 @@ class Queue {
     if (mTail >= num_items + 1) {
       mTail = 0;
     }
+    return true;
   }
 
   item_t head() {

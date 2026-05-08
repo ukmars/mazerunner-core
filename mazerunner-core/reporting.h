@@ -455,6 +455,9 @@ class Reporter {
   void print_maze(int style = PLAIN) {
     const char dirChars[] = "^>v<* ";
     maze.flood(maze.goal());
+    if (maze.flood_queue_overflow()) {
+      Serial.println(F("WARNING: flood queue overflow - maze may be incomplete"));
+    }
 
     for (int y = MAZE_HEIGHT - 1; y >= 0; y--) {
       printNorthWalls(y);
